@@ -1,0 +1,78 @@
+Construis une scène temps réel de Hapikara, une cité égyptienne imaginaire entre le Nil et le désert, qui tourne dans le navigateur et qu'on survole librement en caméra libre. Le rendu est du PHOTORÉALISME FANTASTIQUE : une cité fantastique rendue comme dans un jeu AAA actuel, jamais stylisée, cartoon ou plate. Éviter ce rendu plat et cartoon est l'objectif principal.
+
+ENTRÉES (tout lire avant d'écrire du code)
+- artstyle.md : la bible visuelle. C'est la seule autorité sur l'aspect de la scène.
+- concept-art/ : huit images de référence de cette cité dans le style visé (premier niveau seulement ; ignorer rejected/ et source/). Les regarder toutes. La section 3 d'artstyle.md dit quoi reprendre et quoi dépasser.
+- reference/atlantis/ : un projet existant sous licence MIT (Atlantis, de Maksymilian Dendura) avec les mêmes contraintes, dont le résultat est excellent. C'est la BASE TECHNIQUE de ce projet : génération du monde au chargement, instanciation massive, culling et LOD sur GPU, ciel et IBL précalculés, ombres en cascade, AO, eau réfléchissante avec caustiques, réfraction du cristal, TAA, bloom, tone mapping AgX, trois niveaux de détail (Low/Medium/High) avec repli automatique, contrôles tactiles, collisions, musique Web Audio, modules source/ lisibles, script de build qui produit un index.html minifié et compressé, dev.html avec survol scripté et benchmark, points de vue 1–6.
+  Copie son dossier source/ dans le projet et garde tout ce qui est moteur (main.js, quality.js, math.js, collide.js, dev.js, build.mjs, template.html, sh_base.js, sh_light.js, la structure de sh_scene.js et sh_fx.js). Remplace tout ce qui est MONDE : layout.js, city.js, plants.js, meshes.js, world.js, et adapte les matériaux, l'eau, le ciel et la musique à artstyle.md. Il ne doit rester aucun élément visuel d'Atlantis (anneaux, cristal, lotus, tours, coupoles, liquide indigo, cyprès, villas méditerranéennes, montagnes calcaires, engins volants). Conserve le fichier LICENSE d'origine et cite le projet dans le README.
+
+PRIORITÉS (dans cet ordre en cas de conflit)
+1. Qualité visuelle : réalisme et fidélité à artstyle.md et aux références
+2. Fluidité stable sur les cibles
+3. Petite taille du fichier
+
+CONTRAINTES
+- WebGPU. Pas de Three.js, Babylon.js ni autre moteur.
+- Tout est procédural : aucun fichier de texture, de modèle, d'image ou de son. Le livrable est un seul index.html autonome. Indiquer sa taille minifiée.
+- Zéro allocation JS par image (pas d'à-coups du ramasse-miettes). Préallouer tous les buffers, bind groups et tableaux d'uniformes.
+- Garder le code prêt pour une future version VR (WebXR), sans l'implémenter maintenant : la caméra et les passes de rendu doivent pouvoir être appelées une fois par œil plus tard.
+
+CIBLES
+- Développement : MacBook Air Apple M1, 8 Go de RAM, Chrome à jour, écran 2560×1600. Sur cette machine : niveau Medium à 1440×900 au moins 60 i/s en moyenne pendant le survol de 60 s, aucune image au-delà de 33 ms. La mémoire est limitée : une seule instance du navigateur de test à la fois, la fermer après usage.
+- Smartphone : niveau Low jouable (au moins 25 i/s).
+- Le niveau High reste conçu pour une carte graphique de bureau récente.
+
+CONTRÔLES
+Ceux d'Atlantis, inchangés : ZQSD/WASD, souris (pointer lock), Q/E bas/haut, Shift pour accélérer, molette pour la vitesse, 1–6 pour les points de vue, H pour les stats, M pour la musique, C pour les collisions, Échap pour le menu, contrôles tactiles. Dev seulement : F joue le survol, B le lance en benchmark.
+
+CONVENTIONS DU MONDE
+- Mètres, +Y vers le haut, centre de la pyramide à l'origine, +X = est (le Nil), −X = ouest (désert), +Z = sud, −Z = nord. Niveau du Nil y = 0, quais y = 4, la cité monte en pente douce jusqu'à y = 30 au pied de la pyramide, sommet du pyramidion y ≈ 140.
+- Soleil fixe : environ 35° d'élévation venant du sud-est. Direction vers le soleil ≈ (0.58, 0.57, 0.58).
+- Graine fixe : chaque lancement produit le même monde.
+
+PLANS DE REVUE (section 13 d'artstyle.md). Points de départ : régler chacun une fois pour que son cadrage et le côté du soleil ressemblent à sa référence, puis le figer.
+| # | Position | Regarde vers |
+| P1 vue aérienne | (900, 350, 450) | (0, 40, 0) |
+| P2 approche par l'axe | (380, 45, 0) | (0, 90, 0) |
+| P3 niveau du canal | (240, 21, 160) | (120, 28, 120) |
+| P4 pyramidion | (8, 98, 12) | (0, 130, 0) |
+| P5 quartier des jardins | (260, 60, −280) | (0, 70, 0) |
+| P6 quai du Nil face au soleil | (560, 14, 120) | (900, 18, 500) |
+FOV vertical d'environ 60°, plan proche 0,3 m, plan lointain 8 km ou plus.
+
+SURVOL SCRIPTÉ DE 60 s (une spline fluide ; vitesse max 80 m/s, lacet max 40°/s)
+- 0–10 s : glissade basse sur le Nil depuis (1400, 6, 600), en montant vers (800, 60, 200) : les felouques, les quais, l'axe et la pyramide apparaissent.
+- 10–22 s : le long de l'allée des sphinx, à environ 20 m, entre les pylônes.
+- 22–32 s : montée sur l'acropole et demi-tour autour du pyramidion (rayon environ 40 m, y = 90–140).
+- 32–42 s : vers le nord au-dessus du quartier des jardins, en rasant les canaux à environ 8 m.
+- 42–52 s : vers l'ouest jusqu'à la lisière du désert et les falaises, puis demi-tour.
+- 52–60 s : recul et montée vers un cadrage large comme P1.
+
+APPROCHE DE RENDU
+Celle d'Atlantis, déjà éprouvée, adaptée ainsi :
+1. Ciel plus haut et plus lumineux (matinée, 35°), exposition plus claire, brume chaude et sèche au-dessus du désert, plus humide au-dessus de l'eau.
+2. Eau : teinte vert-jade (absorption orientée vers le vert), même pipeline de reflets, réfraction et caustiques. Ajouter les nappes d'eau minces qui glissent sur les degrés et les escaliers d'eau (à la place des cascades indigo), les rigoles et les filets des gargouilles. Le Nil : plus large, plus opaque, courant lent.
+3. Pyramidion d'émeraude : reprendre la réfraction du cristal avec une absorption verte et une résille d'or.
+4. Matériaux : grès doré à strates, calcaire poli, granit rose, incrustations plates de gemmes (lapis, turquoise, cornaline, malachite) et d'or, bas-reliefs de symboles en relief de normales ou en géométrie, peinture mate passée sur les colonnes.
+5. Géométrie : nouveaux générateurs paramétriques pour pyramide à degrés, obélisque, pylône à fruit et corniche à gorge, colonne papyriforme et lotiforme, salle hypostyle, sphinx couché simplifié mais crédible, villa à toit-terrasse, pergola, vasque-lotus, felouque, dunes et falaises stratifiées.
+6. Végétation : le plus risqué. Palmiers dattiers avec stipe annelé et palmes découpées en cartes alpha, translucides en contre-jour, balancement au vent ; palmiers doum, sycomores, papyrus, lotus flottants, treilles, bougainvilliers. Jamais de boules.
+7. Sable : dunes avec ondulations fines, scintillement doux et filtré.
+
+DISCIPLINE DE PERFORMANCE
+- Mêmes règles qu'Atlantis : monde généré sur GPU au chargement, animation sur GPU via un uniforme de temps, un draw instancié par type de mesh, timestamps GPU par passe.
+- En cas de dépassement, couper dans cet ordre (jamais le haut) : felouques, onde de crue sur l'eau, rayons de lumière, densité des fleurs au loin, petites caustiques → densité de végétation, qualité des reflets → (jamais) ciel et atmosphère, tone mapping, reflets de l'eau, ombres et AO, le pyramidion et les nappes d'eau de la pyramide, l'axe et la trame des canaux.
+
+MÉTHODE
+- Profondeur avant étendue. Commencer par faire tourner le moteur d'Atlantis tel quel dans ce projet (build OK, rendu OK sur le Mac), puis vider le monde, puis : terrain (Nil, colline, désert, falaises) → ciel et lumière de matinée → pyramide, pyramidion et un pylône avec leurs matériaux jusqu'à ce que P4 et P2 dépouillés aient déjà l'air photoréels → eau vert-jade et nappes (P3) → bâtiments et végétation (P1, P5) → mouvement et détails restants (P6, survol).
+- Faire un commit git à chaque étape validée, avec un message clair, pour pouvoir revenir en arrière.
+- Avant de croire un rendu ou un chronométrage, vérifier que Chrome utilise bien le GPU matériel (pas SwiftShader).
+- Ne jamais créer ni modifier de fichiers via le shell ; utiliser les outils Edit/Write. Travailler en économisant les tokens.
+- Toute commande de plus de 120 s est une erreur ou doit être accélérée ; ne pas boucler dessus.
+- Limiter les i/s pendant le développement et ne jamais laisser la scène tourner en arrière-plan.
+
+VÉRIFICATION
+- Critique visuel : un sous-agent séparé qui ne voit QUE artstyle.md, les images de concept-art/ et tes rendus, jamais ton code ni ton raisonnement. Lui donner les 6 plans en capture depuis Chrome accéléré, plus des images du survol pour les contrôles temporels (paires d'images consécutives, recadrages à 100 % des palmes, des incrustations et des reflets d'eau). Il juge avec la grille de la section 14 et renvoie des défauts concrets et hiérarchisés. Le lancer à chaque jalon (après la lumière et les matériaux, après le peuplement de la cité, à la fin).
+- Itérer jusqu'à ce que le critique ne signale plus rien au-dessus de « mineur ». Si un défaut résiste à 3 vraies tentatives, le noter comme limite connue (ce qui a été tenté, pourquoi ça a échoué) et passer à la suite.
+- Performance : timestamps GPU plus un journal des temps d'image sur le survol. Donner moyenne, 99e centile et maximum.
+
+TERMINÉ QUAND les deux contrôles passent. Livrer index.html, sa taille minifiée, le rapport de performance, la dernière revue du critique et les limites connues.
