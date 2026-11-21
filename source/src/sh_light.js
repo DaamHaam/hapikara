@@ -51,10 +51,10 @@ fn hazeOD(ro: vec3f, rd: vec3f, d: f32) -> f32 {
 }
 fn aerial(c: vec3f, ro: vec3f, rd: vec3f, d: f32) -> vec3f {
   let od = hazeOD(ro, rd, min(d, 150000.));
-  let tr = exp(-od * vec3f(3.e-4, 3.4e-4, 4.e-4));
+  let tr = exp(-od * vec3f(1.7e-4, 2.e-4, 2.5e-4));
   // near haze is open-sky blue, far haze the horizon's colour, so distant sea and hills dissolve into the sky
   let ins = mix(skyLut(normalize(vec3f(rd.x, max(rd.y, 0.) + .035, rd.z))), skyLut(normalize(vec3f(-view.sun.z, .1, view.sun.x))) * vec3f(.9, 1., 1.12), .62 * exp(-od * 1.5e-4));
-  return c * tr + ins * (1. - exp(-od * 3.3e-4));
+  return c * tr + ins * (1. - exp(-od * 2.e-4));
 }
 // energy pulse: two rings (the second fainter) running out at 60 m/s, carried by gold inlay, lighting what they pass
 fn pulseK(r: f32, x: f32) -> f32 { return exp(-sq((r - 22. - 60. * x) / 14.)) * ss(0., .35, x); }
@@ -255,6 +255,8 @@ fn shafts(fc: vec2f, z: f32, rd: vec3f) -> vec3f {
   let aoc = max(vec3f(aoA), ((aoA * aa + bb) * aoA + cc) * aoA);
   let nv = max(dot(N, V), 1e-3);
   col += dc * textureSampleLevel(tIrr, sLin, N, 0.).rgb * aoc;
+  // sunlit sand and stone bounce warm light up into shadows and under eaves
+  col += dc * view.sunc.rgb * vec3f(.9, .66, .4) * .055 * sat(.55 - .45 * N.y) * aoc;
   let R = reflect(rd, N); var so = sat(pow(nv + aoA, exp2(-16. * rough - 1.)) - 1. + aoA) * mix(sv, 1., .3);
   var env = textureSampleLevel(tEnv, sLin, R, rough * 5.).rgb;
   // a recessed pane still mirrors what's in front: the reveal dims it only a little
@@ -327,8 +329,8 @@ fn agx(c: vec3f) -> vec3f {
   let mi = mat3x3f(1.19687900512017, -.0528968517574562, -.0529716355144438, -.0980208811401368, 1.15190312990417, -.0980434501171241, -.0990297440797205, -.0989611768448433, 1.15107367264116);
   var v = agxCurve((clamp(log2(max(m * c, vec3f(1e-10))), vec3f(-12.47393), vec3f(4.026069)) + 12.47393) / 16.5);
   // look: a little more contrast and saturation
-  let l = lum(v); v = pow(max(v, vec3f(0.)), vec3f(1.14)); v = l + 1.3 * (v - l) + (pow(l, 1.14) - l);
-  return sat3(mi * v);
+  let l = lum(v); v = pow(max(v, vec3f(0.)), vec3f(1.16)); v = l + 1.42 * (v - l) + (pow(l, 1.16) - l);
+  return sat3(mi * v * vec3f(1.03, 1., .94));
 }
 @fragment fn fs(@builtin(position) fc: vec4f) -> @location(0) vec4f {
   let px = vec2i(fc.xy); let mx = vec2i(textureDimensions(tC)) - 1; let uv = fc.xy / vec2f(textureDimensions(tC));

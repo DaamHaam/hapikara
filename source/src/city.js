@@ -3,7 +3,7 @@
 function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
   const rngA = RNG(20261), rngB = RNG(90210); let rng = rngA; const rr = (a, b) => a + (b - a) * rng();
   // leaf tints are square roots (the shader squares them); alpha seeds the flower colour
-  const TINT = { olive: [0.55, 0.59, 0.47], plane: [0.38, 0.49, 0.28], bloom: [0.4, 0.49, 0.3], shrub: [0.36, 0.47, 0.28], palm: [0.42, 0.53, 0.27], papyrus: [0.5, 0.62, 0.3], lily: [0.36, 0.5, 0.3] };
+  const TINT = { olive: [0.55, 0.59, 0.47], plane: [0.38, 0.49, 0.28], bloom: [0.4, 0.49, 0.3], shrub: [0.36, 0.47, 0.28], palm: [0.42, 0.53, 0.27], papyrus: [0.5, 0.62, 0.3], lily: [0.5, 0.66, 0.38] };
   const tintOf = (k, seed) => { const c = TINT[k], v = 0.78 + 0.34 * rng(), w = rng(); return rgb(c[0] * v * (0.92 + 0.22 * w), c[1] * v * (0.94 + 0.1 * rng()), c[2] * v * (1.12 - 0.25 * w), (seed & 255) / 255); };
   // crown reach at scale 1 per variant (the planting spacing)
   const CROWN = { olive: [5.09, 6.61], plane: [6.2, 7.05], bloom: [4.72, 5.05], palm: [5.2, 5.6] };
@@ -36,7 +36,7 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
   const vine = (x, y, z, yaw, k = (rng() * 3) | 0) => put(vines[k], x, y, z, rr(0.9, 1.25), qYaw(yaw), tintOf('shrub', [0, 5, 0, 7, 0][(rng() * 5) | 0]), rr(0.8, 1.3));
   const tPap = type([meshPapyrus(3, 0), meshPapyrus(3, 1), meshPapyrus(3, 2)], K.LEAF, 70, 200, 900), tLily = type([meshLotus(5)], K.LEAF, 1e9, 1e9, 350);
   const papyrus = (x, y, z) => put(tPap, x, y, z, rr(0.8, 1.3), qYaw(rng() * TAU), tintOf('papyrus', 0), rr(0.8, 1.2));
-  const lily = (x, z) => put(tLily, x, WATER, z, rr(0.7, 1.4), qYaw(rng() * TAU), tintOf('lily', [3, 4, 3, 7][(rng() * 4) | 0]));
+  const lily = (x, z) => put(tLily, x, WATER, z, rr(0.7, 1.4), qYaw(rng() * TAU), tintOf('lily', [4, 4, 3, 7][(rng() * 4) | 0]));
   const box = (x0, z0, x1, z1, top) => hard.boxes.push(min(x0, x1), min(z0, z1), max(x0, x1), max(z0, z1), top);
   // a box in an instance's own frame (yaw a, scale s at x, y, z) into the world
   const boxAt = (b, x, y, z, a, s = 1) => { const c = round(cos(a)), sn = round(sin(a)), P = (u, v) => [x + (u * c + v * sn) * s, z + (-u * sn + v * c) * s], p = P(b[0], b[1]), q = P(b[2], b[3]); box(p[0], p[1], q[0], q[1], y + b[4] * s); };
@@ -102,6 +102,8 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
   for (const sz of [-1, 1]) { const z = sz * QZ, pts = [[QX0, LAND + 0.02], ...US.slice(1).map((u) => [QX0 + (quayX(z) - QX0) * u, quayY(QX0 + (quayX(z) - QX0) * u - 1e-3, z)])]; qm.mat = M.QUAY; for (let i = 0; i < pts.length - 1; i++) qm.quad(qm.v(pts[i][0], pts[i][1], z, 0, 0, sz), qm.v(pts[i + 1][0], pts[i + 1][1], z, 0, 0, sz), qm.v(pts[i + 1][0], -4, z, 0, 0, sz, 0.6), qm.v(pts[i][0], -4, z, 0, 0, sz, 0.6)); }
   put(type([qm.build()], K.SOLID), 0, 0, 0);
   pylon(505, LAND, 0, 0, 1.1);
+  const tPort = type([meshHall(9, 1, 7, 9, 0), meshHall(9, 1, 7, 9, 1), meshHall(9, 1, 7, 9, 2)], K.SOLID, 200, 600, 1e9);
+  for (const sz of [-1, 1]) { const zc = sz * 68; put(tPort, QX0 - 7, LAND, zc, 1, qYaw(PI / 2)); box(QX0 - 12, zc - 31, QX0 - 2, zc + 31, LAND + 12); occ.push([QX0 - 7, zc, 32]); }
   obelisk(560, LAND, -40, 0.55); obelisk(560, LAND, 40, 0.55);
   for (let x = 480; x < QX0 - 6; x += 11) for (let z = -QZ + 6; z <= QZ - 6; z += 11) if (abs(z) > 30 && !(abs(z - 44) < 6 || abs(z + 44) < 6) && rng() < 0.6) tree('palm', x + rr(-2, 2), LAND, z + rr(-2, 2), 1, 0.4, false);
   for (let x = 480; x < QX0 - 4; x += 3) for (const sz of [-1, 1]) if (rng() < 0.3) shrub((rng() * 5) | 0, x, LAND, sz * rr(27, 60), 1.1);
@@ -129,10 +131,15 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
       if (rng() < 0.6) { const f = (rng() * 4) | 0, ang = a + f * PI / 2, nx = round(cos(ang)), nz = -round(sin(ang)); vine(px + nx * 4.6, LAND + 4.2, pz + nz * 4.6, atan2(nx, nz)); }
     }
   }
+  // lotus basins with water, on the temple blocks and in the gardens
+  const basin = (x, z, y = LAND) => { put(tBasin, x, y, z, 1.3, qYaw(rng() * TAU)); const pts = []; for (let i = 0; i < 16; i++) { const a = i / 16 * TAU; pts.push([x + 1.62 * cos(a), z + 1.62 * sin(a)]); } waterPoly(wm, pts, y + 1.3 * 1.62, 1); occ.push([x, z, 2.2]); box(x - 1.8, z - 1.8, x + 1.8, z + 1.8, y + 2.3); };
+  for (const sz of [-1, 1]) for (const x of [150, 232]) basin(x, sz * 28);
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) basin(sx * 80, sz * 101, T1.y);
+  for (let i = 0; i < 40; i++) { const x = rr(-430, 430), z = rr(-360, 360); if (inCity(x, z) && edgeDist(x, z) > 6 && abs(z) > AVE + 8 && abs(x) > AVE + 8 && !(abs(x) < ACRO + 4 && abs(z) < ACRO + 4) && free(x, z, 6)) { basin(x, z); paint(x, z, 5, 0, 230, 1.5); } }
   // garden planting: palms, sycamores, flowering trees, shrubs; paths
   for (const poly of garden) {
     let bx0 = 1e9, bz0 = 1e9, bx1 = -1e9, bz1 = -1e9; for (const p of poly) { bx0 = min(bx0, p[0]); bz0 = min(bz0, p[1]); bx1 = max(bx1, p[0]); bz1 = max(bz1, p[1]); }
-    const n = polyArea(poly) / 95;
+    const n = polyArea(poly) / 55;
     for (let i = 0; i < n; i++) {
       const x = rr(bx0, bx1), z = rr(bz0, bz1), k = rng();
       if (!inCity(x, z) || edgeDist(x, z) < 2.5 || abs(z) < AVE + 4 || abs(x) < AVE + 2 || (abs(x) < ACRO + 4 && abs(z) < ACRO + 4)) continue;
@@ -140,7 +147,7 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
       else if (k < 0.55) tree('plane', x, LAND, z, 0.9, 0.6);
       else if (k < 0.66) tree('olive', x, LAND, z, 1, 0.6);
       else if (k < 0.8) tree('bloom', x, LAND, z, 1, 0.6);
-      else if (free(x, z, 1.5)) shrub((rng() * 5) | 0, x, LAND, z, 1.2);
+      else if (free(x, z, 1.5)) { shrub((rng() * 5) | 0, x, LAND, z, 1.2); paint(x, z, 2.2, 1, 255, 1.5); }
     }
     // palms along the quays
     for (let i = 0; i < poly.length; i++) {

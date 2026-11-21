@@ -18,10 +18,14 @@ function meshPalm(seed, lod) {
       // the rachis bends down more towards its tip
       d = vnorm([d[0], d[1] - 0.55 * sl / len * (1 + t), d[2]]);
       const c = [p[0] + d[0] * sl / 2, p[1] + d[1] * sl / 2, p[2] + d[2] * sl / 2];
-      const wid = 0.95 * sin(PI * (0.12 + 0.82 * t)) * wk, sx = vnorm([side[0] * cos(roll), -sin(roll) - 0.25, side[2] * cos(roll)]);
-      const N0 = vnorm([c[0] - top[0], c[1] - top[1] + 1.2, c[2] - top[2]]);
-      mb.mat = M.LEAF + LT.PALM; mb.ec = rng() * 255 | 0;
-      mb.card(c, [sx[0] * wid, sx[1] * wid, sx[2] * wid], [d[0] * sl * 0.56, d[1] * sl * 0.56, d[2] * sl * 0.56], N0, 0.55 + 0.45 * t);
+      // two cards crossed along the rachis, each leaning down: the leaflets hang in a shallow V
+      const wid = 0.95 * sin(PI * (0.12 + 0.82 * t)) * wk, sp = vnorm(vcross(d, [0, 1, 0])), up = vcross(sp, d);
+      const N0 = vnorm([c[0] - top[0], c[1] - top[1] + 1.2, c[2] - top[2]]), ec = rng() * 255 | 0;
+      for (const rl of lod < 2 ? [-0.5, 0.5] : [0]) {
+        const a = rl + roll * 0.4 - (lod < 2 ? 0 : 0.2), sx = [sp[0] * cos(a) + up[0] * sin(a), sp[1] * cos(a) + up[1] * sin(a) - 0.18, sp[2] * cos(a) + up[2] * sin(a)];
+        mb.mat = M.LEAF + LT.PALM; mb.ec = ec;
+        mb.card(c, [sx[0] * wid, sx[1] * wid, sx[2] * wid], [d[0] * sl * 0.56, d[1] * sl * 0.56, d[2] * sl * 0.56], N0, (0.55 + 0.45 * t) * (rl < 0 ? 0.85 : 1));
+      }
       p = [p[0] + d[0] * sl, p[1] + d[1] * sl, p[2] + d[2] * sl];
     }
   }
@@ -125,6 +129,7 @@ function meshSphinx(lod) {
   for (const sd of [-1, 1]) mb.box(0.9, y, sd * 0.2, 3.35, y + 0.45, sd * 0.72, 0.15 * b); // forelegs
   for (const sd of [-1, 1]) mb.box(-2.9, y, sd * 0.55, -1.3, y + 0.35, sd * 1.0, 0.12 * b); // hind legs
   mb.box(1.15, y + 1.85, -0.42, 2.0, y + 2.85, 0.42, 0.2 * b); // head
+  if (!lod) { mb.box(1.98, y + 2.15, -0.09, 2.12, y + 2.5, 0.09, 0.04); mb.box(1.85, y + 1.45, -0.13, 2.05, y + 1.9, 0.13, 0.05); mb.mat = M.GOLD; mb.box(1.9, y + 2.85, -0.07, 2.08, y + 3.2, 0.07, 0.03); mb.mat = M.SANDST; } // nose, beard, uraeus
   // nemes: headcloth and lappets, striped lapis and gold
   mb.mat = M.PAINT; mb.ea = PC.LAPIS;
   mb.box(0.95, y + 2.6, -0.56, 1.85, y + 3.05, 0.56, 0.18 * b);

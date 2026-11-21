@@ -3,7 +3,7 @@
 const WATER = 6.5, LAND = 10; // canal water and city ground; the Nile is at y = 0
 const PULSE = 14; // seconds between the flood waves running down the pyramid
 const SEA_GROW = 1.034; // each water ring this much wider than the last (meshSea, and the swell's fade in the shader)
-const SUN = vnorm([0.58, 0.57, 0.58]); // towards the sun: 35 degrees up, south-east (mid-morning)
+const SUN = vnorm([-0.6, 0.55, 0.62]); // towards the sun: 32 degrees up, south-west (afternoon): three-quarter backlight on the views west
 const angd = (a, b) => { let d = (a - b) % TAU; if (d > PI) d -= TAU; if (d < -PI) d += TAU; return d; };
 const bump = (x) => (abs(x) < 1 ? cos(x * PI / 2) ** 2 : 0);
 
@@ -142,9 +142,9 @@ const POSES = [
   [950, 330, 430, 0, 30, 0],
   [430, 24, 0, 0, 62, 0],
   [310, 8.4, 130, 140, 14, 126],
-  [17, 111.9, 18, 0, 128, 0],
+  [27, 111.4, 26, 0, 121, 0],
   [300, 46, -330, 0, 46, 0],
-  [596, 12, 40, 900, 18, 360],
+  [1060, 13, -230, 640, 22, 120],
 ];
 // 60 s path: position + look-at every 2.5 s on one Catmull-Rom spline (<= 150 m between points)
 const FLY = new Float32Array([

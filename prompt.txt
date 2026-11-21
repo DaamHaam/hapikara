@@ -27,7 +27,7 @@ Ceux d'Atlantis, inchangés : ZQSD/WASD, souris (pointer lock), Q/E bas/haut, Sh
 
 CONVENTIONS DU MONDE
 - Mètres, +Y vers le haut, centre de la pyramide à l'origine, +X = est (le Nil), −X = ouest (désert), +Z = sud, −Z = nord. Niveau du Nil y = 0, quais y = 4, la cité monte en pente douce jusqu'à y = 30 au pied de la pyramide, sommet du pyramidion y ≈ 140.
-- Soleil fixe : environ 35° d'élévation venant du sud-est. Direction vers le soleil ≈ (0.58, 0.57, 0.58).
+- Soleil fixe : environ 32° d'élévation venant du sud-ouest. Direction vers le soleil ≈ (-0.58, 0.53, 0.6).
 - Graine fixe : chaque lancement produit le même monde.
 
 PLANS DE REVUE (section 13 d'artstyle.md). Points de départ : régler chacun une fois pour que son cadrage et le côté du soleil ressemblent à sa référence, puis le figer.

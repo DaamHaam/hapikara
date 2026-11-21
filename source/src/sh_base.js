@@ -1,7 +1,7 @@
 // shaders 1/4: shared code, textures and tables baked at load, sky and atmosphere
 // atmosphere (CPU side: the sun's colour at the ground)
 // Rayleigh + Mie + ozone, same constants as the sky shader; metres
-const ATM = { RG: 6360e3, RT: 6440e3, BR: [5.802e-6, 13.558e-6, 33.1e-6], BM: 0.85e-5, BME: 0.95e-5, BO: [0.65e-6, 1.881e-6, 0.085e-6], HR: 8000, HM: 1200 };
+const ATM = { RG: 6360e3, RT: 6440e3, BR: [5.802e-6, 13.558e-6, 33.1e-6], BM: 0.36e-5, BME: 0.4e-5, BO: [0.65e-6, 1.881e-6, 0.085e-6], HR: 8000, HM: 950 };
 const E0 = 16; // sun illuminance above the atmosphere, scene units
 // ground-to-sun transmittance, and the multiple-scattering factor PSI (Hillaire 2020) at the ground
 const atmo = () => {
@@ -304,10 +304,10 @@ fn skyLut(d: vec3f) -> vec3f {
   let az = atan2(d.z, d.x) - atan2(view.sun.z, view.sun.x); let el = asin(clamp(d.y, -1., 1.));
   let uv = vec2f(az / (2. * PI) + .5, clamp(.5 + .5 * sign(el) * sqrt(abs(el) / (PI * .5)), .004, .996));
   // lifted towards the zenith (single scattering alone is too dark overhead)
-  var c = textureSampleLevel(tSky, sRep, uv, 0.).rgb * E0 * mix(1., 1.8, sat(d.y * 1.4) * (1. - ss(.5, .97, dot(d, view.sun.xyz))));
+  var c = textureSampleLevel(tSky, sRep, uv, 0.).rgb * E0 * mix(1., 2.3, sat(d.y * 1.4) * (1. - ss(.5, .97, dot(d, view.sun.xyz))));
   // pearl just above the horizon, warming to cream and gold (and higher) towards the low sun
   let ts = ss(-.35, .95, dot(d.xz / max(length(d.xz), 1e-4), normalize(view.sun.xz)));
-  let l = lum(c); c = mix(c, vec3f(l) * mix(vec3f(1.03, 1., .99), vec3f(1.2, 1., .72), ts) * 1.12, mix(.8, .9, ts) * (1. - ss(0., mix(.16, .3, ts), abs(d.y))));
+  let l = lum(c); c = mix(c, vec3f(l) * mix(vec3f(1.03, 1., .99), vec3f(1.2, 1., .72), ts) * 1.12, mix(.8, .9, ts) * (1. - ss(0., mix(.24, .38, ts), abs(d.y))));
   return c;
 }
 // small cumulus on a flat layer 1.7 km up; lit sunward, grey-blue below
@@ -317,7 +317,7 @@ fn clouds(rd: vec3f, base: vec3f) -> vec3f {
   let q = p / 3400.;
   let sh = textureSampleLevel(tNoiseA, sRep, q * .23 + .21, 0.).r;
   let n = textureSampleLevel(tNoiseA, sRep, q, 0.).r * .62 + textureSampleLevel(tNoiseA, sRep, q * 3.1 + .4, 0.).r * .38;
-  let cov = .63 - .11 * ss(.4, .62, sh);
+  let cov = .71 - .08 * ss(.4, .62, sh);
   // puffs: a firm edge eaten by finer noise
   let dn = ss(cov, cov + .07, n - .05 * textureSampleLevel(tNoiseA, sRep, q * 9.7, 0.).a);
   if (dn <= 0.) { return base; }

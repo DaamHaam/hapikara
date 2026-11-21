@@ -164,8 +164,8 @@ L'eau est le deuxième héros après le pyramidion. Elle est **légèrement vert
 
 ## 9. Lumière, ciel, atmosphère et couleur
 
-**Heure fixe : milieu de matinée, très lumineux.**
-- **Soleil :** environ 35° d'élévation, venant du **sud-est**. Lumière blanc-doré (environ #FFF1D6), ombres nettes et assez courtes. Dans la plupart des plans phares le soleil est de trois-quarts face, pour que le pyramidion, l'eau, les palmes et le lin soient partiellement en contre-jour.
+**Heure fixe : début d'après-midi, très lumineux.**
+- **Soleil :** environ 32° d'élévation, venant du **sud-ouest** (au-dessus du désert). Lumière blanc-doré (environ #FFE9C4), ombres nettes. Dans les plans phares, qui regardent vers l'ouest, le soleil est de trois-quarts face : le pyramidion, l'eau, les palmes et le lin sont partiellement en contre-jour.
 - **Ciel :** clair et lumineux, zénith bleu franc (#3F86C8) dégradé vers un bleu pâle (#A8D0EA) puis un horizon crème lumineux (#F4E6C8). Quelques nuages légers très hauts. Pas de lune, pas d'étoiles.
 - **Atmosphère :** chaude, sèche sur le désert (brume dorée légère, chaleur qui tremble au loin), plus humide et fraîche au-dessus de l'eau. Les falaises lointaines sont adoucies et teintées de rose-violet. Halo doux autour du soleil, rayons de lumière subtils à travers les palmes et les colonnades.
 - **Ombres :** ombres ouvertes ambrées par le rebond du sable et vertes près de l'eau. Ombres de contact profondes.

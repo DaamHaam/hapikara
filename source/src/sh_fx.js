@@ -277,7 +277,7 @@ fn behind(pe: vec3f, d: vec3f, zf: f32, disp: f32, far: f32) -> vec3f {
   let facet = h21(floor(nw.xz * 3.1 + nw.y * 1.7 + .23) + floor(nl.xz * 2.3 + .37));
   // the crystals breathe with the city and flash as the pulse passes
   let live = .55 + .45 * view.pulse.y + 1.2 * view.pulse.z; let pu = pulseAt(length(p.xz));
-  let tint = mix(vec3f(.55, 1., .7), vec3f(.7, 1., .62), facet) * exp(-tex * vec3f(.11, .012, .07));
+  let tint = mix(vec3f(.3, 1., .52), vec3f(.42, 1., .45), facet) * exp(-tex * vec3f(.22, .02, .13));
   var bg: vec3f;
   if (slab && size < 6. && view.misc.y < .5) {
     // thin panels: the scene behind nudged by facet tilt, a hint of dispersion
@@ -294,7 +294,7 @@ fn behind(pe: vec3f, d: vec3f, zf: f32, disp: f32, far: f32) -> vec3f {
       let m = textureSampleLevel(tNoiseA, sRep, (hp.xy + hp.zz * vec2f(.6, -.4)) / (9. * (.4 + s)) + pk * .37 + view.cam.w * vec2f(.004, .011), 1.5); // veils drift slowly upwards
       let v = ss(.5, .72, m.r) * (.5 + .5 * m.b) + .25 * ss(.6, .9, m.g);
       veil += v * (.35 + .65 * pow(1. - abs(dot(dl, pn)), 2.));
-      bg += textureSampleLevel(tEnv, sLin, qrot(i.q, reflect(dl, pn)), 1.5).rgb * v * .3;
+      bg += textureSampleLevel(tEnv, sLin, qrot(i.q, reflect(dl, pn)), 1.5).rgb * vec3f(.4, 1., .6) * v * .12;
     }
   }
   // core: a soft white glow along the axis, strongest low, breathing
@@ -318,7 +318,7 @@ fn behind(pe: vec3f, d: vec3f, zf: f32, disp: f32, far: f32) -> vec3f {
     memit = vec3f(.6, 1., .72) * amt * (.42 + .5 * f1 + .35 * f2 + .5 * veil) * view.sunc.g * .17;
   }
   // light caught in the body: quartz is never dark; grows with distance as inner planes average out
-  bg += (view.sunc.rgb * (.03 + .06 * sh) + skyLut(vec3f(0., 1., 0.)) * .04) * vec3f(.5, 1., .68) * (.5 + 1.5 * veil) * select(1., .4, slab) * (1. + min(dist / 300., 1.5)) * (.55 + .6 * live);
+  bg += (view.sunc.rgb * (.03 + .06 * sh) + skyLut(vec3f(0., 1., 0.)) * .04) * vec3f(.25, .8, .42) * (.5 + 1.5 * veil) * select(1., .4, slab) * (1. + min(dist / 300., 1.5)) * (.55 + .6 * live);
   bg += pu * vec3f(.6, 1., .75) * (.8 + 2. * veil) * select(1., .5, slab && size < 6.);
   // internal planes on two lattices: some cells mirror another part of the world (horizon, zenith, ground), giving
   // depth; a rare one flashes with the sun

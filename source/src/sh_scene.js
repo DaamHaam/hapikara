@@ -179,9 +179,9 @@ fn pave(p: vec3f, dx: vec3f, dy: vec3f, fw: f32, n: vec3f) -> Mt {
   let g = p.xz / 2.; let f = min(fract(g), 1. - fract(g)) * 2.; let jd = min(f.x, f.y); let cell = floor(g);
   let hs = h22(cell + 3.);
   let w = triW(n); let m = marble(p, dx, dy, w, vec3f(hs.x, 0., hs.y) * 40.);
-  var o: Mt; o.alb = vec3f(.84, .79, .7) * m.rgb * (.93 + .14 * hs.x); o.rough = .14 + .12 * m.a + .08 * hs.y; o.metal = 0.; o.trans = 0.;
+  var o: Mt; o.alb = vec3f(.87, .78, .63) * m.rgb * (.93 + .14 * hs.x); o.rough = .14 + .12 * m.a + .08 * hs.y; o.metal = 0.; o.trans = 0.;
   o.nb = triN(p, dx, dy, w, 2.3, false) * .035;
-  o.alb = mix(o.alb, o.alb * vec3f(.6, .6, .64), gVein * .45);
+  o.alb = mix(o.alb, o.alb * vec3f(.78, .72, .66), gVein * .4);
   let j = line(jd, .005, fw); o.alb *= 1. - .5 * j; o.rough = mix(o.rough, .7, j);
   let ax = abs(p.x); let az = abs(p.z); let sq = max(ax, az); var il = 0.; var lap = 0.;
   if (sq < 110.) { il = max(il, line(min(abs(sq - 84.), abs(sq - 103.)), .07, fw)); il = max(il, line(abs(sq - 75.5), .05, fw)); }
@@ -344,6 +344,7 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
       o.alb *= (1. - .32 * max(j, vj)) * (.975 + .05 * h21(vec2f(floor(cy), floor(ax))));
     }
     if (mat == 4u) {
+      o.alb *= vec3f(.97, .86, .68);
       let d = p.y - select(${WATER}, 0., i.uv.x > .5); let B = tri(tNoiseA, p, dx, dy, w, .8);
       let wet = 1. - ss(.02, .3 + .25 * B.r, d);
       let moss = ss(.5, .0, d - B.r * .5) * ss(.35, .6, B.r * .7 + B.a * .4 + .12 * ss(.3, -.3, d));

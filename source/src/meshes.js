@@ -205,11 +205,17 @@ function meshCascades() {
     mb.ea = 4; sweep([0, 0.3, 0.65, 1].map((t) => [-0.05 + (reach + pool) * t, y0 + 0.05, big, t]), ax, az, bx, bz, nx, nz);
     mb.ea = 5; for (const j of [0, 1]) sweep([0, 0.25, 0.6, 1].map((t) => [reach * 0.5 + j * 0.45 + (0.8 + j * 0.9) * big * t * (0.6 + 0.4 * t) + 0.25 * t, y0 + 0.03 + mh * (0.75 + 0.25 * j) * t, big, t]), ax, az, bx, bz, nx, nz);
   };
-  // each face of each step, the east face split round the stair
+  // on each face of each step, falls a few metres wide with dry stone between, staggered from step to step (none
+  // over the east stair)
   for (let k = 0; k < PYR.n; k++) {
-    const h = pyrH(k) + 0.02, y1 = pyrY(k + 1) + 0.06, y0 = k ? pyrY(k) + 0.06 : T2.wy, pool = k ? 2.2 : 4.5, gap = 6.2;
-    fall(h, -h, h, -gap, 1, 0, y1, y0, pool); fall(h, gap, h, h, 1, 0, y1, y0, pool);
-    fall(h, h, -h, h, 0, 1, y1, y0, pool); fall(-h, h, -h, -h, -1, 0, y1, y0, pool); fall(-h, -h, h, -h, 0, -1, y1, y0, pool);
+    const h = pyrH(k) + 0.02, y1 = pyrY(k + 1) + 0.06, y0 = k ? pyrY(k) + 0.06 : T2.wy, pool = k ? 2.2 : 4.5;
+    const n = max(1, round(2 * h / 13)), w = min(2 * h / n * 0.55, 8);
+    for (const [nx, nz] of [[1, 0], [0, 1], [-1, 0], [0, -1]]) for (let i = 0; i < n; i++) {
+      const c = -h + (i + 0.5 + (k % 2 ? 0.25 : -0.25) * (n > 1 ? 1 : 0)) * 2 * h / n, a = c - w / 2, b = c + w / 2;
+      if (nx > 0 && a < 6.5 && b > -6.5) continue;
+      const tx = -nz, tz = nx;
+      fall(nx * h + tx * a, nz * h + tz * a, nx * h + tx * b, nz * h + tz * b, nx, nz, y1, y0, pool);
+    }
   }
   mb.ea = mb.eb = mb.ec = 0;
   return mb.build();
