@@ -68,7 +68,16 @@ Les huit images montrent la même cité dans le même style de rendu de jeu. Ell
 
 **Coller aux références pour** la composition, la palette, la direction de la lumière et l'ambiance, l'architecture, les matériaux et la densité de végétation.
 
-**Écarts connus dans les références** (suivre ce document, pas l'image) : à compléter quand les images seront faites (nombre d'obélisques, taille de la pyramide, eau trop bleue ou trop turquoise, éclats en étoile…).
+`plan.png` (vue zénithale, hors plans de revue) sert de plan d'ensemble : ovale de la cité, pyramide légèrement à l'ouest du centre, axe droit vers le Nil, trame de canaux, champs au nord et au sud, désert et falaises à l'ouest. Le suivre pour la disposition, la section 5 pour les dimensions.
+
+**Écarts connus dans les références** (suivre ce document, pas l'image) :
+- **Saturation et netteté** : P1, P2 et P3 sont très saturées et sur-contrastées, avec un aspect d'illustration retouchée. Le rendu doit être plus naturel et plus photographique (section 2), en gardant la luminosité et l'abondance.
+- **Pyramidion** : dans P1 et P2, c'est un bloc vert opaque, presque en plastique. Il doit être une émeraude claire et réfractante, avec résille d'or et plans internes (section 6.B).
+- **Taille de la pyramide** : dans P1, elle paraît trop basse et ne domine pas assez. Le pyramidion culmine vers 140 m au-dessus du Nil, bien au-dessus des obélisques.
+- **Distance des falaises** : dans P1 et P2, elles semblent toutes proches de la cité. Elles sont à 1–3 km, adoucies par la brume chaude.
+- **Couleur de l'eau** : dans P3 et une partie de P2, l'eau tire vers le turquoise. Elle doit pencher davantage vers le vert-jade (section 8). La clarté, les caustiques et les reflets de P3 sont en revanche exactement la cible.
+- **Figures humaines** : les sphinx ont des visages détaillés, et les pylônes portent de grands reliefs de personnages. On garde les sphinx avec des visages simplifiés et lisses ; sur les pylônes, on préfère le disque solaire ailé, les lotus, les papyrus et des bandeaux de symboles. Des silhouettes en bas-relief, peu profondes et stylisées, restent tolérées.
+- **Éclats en étoile** sur l'eau et les pointes dorées : les reflets doivent avoir une forme physique, sans étoiles.
 
 Un rendu moins riche en micro-détail que les références est acceptable. Un rendu moins physiquement réel ne l'est pas.
 
