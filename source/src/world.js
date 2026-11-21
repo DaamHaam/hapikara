@@ -5,6 +5,9 @@ const K = { SOLID: 0, LEAF: 1, CRYSTAL: 2, GLASS: 3, WATER: 4, CASCADE: 5 };
 const NO_NEAR = 1, NO_MIRROR = 2, NO_SHADOW = 4, NO_BAKE = 8, ALWAYS = 16, DRAW_LAST = 32, THIN = 64;
 const Q0 = [0, 0, 0, 1];
 const rgb = (r, g, b, a = 1) => (round(clamp(a, 0, 1) * 255) << 24 | round(clamp(b, 0, 1) * 255) << 16 | round(clamp(g, 0, 1) * 255) << 8 | round(clamp(r, 0, 1) * 255)) >>> 0;
+// places paved in the city: the acropolis, the avenues, the temple blocks either side of the avenue, the quaysides
+const TEMPLE = [138, 244]; // x range of the temple blocks
+const pavedAt = (x, z) => (abs(x) < ACRO && abs(z) < ACRO) || abs(z) < AVE + 5 || abs(x) < AVE + 2 || (x > TEMPLE[0] && x < TEMPLE[1] && abs(z) < ACRO) || edgeDist(x, z) < 3.2;
 
 function buildWorld() {
   const meshes = [], types = [];
@@ -16,92 +19,69 @@ function buildWorld() {
     const o = nI++ * 12; IF[o] = x; IF[o + 1] = y; IF[o + 2] = z; IF[o + 3] = s; IF[o + 4] = q[0]; IF[o + 5] = q[1]; IF[o + 6] = q[2]; IF[o + 7] = q[3];
     IU[o + 8] = tint; IU[o + 9] = ty; IF[o + 10] = types[ty].flags & ALWAYS ? 1e6 : meshes[types[ty].lods[0]].rad * s * max(1, sy); IF[o + 11] = sy; types[ty].n++;
   };
-  // ground masks, 1 m/texel over +-1024 m. City: r paved, g planting bed, b worn path. Farmed shelf: r track, g wide-row
+  // ground masks, 1 m/texel over +-1024 m. City: r paved, g planting bed, b worn path. Farmed land: r track, g wide-row
   // crop, b parcel verge, a tilled field; LANDMAP there: crop colour (sqrt) and in alpha the earth between rows.
-  // CROP per parcel kind: colour, earth between rows, wide rows.
   const MAP = new Uint8Array(2048 * 2048 * 4), LANDMAP = new Uint8Array(2048 * 2048 * 4);
-  const CROP = [null, [0.4, 0.31, 0.12, 0.3, 0], [0.26, 0.2, 0.4, 0.85, 1], [0.1, 0.19, 0.055, 0.9, 1], null, [0.2, 0.145, 0.095, 0.5, 0], [0.085, 0.2, 0.06, 0.22, 0]];
+  const CROP = [null, [0.45, 0.36, 0.13, 0.3, 0], [0.13, 0.24, 0.12, 0.85, 1], [0.1, 0.19, 0.055, 0.9, 1], null, [0.2, 0.145, 0.095, 0.5, 0], [0.085, 0.21, 0.06, 0.22, 0]];
   const paint = (x, z, rad, ch, val, soft = 1.5) => {
     const x0 = max(0, floor(x + 1024 - rad - soft)), x1 = min(2047, ceil(x + 1024 + rad + soft)), z0 = max(0, floor(z + 1024 - rad - soft)), z1 = min(2047, ceil(z + 1024 + rad + soft));
     for (let j = z0; j <= z1; j++) for (let i = x0; i <= x1; i++) { const d = hypot(i + 0.5 - 1024 - x, j + 0.5 - 1024 - z), k = clamp((rad + soft - d) / soft, 0, 1), o = (j * 2048 + i) * 4 + ch; MAP[o] = MAP[o] + (val - MAP[o]) * k; }
   };
   for (let j = 0; j < 2048; j++) for (let i = 0; i < 2048; i++) {
-    const x = i + 0.5 - 1024, z = j + 0.5 - 1024, r = hypot(x, z), o = (j * 2048 + i) * 4;
-    if (r < 420) { const zn = zoneOf(x, z), lat = spokeLat(x, z); MAP[o] = zn === 2 || lat < 8.5 ? 255 : 0; }
-    else {
-      LANDMAP[o] = 140; LANDMAP[o + 1] = 162; LANDMAP[o + 2] = 115; // grass, for a crop's edge to blend into
-      // no fields at the canal, coast, river or under the woods
-      const t = atan2(z, x), zone = r < 1250 ? sstep(20, 50, r - RB.out(t)) * sstep(25, 60, coastT(t) - r) * sstep(RIV_SHELF + 2, RIV_SHELF + 10, riverDist(x, z)) * (1 - sstep(0.57, 0.62, woodAt(x, z))) : 0;
-      if (zone > 0) {
-        const pa = parcelAt(x, z), use = parcelUse(pa.b, pa.s), C = CROP[use.kind], tone = 0.8 + 0.4 * use.id;
-        if (use.farm) MAP[o + 2] = 255 * zone * (1 - sstep(1, 3.2, pa.edge));
-        if (C) { MAP[o + 3] = 255 * zone * sstep(1.4, 3.4, pa.edge); MAP[o + 1] = 255 * C[4]; for (let k = 0; k < 3; k++) LANDMAP[o + k] = 255 * sqrt(min(1, C[k] * tone)); LANDMAP[o + 3] = 255 * C[3]; }
-      }
+    const x = i + 0.5 - 1024, z = j + 0.5 - 1024, o = (j * 2048 + i) * 4;
+    if (inCity(x, z)) { MAP[o] = pavedAt(x, z) ? 255 : 0; continue; }
+    LANDMAP[o] = 140; LANDMAP[o + 1] = 162; LANDMAP[o + 2] = 115;
+    const r = hypot(x, z), t = atan2(z, x), zone = sstep(20, 50, r - RB.out(t)) * sstep(30, 70, nileD(x, z)) * (1 - sstep(0.02, 0.15, desertK(x, z))) * (1 - sstep(0.57, 0.62, woodAt(x, z)));
+    if (zone > 0) {
+      const pa = parcelAt(x, z), use = parcelUse(pa.b, pa.s), C = CROP[use.kind], tone = 0.8 + 0.4 * use.id;
+      if (use.farm) MAP[o + 2] = 255 * zone * (1 - sstep(1, 3.2, pa.edge));
+      if (C) { MAP[o + 3] = 255 * zone * sstep(1.4, 3.4, pa.edge); MAP[o + 1] = 255 * C[4]; for (let k = 0; k < 3; k++) LANDMAP[o + k] = 255 * sqrt(min(1, C[k] * tone)); LANDMAP[o + 3] = 255 * C[3]; }
     }
   }
 
-  // ground, podium, terrain
+  // ground, acropolis, pyramid, terrain
   put(type([meshCityGround()], K.SOLID, 1e9, 1e9, 1e9, 0, DRAW_LAST), 0, 0, 0);
-  put(type([meshPodium()], K.SOLID), 0, 0, 0);
-  const tStair = type([meshPodiumStair(0), meshPodiumStair(1)], K.SOLID, 125, 1e9, 1e9);
-  for (const a of SPOKES) put(tStair, STAIR_C[0] * cos(a), STAIR_C[1], STAIR_C[0] * sin(a), 1, qYaw(-a));
+  put(type([meshAcropolis()], K.SOLID), 0, 0, 0);
+  put(type([meshPyramid()], K.SOLID), 0, 0, 0);
+  put(type([meshPyramidion()], K.CRYSTAL), 0, PYR_TOP + 1.5, 0);
+  put(type([meshLattice()], K.SOLID), 0, 0, 0);
   const land = meshTerrain();
-  // Medium/Low: three LODs per chunk, distances in LODK units. LOD distance is measured from the sphere's edge less half
-  // its radius, so chunks count as twice their size: the one under the camera must be finest (collision follows it).
   for (const ch of land.chunks) { put(type(ch.lods, K.SOLID, QL(1e9, 650, 500), QL(1e9, 1950, 1500), 1e9, 0, NO_NEAR | DRAW_LAST), ch.c[0], ch.c[1], ch.c[2]); if (LV) IF[(nI - 1) * 12 + 10] *= 2; }
 
   // bridges and their balustrades
-  const tPost = type([meshBalPost(0), meshBalPost(1)], K.SOLID, 130, 1e9, 700), tPanel = type([meshBalPanel(0), meshBalPanel(1)], K.CRYSTAL, 130, 1e9, 420, 0, NO_NEAR | THIN);
-  // balustrade from a to b, posts at both ends
+  const tPost = type([meshBalPost(0), meshBalPost(1)], K.SOLID, 130, 1e9, 700), tPanel = type([meshBalPanel(0), meshBalPanel(1)], K.SOLID, 130, 1e9, 420);
   const balRun = (a, b) => {
     const L = hypot(b[0] - a[0], b[2] - a[2]), n = max(1, round(L / BAL)), k = L / n / BAL, q = qYaw(-atan2(b[2] - a[2], b[0] - a[0]));
     for (let i = 0; i < n; i++) { const t = i / n, x = mix(a[0], b[0], t), y = mix(a[1], b[1], t), z = mix(a[2], b[2], t); put(tPost, x, y, z, k, q, 0xffffffff, 1 / k); put(tPanel, x, y, z, k, q, 0xffffffff, 1 / k); }
   };
-  const balArc = (r, y, a0, a1) => { const n = max(1, round(abs(a1 - a0) * r / BAL)); for (let i = 0; i < n; i++) { const t0 = mix(a0, a1, i / n), t1 = mix(a0, a1, (i + 1) / n); balRun([r * cos(t0), y, r * sin(t0)], [r * cos(t1), y, r * sin(t1)]); } };
-  const brm = new MB(1 << 15);
-  for (let k = 0; k < 6; k++) {
-    const t = SPOKES[k], c = cos(t), s = sin(t);
-    const span = (r0, r1, ya, yb, hump, arches, floor) => {
-      const b = bridge(brm, r0 * c, r0 * s, r1 * c, r1 * s, SPOKE_W, ya, yb, hump, arches, floor), S = max(2, round(b.L / 7.8));
-      for (const sd of [-1, 1]) for (let i = 0; i < S; i++) {
-        const u0 = b.L * i / S, u1 = b.L * (i + 1) / S, v = sd * (SPOKE_W - 0.19), P = (u) => [r0 * c + b.ux * u + b.vx * v, b.top(u) + 0.34, r0 * s + b.uz * u + b.vz * v];
-        balRun(P(u0), P(u1));
-      }
-    };
-    // decks 1 cm above the quays' copings, against z-fighting
-    span(RB.moat(t) + 0.4, STAIR.r0, 10.31, STAIR.y0, 0.5, 3, FLOOR_Y.moat);
-    span(RB.civ(t) - 0.4, RB.mid(t) + 0.4, 10.31, 10.31, 1.15, 3, FLOOR_Y.mid);
-    span(RB.chi(t) - 0.4, RB.cho(t) + 0.4, 10.31, 10.31, k ? 0.5 : 1.0, k ? 1 : 3, FLOOR_Y.ch);
-    span(RB.gar(t) - 0.4, RB.out(t) + 0.4, 10.31, 10.31, 1.15, 3, FLOOR_Y.out);
-  }
+  const hard = { boxes: [], bridges: [] };
+  const brm = new MB(1 << 16), DECK = LAND + 0.31;
+  const span = (x0, z0, x1, z1, hw, hump, arches) => {
+    const b = bridge(brm, x0, z0, x1, z1, hw, DECK, DECK, hump, arches, FLOOR_Y), S = max(2, round(b.L / 7.8));
+    for (const sd of [-1, 1]) for (let i = 0; i < S; i++) {
+      const u0 = b.L * i / S, u1 = b.L * (i + 1) / S, v = sd * (hw - 0.3), P = (u) => [x0 + b.ux * u + b.vx * v, b.top(u) + 0.34, z0 + b.uz * u + b.vz * v];
+      balRun(P(u0), P(u1));
+    }
+    hard.bridges.push(min(x0, x1) - (x0 === x1 ? hw : 0), min(z0, z1) - (z0 === z1 ? hw : 0), max(x0, x1) + (x0 === x1 ? hw : 0), max(z0, z1) + (z0 === z1 ? hw : 0), DECK + hump, x0 === x1 ? 1 : 0, hump);
+  };
+  // the avenues over every canal they cross (east, west, north, south), and the ring
+  const ringAt = (t) => [RB.gar(t) - 0.4, RB.out(t) + 0.4];
+  for (const [c, w] of CXL) span(c - w - 0.4, 0, c + w + 0.4, 0, AVE, 0.6, abs(c) === 130 ? 3 : 1);
+  for (const [c, w] of CZL) span(0, c - w - 0.4, 0, c + w + 0.4, AVE, 0.6, abs(c) === 130 ? 3 : 1);
+  for (const t of [0, PI / 2, PI, -PI / 2]) { const [a, b] = ringAt(t), c = round(cos(t)), s = round(sin(t)); span(a * c, a * s, b * c, b * s, AVE, 0.9, 3); }
+  // footbridges half way along every canal stretch between crossings
+  const xs = [-CITY_A, ...CXL.map((c) => c[0]), CITY_A], zs = [-CITY_B, ...CZL.map((c) => c[0]), CITY_B];
+  for (const [c, w] of CXL) for (let j = 0; j < zs.length - 1; j++) { const m = (zs[j] + zs[j + 1]) / 2; if (abs(m) > 40 && inCity(c, m) && !inRing(c, m) && !inRing(c, m - 20) && !inRing(c, m + 20)) span(c - w - 0.4, m, c + w + 0.4, m, 3.2, 0.9, 1); }
+  for (const [c, w] of CZL) for (let i = 0; i < xs.length - 1; i++) { const m = (xs[i] + xs[i + 1]) / 2; if (abs(m) > 40 && inCity(m, c) && !inRing(m, c) && !inRing(m - 20, c) && !inRing(m + 20, c)) span(m, c - w - 0.4, m, c + w + 0.4, 3.2, 0.9, 1); }
   put(type([brm.build()], K.SOLID), 0, 0, 0);
-  // podium balustrades: plaza edge and the two ledges, between the stairways
-  for (let k = 0; k < 6; k++) for (const [R, y] of [[57.2, 40.46], [69.3, 30.46], [83.8, 20.46]]) { const c = asin((STAIR.hw + 1) / R); balArc(R, y, SPOKES[k] + c, SPOKES[k] + PI / 3 - c); }
-
-  // crystal, lotus, pylons, towers
-  const tCrystal = type([meshCrystal([[8.5, 0], [7.25, 84], [3.5, 95.5], [0, 101]])], K.CRYSTAL);
-  put(tCrystal, 0, 44.4, 0);
-  const tPetal = type([meshPetal()], K.CRYSTAL, 1e9, 1e9, 1e9, 0, THIN), tRim = type([meshPetalRim()], K.SOLID);
-  for (let i = 0; i < 16; i++) {
-    const inner = i % 2 === 0, a = i / 16 * TAU + 0.11, tilt = (inner ? 25 : 47) * DEG, len = inner ? 33 : 28, br = inner ? 10.4 : 13.2;
-    const y = [sin(tilt) * cos(a), cos(tilt), sin(tilt) * sin(a)], x = [-sin(a), 0, cos(a)], z = vcross(x, y), q = qBasis(x, y, z);
-    put(tPetal, br * cos(a), 44.5, br * sin(a), len, q); put(tRim, br * cos(a), 44.5, br * sin(a), len, q);
-  }
-  const tPylon = type([meshCrystal([[0.25, 0], [1.2, 2.4], [1.32, 7], [0.95, 10.4], [0, 12.6]], true)], K.CRYSTAL), tPyBase = type([meshPylonBase()], K.SOLID);
-  for (let i = 0; i < 12; i++) { const a = (i + 0.5) / 12 * TAU, x = 50.4 * cos(a), z = 50.4 * sin(a); put(tPyBase, x, 40, z, 1, qYaw(-a)); put(tPylon, x, 41.7, z, 1, qYaw(-a)); }
-  const tw = [72, 80, 88].map((h) => { TOWER.h = h; return [type([meshCrystal([[TOWER.r0, 0], [TOWER.r1, h - TOWER.tip], [TOWER.r1 * 0.78, h - TOWER.tip * 0.72], [0, h]])], K.CRYSTAL), type([meshTowerTrim()], K.SOLID)]; });
-  for (let k = 0; k < 6; k++) { const a = TOWERS[k], v = tw[[72, 80, 88].indexOf(TOWER_HS[k])], x = TOWER_R * cos(a), z = TOWER_R * sin(a); put(v[0], x, 12.6, z, 1, qYaw(k * 0.4)); put(v[1], x, 0, z, 1, qYaw(k * 1.3)); }
 
   // water
   const wm = new MB(1 << 14);
-  waterRing(wm, RB.civ, RB.mid, WATER, 0); waterRing(wm, RB.chi, RB.cho, WATER, 0); waterRing(wm, RB.gar, RB.out, WATER, 0);
-  waterRing(wm, 85, RB.moat, WATER, 1); waterRing(wm, POOL[0], POOL[1], 39.95, 1, 96); waterRing(wm, 58, 60.4, 29.9, 1, 192); waterRing(wm, 70.5, 72.9, 19.9, 1, 192);
-  waterRing(wm, 15.5, 20.1, 42.0, 1, 64); waterRing(wm, 57, 57.8, 39.84, 1, 192); waterRing(wm, 69.5, 70.3, 29.84, 1, 192); waterRing(wm, 84, 84.8, 19.84, 1, 192);
-  put(type([wm.build()], K.WATER), 0, 0, 0);
+  put(type([meshCityWater()], K.WATER), 0, 0, 0);
   put(type([meshSea()], K.WATER), 0, 0, 0);
   put(type([meshCascades()], K.CASCADE), 0, 0, 0);
 
-  const hard = { domes: [], halls: [], villas: [], shapes: [] };
-  populate({ type, put, paint, MAP, balRun, gH: land.heightAt, hard });
+  populate({ type, put, paint, MAP, balRun, gH: land.heightAt, hard, wm });
+  put(type([wm.build()], K.WATER), 0, 0, 0);
   return { meshes, types, inst: IB.slice(0, nI * 48), nI, MAP, LANDMAP, ground: land.drawnAt, hard };
 }

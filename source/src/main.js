@@ -75,7 +75,7 @@ const waterBG = [0, 1, 2, 3, 4].map((m) => blitBG(mipView(tWater, m)));
 const NU = 216, V_MAIN = 0, V_MIR = 1, V_SH = 2;
 const UB = [0, 1, 2].map(() => new Float32Array(NU)), ubo = UB.map(() => device.createBuffer({ size: NU * 4, usage: BU.UNIFORM | BU.COPY_DST }));
 const O_SM = 48, O_CAM = 112, O_RES = 116, O_JIT = 120, O_SUN = 124, O_SUNC = 128, O_RIGHT = 132, O_UP = 136, O_FWD = 140, O_PL = 144, O_PULSE = 168, O_MISC = 172, O_LODC = 176, O_LODB = 180;
-const TANH = tan(30 * DEG), NEAR = 0.3, EXPO = 0.8;
+const TANH = tan(30 * DEG), NEAR = 0.3, EXPO = 0.6;
 // sun at the ground: atmospheric transmittance x 1.35 (keeps sunlit paving warm rather than grey)
 const AT = atmo(), SUNC = AT.Ts.map((t) => t * E0 * 1.35);
 if (AUTO) console.log('sun at ground ' + SUNC.map((v) => v.toFixed(2)) + ' · psi ' + AT.PSI.map((v) => v.toFixed(4)));

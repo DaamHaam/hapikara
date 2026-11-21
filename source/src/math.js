@@ -1,6 +1,6 @@
 // maths, random numbers, noise and the mesh builder
 const { sin, cos, tan, atan2, sqrt, abs, min, max, floor, ceil, round, PI, hypot, exp, pow, asin } = Math;
-const TAU = PI * 2, DEG = PI / 180;
+const TAU = PI * 2, DEG = PI / 180, SQRT2 = Math.SQRT2;
 const clamp = (x, a, b) => (x < a ? a : x > b ? b : x);
 const mix = (a, b, t) => a + (b - a) * t;
 const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };

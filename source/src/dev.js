@@ -83,7 +83,7 @@
   window.__bench = () => new Promise((res) => { finish = res; menu = false; F[FLT] = 0; flyAt(); requestAnimationFrame((t) => { F[LAST] = t; requestAnimationFrame(frame); }); setTimeout(() => start(true), 2000); });
   // peak speed and turn rate of the path (limits: 80 m/s, 40 deg/s), and its lowest clearance over ground or water
   // (bridges, buildings, trees not counted)
-  const groundY = (x, z) => { const r = hypot(x, z); if (r < 58) return 40; if (r < 70.5) return 30; if (r < 85) return 20; const zn = zoneOf(x, z); return zn === 8 ? max(terrainH(x, z), 0) : zn % 2 ? WATER : LAND; };
+  const groundY = (x, z) => { if (inCity(x, z)) { const m = max(abs(x), abs(z)); return canalAt(x, z) ? WATER : m < T1.h ? max(T1.y, acroY(m)) : LAND; } return max(terrainH(x, z), 0); };
   window.__path = () => {
     let vm = 0, wm = 0, px = 0, py = 0, pz = 0, pa = 0, lo = 1e9, lt = 0;
     for (let i = 0; i <= 3600; i++) {
@@ -123,7 +123,7 @@
   // collision tests. __surf("x,z,y;..."): floor and ceiling there (y decides on or under a bridge).
   // __ram("x,y,z,dx,dy,dz,speed,seconds;..."): push the camera at 180 steps/s; where it ends and the floor there.
   // __hard(): the first domes, halls and villas the collision knows
-  window.__hard = () => `domes ${Array.from(HD.slice(0, 6)).map((v) => v.toFixed(1))} | halls ${Array.from(HH.slice(0, 8)).map((v) => v.toFixed(2))} | villas ${HV.length / 7}: ${Array.from(HV.slice(0, 14)).map((v) => v.toFixed(2))} | shape 0: ${Array.from(HS.slice(HV[6] * 9, HV[6] * 9 + 9)).map((v) => v.toFixed(2))}`;
+  window.__hard = () => `boxes ${HB.length / 5} | bridges ${HR.length / 7}`;
   window.__surf = (s) => s.split(';').map((p) => { const [x, z, y] = p.split(',').map(Number); surfaceAt(x, z, y === undefined ? 1e9 : y); return `floor ${COL[0].toFixed(2)}${COL[1] < 1e8 ? ' ceiling ' + COL[1].toFixed(2) : ''}${COL[2] ? ' natural' : ''}`; }).join(' | ');
   window.__ram = (s) => s.split(';').map((p) => {
     const [x, y, z, dx, dy, dz, sp, secs] = p.split(',').map(Number), l = hypot(dx, dy, dz), n = round(secs * 180), dt = 1 / 180;

@@ -220,7 +220,7 @@ fn carpet(c0: LA, p: vec2f, n: i32, sd: f32, ln: f32, wd: f32) -> LA {
   let g = fc.xy / ${LEAFPX}.; let tile = i32(g.x) + 4 * i32(g.y); var p = fract(g); p.y = 1. - p.y;
   var c = LA(1., .8, 0., .5);
   // vine tiles have a softer edge ramp
-  if (tile == 6 || tile >= 8) { c = wallFoliage(tile, p); return vec4f(c.sh, c.fl, c.id, sat(.5 - c.d * 60.)); }
+  if (tile == 6 || tile == 8 || tile == 9) { c = wallFoliage(tile, p); return vec4f(c.sh, c.fl, c.id, sat(.5 - c.d * 60.)); }
   // cypress: upright sprays, four mirrored copies per tile, around a solid core
   if (tile == 3) { let q = p * 2.; let cl = floor(q) % 2.; p = fract(q); if (cl.x > .5) { p.x = 1. - p.x; } p = p * .96 + .02; }
   if (tile == 3) { // cypress: dense sprays of scale leaves
@@ -245,6 +245,24 @@ fn carpet(c0: LA, p: vec2f, n: i32, sd: f32, ln: f32, wd: f32) -> LA {
       c = put(c, seg(p, o, top) - .006, .55, 0., r.x);
       for (var i = 0; i < 9; i++) { let q = mix(o, top, .62 + .042 * f32(i)); c = put(c, length(p - q - vec2f(.012 * (f32(i & 1) * 2. - 1.), 0.)) - .017, .8 + .3 * h11(f32(i * 7 + k)), 1., r.y); }
       c = leaf(c, p, o, o + rot2(1.571 + (r.x - .5) * 1.4) * (.3 + .15 * r.y), .014, .7);
+    }
+  } else if (tile == 10) { // palm frond: a rachis with long narrow leaflets swept towards the tip
+    c = put(c, seg(p, vec2f(.5, 0.), vec2f(.5, 1.)) - .011, .45, 0., .5);
+    for (var i = 0; i < 21; i++) {
+      let y = .015 + f32(i) * .047; let r = h22(vec2f(f32(i), 13.)); let L = (.43 + .08 * r.x) * (1. - .5 * y * y);
+      c = leaf(c, p, vec2f(.5, y), vec2f(.5, y) + rot2(.55 + .25 * r.y) * L, .02, .65 + .35 * r.x);
+      c = leaf(c, p, vec2f(.5, y + .022), vec2f(.5, y + .022) + rot2(PI - .55 - .25 * r.x) * L, .02, .65 + .35 * r.y);
+    }
+  } else if (tile == 11) { // water lily: round notched pads, two flowers
+    for (var i = 0; i < 6; i++) {
+      let r = h22(vec2f(f32(i), 141.)); let o = vec2f(.22, .22) + r * .56; let R = .12 + .07 * h11(f32(i) + 5.); let q = p - o;
+      let a = atan2(q.y, q.x) + r.x * 6.283; let nt = abs(fract(a / 6.283) - .5);
+      c = put(c, max(length(q) - R, .04 - nt * .5), .55 + .45 * sat(length(q) / R) * (.8 + .2 * sin(a * 9.)), 0., r.y);
+    }
+    for (var i = 0; i < 2; i++) {
+      let r = h22(vec2f(f32(i), 151.)); let o = vec2f(.3, .3) + r * .4; let q = p - o; let R = .085;
+      let d = length(q) - R * (.55 + .45 * abs(cos(4. * atan2(q.y, q.x) + r.x * 3.)));
+      c = put(c, d, .8 + .4 * sat(1. - length(q) / R), 1., r.x);
     }
   } else { c = sprigs(tile, p); }
   return vec4f(c.sh, c.fl, c.id, sat(.5 - c.d * 180.));

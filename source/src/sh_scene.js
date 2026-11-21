@@ -1,8 +1,8 @@
 // shaders 2/4: instancing, GPU culling, materials (G-buffer) and shadow casters
 // material ids, shared by mesh generators and shaders
-const M = { MARBLE: 0, PAVE: 1, PLASTER: 2, GOLD: 3, QUAY: 4, FLOOR: 5, WINDOW: 6, BARK: 7, ALLOY: 8, TRIM: 9, TERRAIN: 10, CORE: 11, TERRACE: 12, GROUND: 13, STEP: 14, ROCK: 15, FALL: 16, SEA: 17, LEAF: 32 };
+const M = { MARBLE: 0, PAVE: 1, PLASTER: 2, GOLD: 3, QUAY: 4, FLOOR: 5, WINDOW: 6, BARK: 7, ALLOY: 8, TRIM: 9, TERRAIN: 10, CORE: 11, TERRACE: 12, GROUND: 13, STEP: 14, ROCK: 15, FALL: 16, SEA: 17, PAINT: 18, SANDST: 19, GRANITE: 20, LEAF: 32 };
 // leaf atlas tiles (material = M.LEAF + tile): crowns, then vines (TRAIL fringe, VLEAF / VBLOSSOM carpets)
-const LT = { OLIVE: 0, BROAD: 1, PINE: 2, CYPRESS: 3, BLOSSOM: 4, HYDRANGEA: 5, TRAIL: 6, LAVENDER: 7, VLEAF: 8, VBLOSSOM: 9 };
+const LT = { OLIVE: 0, BROAD: 1, PINE: 2, CYPRESS: 3, BLOSSOM: 4, HYDRANGEA: 5, TRAIL: 6, LAVENDER: 7, VLEAF: 8, VBLOSSOM: 9, PALM: 10, LILY: 11 };
 
 // per view, a compute pass frustum-tests each instance, picks its LOD and appends it to that mesh's list, drawn with one
 // indirect draw per mesh
@@ -74,7 +74,7 @@ fn sway(wp: vec3f, h: f32, ph: f32, leaf: bool) -> vec3f {
 // (vertex) or pixel (fragment) can't resolve it. Returns height and slope.
 const SEAW = array<vec4f, 4>(vec4f(.159, -.092, .2, 1.34), vec4f(.15, -.26, .12, 1.72), vec4f(.473, .082, .065, 2.17), vec4f(.157, -.77, .035, 2.77));
 fn seaWave(p: vec2f, fade: vec4f) -> vec3f {
-  var o = vec3f(0.); let t = view.cam.w; let calm = mix(.4, 1., ss(480., 950., length(p))); // sheltered near the city
+  var o = vec3f(0.); let t = view.cam.w; let calm = .1; // a river: barely a swell
   for (var k = 0; k < 4; k++) { let w = SEAW[k]; let ph = dot(w.xy, p) - w.w * t; let a = w.z * fade[k] * calm; o += vec3f(a * sin(ph), w.xy * (a * cos(ph))); }
   return o;
 }
@@ -113,9 +113,9 @@ fn transform(v: VI) -> VO {
 }
 @vertex fn vs(v: VI) -> VO { return transform(v); }
 // is this a vine tile (foliage lying on a surface)?
-fn onWall(tile: u32) -> bool { return tile == 6u || tile >= 8u; }
+fn onWall(tile: u32) -> bool { return tile == 6u || tile == 8u || tile == 9u; }
 // how much of a leaf card counts at uv: crowns fade over the outer quarter, vines all but a thin margin
-fn cardRim(uv: vec2f, tile: u32) -> f32 { let q = abs(uv - .5) * 2.; return 1. - ss(select(.72, .95, onWall(tile)), 1., max(q.x, q.y)); }
+fn cardRim(uv: vec2f, tile: u32) -> f32 { let q = abs(uv - .5) * 2.; return 1. - ss(select(.72, .95, onWall(tile) || tile >= 10u), 1., max(q.x, q.y)); }
 // card uv in the atlas (4 x 3 tiles with a thin margin)
 fn atlasUV(tile: u32, uv: vec2f) -> vec2f { return (vec2f(f32(tile % 4u), f32(tile / 4u)) + uv * .98 + .01) / vec2f(4., 3.); }
 `;
@@ -163,7 +163,7 @@ fn triN(p: vec3f, dx: vec3f, dy: vec3f, w: vec3f, s: f32, rock: bool) -> vec3f {
 }
 // coverage of a line (half width hw, distance d) for a pixel fw wide: thin lines fade instead of aliasing
 fn line(d: f32, hw: f32, fw: f32) -> f32 { return sat((min(d + fw * .5, hw) - max(d - fw * .5, -hw)) / fw); }
-const MARB = vec3f(.82, .79, .735);
+const MARB = vec3f(.88, .83, .74);
 var<private> gVein: f32; // how veined the last marble() sample was
 fn marble(p: vec3f, dx: vec3f, dy: vec3f, w: vec3f, off: vec3f) -> vec4f { // rgb colour factor, a grain
   let A = tri(tNoiseA, p + off, dx, dy, w, .21); let B = tri(tNoiseA, p, dx, dy, w, 1.9); let C = tri(tNoiseA, p + off.zxy, dx, dy, w, .047);
@@ -173,26 +173,27 @@ fn marble(p: vec3f, dx: vec3f, dy: vec3f, w: vec3f, off: vec3f) -> vec4f { // rg
   c *= mix(vec3f(1.), vec3f(1.03, 1., .95), ss(.4, .65, C.r)); // warm and cool drifts
   return vec4f(c, B.a);
 }
-// polished paving, 2 m modules: rings and radials near the centre, a grid further out; gold inlay lines
+// polished paving, 2 m modules in a grid; inlay: gold squares round the pyramid, lapis bands edged with gold along the
+// avenues
 fn pave(p: vec3f, dx: vec3f, dy: vec3f, fw: f32, n: vec3f) -> Mt {
-  let r = length(p.xz); let th = atan2(p.z, p.x);
-  var jd: f32; var cell: vec2f;
-  if (r < 432.) {
-    let ri = floor(r / 2.); let nt = max(6., round(PI * (2. * ri + 1.))); let a = th / (2. * PI) * nt + .5 * (ri % 2.);
-    jd = min(min(fract(r / 2.), 1. - fract(r / 2.)) * 2., min(fract(a), 1. - fract(a)) * 2. * PI * r / nt); cell = vec2f(ri, floor(a));
-  } else { let g = p.xz / 2.; let f = min(fract(g), 1. - fract(g)) * 2.; jd = min(f.x, f.y); cell = floor(g); }
+  let g = p.xz / 2.; let f = min(fract(g), 1. - fract(g)) * 2.; let jd = min(f.x, f.y); let cell = floor(g);
   let hs = h22(cell + 3.);
   let w = triW(n); let m = marble(p, dx, dy, w, vec3f(hs.x, 0., hs.y) * 40.);
-  var o: Mt; o.alb = vec3f(.79, .76, .705) * m.rgb * (.93 + .14 * hs.x); o.rough = .13 + .12 * m.a + .08 * hs.y; o.metal = 0.; o.trans = 0.;
+  var o: Mt; o.alb = vec3f(.84, .79, .7) * m.rgb * (.93 + .14 * hs.x); o.rough = .14 + .12 * m.a + .08 * hs.y; o.metal = 0.; o.trans = 0.;
   o.nb = triN(p, dx, dy, w, 2.3, false) * .035;
-  o.alb = mix(o.alb, o.alb * vec3f(.56, .6, .68), gVein * .55); // polished slabs show grey veins clearly
+  o.alb = mix(o.alb, o.alb * vec3f(.6, .6, .64), gVein * .45);
   let j = line(jd, .005, fw); o.alb *= 1. - .5 * j; o.rough = mix(o.rough, .7, j);
-  // inlay: 12 radials and rings on the podium, lines along the six spokes
-  let a12 = (fract(th / (PI / 6.) + .5) - .5) * (PI / 6.); let a6 = (fract((th - PI * .5) / (PI / 3.) + .5) - .5) * (PI / 3.);
-  let lat = abs(r * sin(a6)); var il = 0.;
-  if (r < 58.5 && r > 40.5) { il = max(il, line(abs(r * sin(a12)), .07, fw)); il = max(il, line(min(min(abs(r - 43.), abs(r - 50.5)), abs(r - 56.5)), .09, fw)); }
-  if (r > 58.5 && r < 86.) { il = max(il, line(min(abs(r - 64.2), abs(r - 77.7)), .08, fw)); }
-  if (r > 60. && lat < 6.9 && cos(a6) > 0.) { il = max(il, line(min(abs(lat - 2.4), abs(lat - 5.6)), .055, fw)); if (abs(th - PI * .5) < .5) { il = max(il, line(lat, .09, fw)); } }
+  let ax = abs(p.x); let az = abs(p.z); let sq = max(ax, az); var il = 0.; var lap = 0.;
+  if (sq < 110.) { il = max(il, line(min(abs(sq - 84.), abs(sq - 103.)), .07, fw)); il = max(il, line(abs(sq - 75.5), .05, fw)); }
+  let ew = az < 10.6 && ax > 104.; let ns = ax < 10.6 && az > 104.;
+  if (ew || ns) {
+    let lat = select(ax, az, ew); il = max(il, line(min(min(abs(lat - 3.05), abs(lat - 4.95)), lat), .06, fw));
+    lap = ss(3.1, 3.2, lat) * (1. - ss(4.8, 4.9, lat));
+    // a lotus in the band every 2 m
+    let al = select(az, ax, ew); let u = fract(al / 2.) - .5; let q = vec2f(u * 2., (lat - 4.) / .8);
+    let pet = length(q) - .55 * (.5 + .5 * abs(cos(2.5 * atan2(q.y, q.x)))); il = max(il, lap * (1. - ss(-fw, fw, pet)) * sat(1. - fw / .1));
+  }
+  o.alb = mix(o.alb, vec3f(.05, .08, .3) * (.85 + .3 * m.a), lap * (1. - il)); o.rough = mix(o.rough, .2, lap);
   o.inlay = il; o.alb = mix(o.alb, vec3f(.95, .68, .25), il); o.metal = il * .45; o.rough = mix(o.rough, .34, il);
   return o;
 }
@@ -226,15 +227,16 @@ fn terrain(p: vec3f, dx: vec3f, dy: vec3f, fw: f32, n: vec3f, tv: vec3f) -> Mt {
   // noise at five scales: R 80 m, L 20 m, M 5 m, A 1 m, B grain
   let R = tri(tNoiseA, p, dx, dy, up, .0031); let L = tri(tNoiseA, p, dx, dy, up, .011); let M = tri(tNoiseA, p, dx, dy, up, .047);
   let A = tri(tNoiseA, p, dx, dy, w, .19); let B = tri(tNoiseA, p, dx, dy, w, 1.6);
-  let az = atan2(p.x, -p.z) * 57.2958; let north = ss(-52., -30., az) * (1. - ss(62., 88., az));
+  let nlx = 600. + 34. * sin(p.z / 640. + .6) + 18. * sin(p.z / 230. + 2.1); let north = 0.;
+  let dk = max(ss(-470., -640., p.x + 60. * sin(p.z / 210.) + 30. * sin(p.z / 77.)), ss(1300., 1700., p.x - nlx - 480. + 80. * sin(p.z / 300.)));
   let steep = tv.x * .64; let wet = tv.y; let hollow = tv.z * 2. - 1.;
   // limestone: pale, bedded (broad layers far, finer close), cracked, water-stained, ochre in places
   let st = mix(.5, sin(h * .23 + A.r * 5. + L.r * 14.) * .5 + .5, sat(1. - fw / 2.5) * .7);
   let beds = sin(h * .085 + L.r * 7. + L.g * 3.) * .5 + .5; let bed2 = ss(.35, .65, sin(h * .31 + L.r * 11. + A.r * 2.) * .5 + .5);
   let sq3 = vec3f(1., .13, 1.); let stain = tri(tNoiseA, p * sq3, dx * sq3, dy * sq3, w, .21).r;
-  var rock = vec3f(.6, .585, .55) * (.72 + .08 * st + .16 * beds + .06 * bed2 + .2 * (A.b - .3)) * (.85 + .3 * B.a);
-  rock = mix(rock, vec3f(.3, .27, .23), .32 * ss(.5, .72, stain + (M.r - .5) * .3) * ss(.25, .45, 1. - n.y) * ss(.35, .6, L.r + R.g * .4));
-  rock = mix(rock, vec3f(.5, .4, .29), .14 * ss(.5, .8, L.g + R.r * .5));
+  var rock = vec3f(.74, .5, .37) * (.72 + .08 * st + .16 * beds + .06 * bed2 + .2 * (A.b - .3)) * (.85 + .3 * B.a);
+  rock = mix(rock, vec3f(.42, .26, .18), .32 * ss(.5, .72, stain + (M.r - .5) * .3) * ss(.25, .45, 1. - n.y) * ss(.35, .6, L.r + R.g * .4));
+  rock = mix(rock, vec3f(.84, .6, .38), .14 * ss(.5, .8, L.g + R.r * .5));
   rock *= 1. - .35 * ss(.5, .8, A.b) * sat(1. - fw / 1.5);
   // finer bedding: ledges ~1 m apart with shade lines (and their tilt, below)
   let ledge = h * .9 + L.r * 9. + A.r * 1.2; let lk = sat(1. - fw / 2.5); rock *= 1. - .12 * ss(.55, .95, sin(ledge) * .5 + .5) * lk;
@@ -266,7 +268,7 @@ fn terrain(p: vec3f, dx: vec3f, dy: vec3f, fw: f32, n: vec3f, tv: vec3f) -> Mt {
   let wood = north * ss(25., 60., h) * (1. - ss(260., 430., h + L.r * 160.)) * ss(.3, .5, L.r + A.r * .3);
   o.alb = mix(o.alb, vec3f(.035, .07, .028) * (.6 + .8 * B.a), wood * .9);
   // gravel and pebbles by and in the river
-  o.alb = mix(o.alb, mix(vec3f(.5, .47, .4), vec3f(.3, .28, .25), ss(.34, .14, A.g)) * (.7 + .5 * B.a), ss(.6, .82, wet + (A.r - .5) * .35 + (M.r - .5) * .25));
+  o.alb = mix(o.alb, mix(vec3f(.17, .15, .08), vec3f(.05, .1, .03), ss(.34, .14, A.g)) * (.7 + .5 * B.a), ss(.6, .82, wet + (A.r - .5) * .35 + (M.r - .5) * .25));
   // rock where steep or above the grass line, with an edge ragged at every scale (a soft gradient reads as haze)
   let mtn = ss(60., 200., h); let edge = mix(.2, .3, mtn);
   let rq = steep + (A.r - .5) * .15 + (M.r - .5) * .2 + (L.r - .5) * .22 * mtn + (B.a - .5) * .05 - hollow * .04;
@@ -275,10 +277,15 @@ fn terrain(p: vec3f, dx: vec3f, dy: vec3f, fw: f32, n: vec3f, tv: vec3f) -> Mt {
   let scree = ss(edge - .09, edge - .03, rq) * (1. - rk) * ss(.4, .2, A.g) * mtn;
   o.alb = mix(o.alb, vec3f(.5, .47, .41) * (.7 + .5 * B.a), scree * .8);
   o.alb = mix(o.alb, rock, rk); o.rough = mix(o.rough, .8, rk); o.nb = mix(o.nb, rn, rk);
-  // roads: the spokes continue as pale stone ways
-  let a6 = (fract((th - PI * .5) / (PI / 3.) + .5) - .5) * (PI / 3.); let lat = abs(r * sin(a6));
-  let road = (1. - ss(4.6, 5.4, lat + (B.a - .5) * .6)) * ss(-3., 1., h) * (1. - ss(760., 900., r)) * step(0., cos(a6));
-  if (road > 0.) { let m = marble(p, dx, dy, w, vec3f(0.)); let g = p.xz / 1.6; let f = min(fract(g), 1. - fract(g)) * 1.6; o.alb = mix(o.alb, vec3f(.72, .69, .62) * m.rgb * (1. - .4 * line(min(f.x, f.y), .012, fw)), road); o.rough = mix(o.rough, .5, road); o.nb *= 1. - road * .8; }
+  // the desert: fine sand with ripples, pale on crests, warmer in hollows; sandstone where steep
+  if (dk > 0.) {
+    let ph = (p.x * .9 + p.z * .38) * 2.6 + M.r * 6. + A.r * 2.; let rf = sat(1. - fw / .4);
+    var sand = mix(vec3f(.8, .62, .4), vec3f(.9, .75, .53), ss(.3, .8, L.r + (R.g - .5) * .6 - hollow * .3)) * (.9 + .12 * B.a);
+    sand *= 1. + .05 * sin(ph) * rf;
+    let sk = dk * (1. - rk);
+    o.alb = mix(o.alb, sand, sk); o.rough = mix(o.rough, .92, sk);
+    o.nb = mix(o.nb, vec3f(.9, 0., .35) * cos(ph) * .1 * rf + triN(p, dx, dy, w, 1.4, true) * .12, sk);
+  }
   // shore: wet rock and sand, then the sea bed with weed
   let sand = vec3f(.6, .56, .46) * (.8 + .4 * B.a);
   let shore = 1. - ss(.3, 2.2, h + (A.r - .5) * 1.5);
@@ -286,6 +293,7 @@ fn terrain(p: vec3f, dx: vec3f, dy: vec3f, fw: f32, n: vec3f, tv: vec3f) -> Mt {
   if (h < .3) { let dk = ss(.3, -.4, h); o.alb *= mix(1., .62, dk); o.rough = mix(o.rough, .3, dk * ss(-.5, .3, h)); o.alb = mix(o.alb, vec3f(.05, .09, .05), ss(.5, .75, L.g * .5 + A.r) * ss(-.5, -3., h) * .8); }
   return o;
 }
+const PAINTC = array<vec3f, 8>(vec3f(.045, .075, .3), vec3f(.07, .4, .38), vec3f(.42, .1, .05), vec3f(.6, .4, .14), vec3f(.04, .26, .13), vec3f(.82, .79, .72), vec3f(.03, .03, .03), vec3f(.86, .6, .22));
 const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(.42, .3, .66), vec3f(.26, .32, .66), vec3f(.7, .68, .62), vec3f(.6, .12, .34), vec3f(.52, .4, .72), vec3f(.84, .5, .58));
 @fragment fn fs(i: VO) -> GO {
   // all derivatives first, while control flow is uniform
@@ -355,7 +363,7 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
   else if (mat == 10u) { o = terrain(p, dx, dy, fw, N, i.uv); }
   else if (mat == 2u) {
     let A = tri(tNoiseA, p, dx, dy, w, .33); let B = tri(tNoiseA, p, dx, dy, w, 3.1);
-    o.alb = mix(vec3f(.79, .76, .7), i.tint.rgb, .55) * (1. - .08 * (A.r - .5) - .05 * (B.a - .5)); o.rough = .78; o.nb = triN(p, dx, dy, w, 3.3, false) * .2;
+    o.alb = mix(vec3f(.79, .76, .7), i.tint.rgb, .85) * (1. - .08 * (A.r - .5) - .05 * (B.a - .5)); o.rough = .78; o.nb = triN(p, dx, dy, w, 3.3, false) * .2;
   } else if (mat == 3u) { o.alb = vec3f(.86, .6, .22); o.metal = 1.; o.rough = .33; o.inlay = .14; } // gold answers the pulse a little
   else if (mat == 5u) {
     let g = p.xz / 1.5; let f = min(fract(g), 1. - fract(g)) * 1.5; let A = tri(tNoiseA, p, dx, dy, w, .31); let B = tri(tNoiseA, p, dx, dy, w, 1.7);
@@ -405,6 +413,45 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
     let A = tri(tNoiseA, p, dx, dy, w, .5); let B = tri(tNoiseA, p, dx, dy, w, 2.4);
     o.alb = vec3f(.6, .57, .51) * i.tint.rgb * (.7 + .5 * A.r) * (.8 + .4 * B.a); o.rough = .8; o.nb = triN(p, dx, dy, w, .6, true) * 1.5 + triN(p, dx, dy, w, 3., true) * .5;
     let d = p.y; let wet = 1. - ss(.0, .5, d); o.alb = mix(o.alb, o.alb * .5, wet); o.rough = mix(o.rough, .25, wet); o.alb = mix(o.alb, vec3f(.06, .09, .04), ss(.5, .7, A.g + B.a * .4) * ss(.9, -.2, d));
+  } else if (mat == 18u) {
+    // painted and inlaid stone: glazed colour, a frieze of symbols (uv.y 1), a star ceiling (.5), stripes (.78)
+    let ci = min(u32(i.uv.x * 255. + .5), 7u); let A = tri(tNoiseA, p, dx, dy, w, .7); let B = tri(tNoiseA, p, dx, dy, w, 3.);
+    o.alb = PAINTC[ci] * (.9 + .15 * A.r) * (.93 + .1 * B.a); o.rough = .38 + .14 * A.g; o.nb = triN(p, dx, dy, w, 2.3, false) * .03;
+    if (ci == 7u) { o.metal = 1.; o.rough = .33; }
+    let fl = i.uv.y; var gm = 0.;
+    if (fl > .9) {
+      let along = select(p.z, p.x, abs(N.z) > abs(N.x)); let u = fract(along / .9); let id = floor(along / .9); let v = i.uv.z;
+      let q = vec2f(u - .5, v - .5); let k = u32(h11(id + 7.) * 6.); let aa = fw * 1.6 / .9;
+      var d = 1e3;
+      if (k == 0u) { d = min(abs(length(vec2f(q.x, (q.y - .2) * 1.3)) - .1) - .035, max(abs(q.x) - .035, abs(q.y + .12) - .22)); d = min(d, max(abs(q.y - .07) - .035, abs(q.x) - .16)); } // ankh
+      else if (k == 1u) { d = max(abs(q.x) - .06, abs(q.y) - .34); d = min(d, max(max(abs(q.x) - .17, abs(q.y - .22) - .12), .25 - abs(fract(q.y * 14.) - .5) * 1.)); } // djed
+      else if (k == 2u) { d = abs(length(q * vec2f(1., 2.6)) - .26) - .03; d = min(d, length(q) - .07); d = min(d, max(abs(q.x + .08) - .03, abs(q.y + .2) - .1)); } // eye
+      else if (k == 3u) { d = length(q - vec2f(0., .05)) - .17; d = min(d, max(abs(q.y + .2) - .03, abs(q.x) - .3)); } // sun disc
+      else if (k == 4u) { d = length(q * vec2f(1.9, 1.25)) - .26; d = max(d, -max(abs(q.x) - .012, abs(q.y) - .3)); d = min(d, max(abs(q.y + .02) - .02, abs(q.x) - .3)); } // scarab
+      else { let pq = vec2f(q.x, q.y + .1); d = length(pq) - .3 * (.4 + .6 * abs(sin(atan2(pq.y, pq.x) * 1.5))); d = max(d, -q.y - .3); } // lotus
+      d = min(d, abs(u - .02) * 1.2 - .006);
+      gm = (1. - ss(-aa, aa, d)) * ss(.1, .16, v) * ss(.9, .84, v) * sat(1.5 - fw / .06);
+    } else if (fl > .7) { gm = ss(.4, .6, abs(fract(p.y * 2.2) - .5) * 2.) * sat(1. - fw / .15); }
+    else if (fl > .4) {
+      let g = p.xz / .9; let q = fract(g) - .5; let r = length(q); let st = r - .1 * (.55 + .45 * cos(5. * atan2(q.y, q.x) + h21(floor(g)) * 6.));
+      gm = (1. - ss(-fw, fw, st * .9)) * sat(1. - fw / .1);
+    }
+    o.alb = mix(o.alb, vec3f(.95, .7, .28), gm); o.metal = mix(o.metal, .9, gm); o.rough = mix(o.rough, .3, gm);
+  } else if (mat == 19u) {
+    // golden sandstone in courses, with fine bedding; tinted per instance
+    let A = tri(tNoiseA, p, dx, dy, w, .3); let B = tri(tNoiseA, p, dx, dy, w, 2.6); let C = tri(tNoiseA, p, dx, dy, w, .05);
+    let bed = sin(p.y * 9. + A.r * 4. + C.r * 9.) * .5 + .5;
+    o.alb = vec3f(.8, .64, .43) * i.tint.rgb * (.86 + .14 * bed * sat(1. - fw / .1)) * (.9 + .16 * A.g) * (.9 + .12 * B.a) * mix(vec3f(1.), vec3f(1.04, .97, .9), ss(.4, .7, C.g));
+    o.rough = .74; o.nb = triN(p, dx, dy, w, 2.6, true) * .18;
+    let wall = 1. - abs(N.y); let cy = p.y / .9; let jy = line(min(fract(cy), 1. - fract(cy)) * .9, .006, fw) * wall;
+    let ax = select(p.x, p.z, w.x > w.z) / 1.6 + h11(floor(cy)) * 7.; let jx = line(min(fract(ax), 1. - fract(ax)) * 1.6, .006, fw) * wall * ss(.6, .9, max(w.x, w.z));
+    o.alb *= 1. - .3 * max(jy, jx);
+  } else if (mat == 20u) {
+    // pink granite, polished: speckled with dark mica and pale feldspar
+    let A = tri(tNoiseA, p, dx, dy, w, 1.1); let B = tri(tNoiseA, p, dx, dy, w, 6.); let C = tri(tNoiseA, p, dx, dy, w, .2);
+    var c = vec3f(.6, .36, .31) * (.85 + .3 * C.r);
+    c = mix(c, vec3f(.12, .1, .1), ss(.62, .72, B.r) * sat(1. - fw / .03) * .8); c = mix(c, vec3f(.82, .72, .66), ss(.66, .76, B.g) * sat(1. - fw / .03) * .6);
+    o.alb = c * (.92 + .16 * A.a); o.rough = .22 + .1 * A.r; o.nb = triN(p, dx, dy, w, 4., false) * .02;
   } else {
     // mountain stream and fall (uv.x across, uv.y bed steepness): white and streaked when falling, glassy with threads
     // when running; ragged edges move with the flow

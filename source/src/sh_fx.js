@@ -125,9 +125,9 @@ const W_FX2 = /*wgsl*/`
   var under = textureSampleLevel(tScene, sLin, uv2, 0.).rgb; var sig: vec3f; var scat: vec3f; var sA = .2;
   let amb = skyLut(vec3f(0., 1., 0.)) * 1.6 + view.sunc.rgb * .12;
   let shw = shadow(p, vec3f(0., 1., 0.));
-  if (kind == 0u) { sig = vec3f(.26, .045, .04); scat = vec3f(.0, .035, .04) * amb; sA = .05; }
-  else if (kind == 1u) { sig = vec3f(2.4, 3., 1.3); scat = vec3f(.011, .006, .12) * (.35 + .65 * shw); sA = 2.5; }
-  else { sig = vec3f(.4, .08, .06); scat = vec3f(.001, .012, .028) * amb * (1. + 1.4 * sat(p.y * 2. + .15)); sA = .1; } // crests let more light through
+  if (kind == 0u) { sig = vec3f(.32, .05, .1); scat = vec3f(.0, .042, .028) * amb; sA = .05; }
+  else if (kind == 1u) { sig = vec3f(.55, .1, .2); scat = vec3f(.0, .055, .035) * amb; sA = .12; }
+  else { sig = vec3f(.42, .12, .17); scat = vec3f(.006, .032, .022) * amb * (1. + 1.4 * sat(p.y * 2. + .15)); sA = .14; } // crests let more light through
   under = under * exp(-sig * (path + depth * .6)) + scat * (1. - exp(-sA * path));
   // what it mirrors
   let R = reflect(rd, N); var refl: vec3f;
@@ -142,15 +142,15 @@ const W_FX2 = /*wgsl*/`
     refl = textureSampleLevel(tEnv, sLin, Rs, clamp(sqrt(rough2) * 9., 0., 3.5)).rgb;
     if (LV < 2 && view.misc.y < .5 && fw < 1.5) { let h = ssr(p, Rs, nz); refl = mix(refl, h.rgb, h.a * (1. - ss(.7, 1.5, fw))); }
   }
-  if (kind == 1u) { refl *= vec3f(.2, .17, .5); } // dark mirror, violet cast
-  var col = mix(under, refl, select(F, min(F, .55), kind == 1u));
+  
+  var col = mix(under, refl, F);
   // dark line where water meets stone
   if (kind < 2u) { col *= mix(.5, 1., ss(0., .35, thick0)); }
   // sun glitter
   let sh = shw;
   let H = normalize(V + L); let a = max(rough2 * 2., .0008);
   col += view.sunc.rgb * sh * min(ggxD(sat(dot(N, H)), sqrt(a)) * ggxV(sat(dot(N, L)), nv, sqrt(a)), select(90., 30., kind == 2u)) * sat(dot(N, L)) * (.02 + .98 * pow(1. - sat(dot(V, H)), 5.));
-  if (kind == 1u) {
+  if (false) {
     // light-liquid: three layers of violet and rose filaments drifting round the ring at their own speeds, stirred by a
     // swirl, with brightness waves and breathing. Whole-number texture turns around the ring avoid a seam where the angle wraps.
     let nt = select(select(select(82., 56., r < 80.), 46., r < 65.), 25., r < 50.); let an = atan2(p.z, p.x) / (2. * PI); let rv = r / 8.;
@@ -167,19 +167,19 @@ const W_FX2 = /*wgsl*/`
     let f = textureSampleGrad(tNoiseA, sRep, p.xz / 5. + vec2f(view.cam.w * .02), dx / 5., dy / 5.);
     let edge = ss(.55, .0, depth + (f.r - .5) * .5 + .12 * sin(view.cam.w * .7 + f.a * 6.)) * ss(.25, .6, f.g + f.a * .5);
     col = mix(col, amb * .55 + view.sunc.rgb * sh * .22, edge * .8);
-  } else { col += vec3f(.4, .9, .85) * pl * .25; }
+  } else { col += vec3f(.5, .95, .75) * pl * .2; }
   return FO(vec4f(aerial(col, view.cam.xyz, rd, dist), 1.));
 }
 // podium falls: sheet, foam, mist (uv.x = 3, 4, 5; see meshCascades)
 @fragment fn fsCascade(i: VO) -> FO {
   let kind = u32(i.uv.x * 255. + .5); let p = i.wp; let fc = i.clip.xy; let toC = view.cam.xyz - p; let dist = length(toC); let V = toC / dist; let r = length(p.xz);
   // whole-number texture turns around the tier: no seam where the angle wraps
-  let an = atan2(p.z, p.x) / (2. * PI); let cir = 2. * PI * round(r); let t = view.cam.w;
+  let an = atan2(p.z, p.x) / (2. * PI); let cir = 8. * round(max(abs(p.x), abs(p.z)) / 7.) * 7.; let t = view.cam.w;
   let dq = vec2f(length(dpdx(p)), length(dpdy(p)));
   var N = normalize(i.n); if (dot(N, V) < 0.) { N = -N; }
   let sh = shadow(p, N); let pl = lum(pulseAt(r)); let live = .4 + 1.6 * exp(-r / 45.) + .35 * view.pulse.y + .8 * view.pulse.z;
   // froth and mist: droplets, pale lilac in sky and sun light, with a little of the liquid's glow
-  let froth = vec3f(.5, .45, .8) * (skyLut(vec3f(0., 1., 0.)) * .8 + view.sunc.rgb * (.02 + .07 * sh)) + vec3f(.42, .25, 1.) * (.1 + .1 * live) * (1. + 3. * pl);
+  let froth = vec3f(.75, .82, .8) * (skyLut(vec3f(0., 1., 0.)) * .8 + view.sunc.rgb * (.03 + .09 * sh)) * (1. + 1.5 * pl);
   var col: vec3f; var al: f32;
   if (kind == 3u) {
     let h = i.uv.z * 16.; let hb = i.uv.y * 16.; // metres fallen from the lip, metres left to the pool
@@ -197,19 +197,17 @@ const W_FX2 = /*wgsl*/`
     let grow = ss(.15, 3.5, h); let rope = ss(.42, .7, s1.r + (b.r - .5) * .35) * grow; let thin = ss(.55, .3, s1.r + (a.r - .5) * .3) * grow;
     let tg = normalize(vec3f(-N.z, 0., N.x)); N = normalize(N + tg * ((a.r - .5) * .3 + (b.a - .5) * (.12 + .75 * grow)) + vec3f(0., (b.r - .5) * .25 * grow, 0.));
     let nv = max(dot(N, V), 1e-3); let F = .03 + .97 * pow(1. - nv, 5.);
-    // the same liquid as the moat: indigo body, glowing filaments, violet-cast mirror, only a narrow sun glint
-    col = vec3f(.011, .006, .12) * (.35 + .65 * sh) * (.75 + .5 * a.r) * (1. - .5 * thin);
-    // filaments show little in the squeezed film at the lip
-    let glow = (f1 * .9 + f2 * .7) * live * (1. + 4. * pl) * mix(.25, 1., ss(.2, 2.5, h)) + pl * 1.2;
-    col += mix(vec3f(.5, .28, 1.), vec3f(1., .4, .62), sat(f2 * 1.4)) * glow * .45 * (.55 + .7 * rope);
-    col += vec3f(.4, .25, 1.) * rope * (.07 + .16 * b.r) * (.8 + .5 * view.pulse.y);
-    col = col * (1. - F) + sky(reflect(-V, N), false) * vec3f(.2, .17, .5) * min(F, .55) * (1. - .6 * rope);
-    col += view.sunc.rgb * sh * sunBRDF(N, V, vec3f(.01, .005, .05), vec3f(.03), mix(.1, .32, rope)) * .2;
+    // clear water over stone: the stone behind shows green through the thin sheet, white where it gathers into ropes
+    let behind = vec3f(.6, .56, .46) * (view.sunc.rgb * .1 * sh + skyLut(vec3f(0., 1., 0.)) * .6);
+    col = mix(behind * vec3f(.55, .85, .72), froth * (.6 + .5 * b.r), rope * .8 + thin * .15) * (.85 + .3 * a.r);
+    col = col * (1. - F) + sky(reflect(-V, N), false) * min(F, .6);
+    col += view.sunc.rgb * sh * sunBRDF(N, V, vec3f(.02), vec3f(.02), mix(.08, .3, rope)) * .35;
+    col += vec3f(.6, 1., .8) * pl * .4;
     // the last stretch before the pool churns to froth
     let foot = ss(min(2.4, .28 * (h + hb)) * (.55 + .9 * a.r), 0., hb) * (.72 + .2 * rope + .28 * b.a);
     col = mix(col, froth * (.7 + .5 * b.r), sat(foot));
     // one continuous sheet hiding the marble (a tenth of sunlit marble showing turns it pale); clear only at the slot
-    al = min(.95 + .05 * a.r, 1.) * mix(.7, 1., ss(0., .12, h));
+    al = (.68 + .3 * rope + .15 * a.r) * mix(.6, 1., ss(0., .12, h));
   } else if (kind == 4u) {
     // foam: thick where the sheet lands, torn into patches further out
     let tv = i.uv.z; let gr = dq.x / 4.;
@@ -279,7 +277,7 @@ fn behind(pe: vec3f, d: vec3f, zf: f32, disp: f32, far: f32) -> vec3f {
   let facet = h21(floor(nw.xz * 3.1 + nw.y * 1.7 + .23) + floor(nl.xz * 2.3 + .37));
   // the crystals breathe with the city and flash as the pulse passes
   let live = .55 + .45 * view.pulse.y + 1.2 * view.pulse.z; let pu = pulseAt(length(p.xz));
-  let tint = mix(vec3f(.86, 1., .99), vec3f(.95, .9, 1.03), facet) * exp(-tex * vec3f(.012, .003, .004));
+  let tint = mix(vec3f(.55, 1., .7), vec3f(.7, 1., .62), facet) * exp(-tex * vec3f(.11, .012, .07));
   var bg: vec3f;
   if (slab && size < 6. && view.misc.y < .5) {
     // thin panels: the scene behind nudged by facet tilt, a hint of dispersion
@@ -305,7 +303,7 @@ fn behind(pe: vec3f, d: vec3f, zf: f32, disp: f32, far: f32) -> vec3f {
     let ap = max(dot(o.xz, normalize(nl.xz + 1e-5)), .3);
     // light climbs the axis in slow waves
     let g = exp(-dot(pc.xz, pc.xz) / sq(ap * .3)) * (.2 + .8 * exp(-max(pc.y / size, 0.) * 2.6)) * live * (.72 + .28 * sin(pc.y * .16 - view.cam.w * 1.1));
-    bg += vec3f(.88, .97, 1.) * g * view.sunc.g * .3;
+    bg += vec3f(.55, 1., .7) * g * view.sunc.g * .3;
   }
   // the great crystal answers each pulse: clear most of the cycle, a white glow builds in the whole body over the last
   // seconds, then one bright flash gone in half a second as the ring leaves. Added light, never a tint.
@@ -317,11 +315,11 @@ fn behind(pe: vec3f, d: vec3f, zf: f32, disp: f32, far: f32) -> vec3f {
     let f1 = textureSampleLevel(tNoiseA, sRep, vec2f(fa * 2. + pm.y * .004, pm.y * .011 - tm * .035), 1.).b;
     let f2 = textureSampleLevel(tNoiseA, sRep, vec2f(fa * 3. + .4 - pm.y * .006, pm.y * .019 - tm * .06), 1.).b;
     // added below, once the rest of the body is in place
-    memit = vec3f(.92, .97, 1.) * amt * (.42 + .5 * f1 + .35 * f2 + .5 * veil) * view.sunc.g * .17;
+    memit = vec3f(.6, 1., .72) * amt * (.42 + .5 * f1 + .35 * f2 + .5 * veil) * view.sunc.g * .17;
   }
   // light caught in the body: quartz is never dark; grows with distance as inner planes average out
-  bg += (view.sunc.rgb * (.03 + .06 * sh) + skyLut(vec3f(0., 1., 0.)) * .04) * vec3f(.92, .98, 1.) * (.5 + 1.5 * veil) * select(1., .4, slab) * (1. + min(dist / 300., 1.5)) * (.55 + .6 * live);
-  bg += pu * vec3f(.9, .95, 1.) * (.8 + 2. * veil) * select(1., .5, slab && size < 6.);
+  bg += (view.sunc.rgb * (.03 + .06 * sh) + skyLut(vec3f(0., 1., 0.)) * .04) * vec3f(.5, 1., .68) * (.5 + 1.5 * veil) * select(1., .4, slab) * (1. + min(dist / 300., 1.5)) * (.55 + .6 * live);
+  bg += pu * vec3f(.6, 1., .75) * (.8 + 2. * veil) * select(1., .5, slab && size < 6.);
   // internal planes on two lattices: some cells mirror another part of the world (horizon, zenith, ground), giving
   // depth; a rare one flashes with the sun
   {

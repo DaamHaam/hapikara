@@ -4,7 +4,19 @@
 
 Pierre dorée, pierres précieuses et eau vert-jade qui ruisselle de partout, depuis une pyramide couronnée d'émeraude jusqu'au Nil. Tout est généré par le code à l'ouverture de la page (WebGPU, sans image, modèle 3D, son ni bibliothèque), dans un seul fichier HTML.
 
-> 🚧 En construction. Pour l'instant, `index.html` affiche encore le monde d'Atlantis, dont ce projet reprend le moteur.
+![L'allée des sphinx vers la pyramide](.github/screenshots/avenue.jpg)
+
+| | |
+|---|---|
+| ![Un canal vert-jade](.github/screenshots/canal.jpg) | ![Le quartier des jardins](.github/screenshots/jardins.jpg) |
+
+![La cité entre le Nil et le désert](.github/screenshots/aerial.jpg)
+
+## Essayer
+
+Ouvrir `index.html` dans Chrome ou Edge (WebGPU). Entrée pour entrer, souris pour regarder, `W` `A` `S` `D` pour voler, `Q` / `E` pour descendre et monter, `Maj` pour accélérer, `1` à `6` pour les points de vue, `Échap` pour le menu (niveau de détail). Sur écran tactile : un doigt pour avancer et tourner.
+
+> 🚧 Première version : la ville, l'eau, la pyramide et la végétation sont en place ; les détails et le réalisme s'affinent.
 
 ## Démarche
 

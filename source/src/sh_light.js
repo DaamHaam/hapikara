@@ -225,7 +225,7 @@ fn shafts(fc: vec2f, z: f32, rd: vec3f) -> vec3f {
   let glass = g2.a > .5; let f0 = select(mix(vec3f(.04), alb, metal), vec3f(.085), glass); let dc = alb * (1. - metal);
   var sun = view.sunc.rgb * sh;
   // under water: moving caustics from the surface, dimmed with depth
-  let r = length(wp.xz); let wl = select(0., ${WATER}, r < 432.); let dep = wl - wp.y;
+  let r = length(wp.xz); let wl = select(0., ${WATER}, pow(pow(abs(wp.x) / 470., 5.) + pow(abs(wp.z) / 400., 5.), .2) < 1.); let dep = wl - wp.y;
   var cz = 0.; let pu = pulseAt(r);
   if (dep > -2.6 && (r < 432. || wp.y < 2.2)) {
     // two caustic layers at unrelated scales and angles, warped so they never repeat; mip by pixel size against sizzle
