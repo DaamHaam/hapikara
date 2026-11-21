@@ -5,7 +5,7 @@ Source unique des règles pour Codex et Claude Code (`CLAUDE.md` contient seulem
 ## Façon de travailler sur ce projet
 
 - **Branche de travail** : on développe directement sur `main` ; ne pas créer de branche `dev`.
-- **Publication** : GitHub Pages depuis la racine de `main` (`index.html`), à activer quand le monde égyptien aura remplacé celui d'Atlantis.
+- **Publication** : GitHub Pages depuis la racine de `main` (`index.html`) : https://daamhaam.github.io/hapikara/ — chaque push sur `main` republie.
 - **Tags de version** : `vX.Y.Z` posés automatiquement par `.github/workflows/agents.yml` depuis `source/package.json`.
 - **Particularités** :
   - Mac M1 8 Go : une seule fenêtre de navigateur de test à la fois, la fermer et arrêter le serveur après usage ; limiter les i/s en développement.

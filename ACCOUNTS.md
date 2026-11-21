@@ -8,7 +8,7 @@ Carte des comptes utilisés par le projet, pour reprendre après des mois. **Auc
 - Config git spécifique : aucune
 
 ## Hébergement
-- GitHub Pages : à activer (URL prévue `https://daamhaam.github.io/hapikara/`)
+- GitHub Pages : actif, branche `main`, racine — https://daamhaam.github.io/hapikara/
 - Connexion : GitHub DaamHaam
 - Déploiement : automatique au push sur `main` une fois Pages activé
 
