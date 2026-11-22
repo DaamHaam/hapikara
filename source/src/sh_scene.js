@@ -293,6 +293,17 @@ fn terrain(p: vec3f, dx: vec3f, dy: vec3f, fw: f32, n: vec3f, tv: vec3f) -> Mt {
   if (h < .3) { let dk = ss(.3, -.4, h); o.alb *= mix(1., .62, dk); o.rough = mix(o.rough, .3, dk * ss(-.5, .3, h)); o.alb = mix(o.alb, vec3f(.05, .09, .05), ss(.5, .75, L.g * .5 + A.r) * ss(-.5, -3., h) * .8); }
   return o;
 }
+// six Egyptian signs as signed distances in a unit cell (q in -.5..5): ankh, djed, eye, sun disc, scarab, lotus
+fn glyphD(q: vec2f, k: u32) -> f32 {
+  var d = 1e3;
+  if (k == 0u) { d = min(abs(length(vec2f(q.x, (q.y - .2) * 1.3)) - .1) - .035, max(abs(q.x) - .035, abs(q.y + .12) - .22)); d = min(d, max(abs(q.y - .07) - .035, abs(q.x) - .16)); } // ankh
+  else if (k == 1u) { d = max(abs(q.x) - .06, abs(q.y) - .34); d = min(d, max(max(abs(q.x) - .17, abs(q.y - .22) - .12), .25 - abs(fract(q.y * 14.) - .5) * 1.)); } // djed
+  else if (k == 2u) { d = abs(length(q * vec2f(1., 2.6)) - .26) - .03; d = min(d, length(q) - .07); d = min(d, max(abs(q.x + .08) - .03, abs(q.y + .2) - .1)); } // eye
+  else if (k == 3u) { d = length(q - vec2f(0., .05)) - .17; d = min(d, max(abs(q.y + .2) - .03, abs(q.x) - .3)); } // sun disc
+  else if (k == 4u) { d = length(q * vec2f(1.9, 1.25)) - .26; d = max(d, -max(abs(q.x) - .012, abs(q.y) - .3)); d = min(d, max(abs(q.y + .02) - .02, abs(q.x) - .3)); } // scarab
+  else { let pq = vec2f(q.x, q.y + .1); d = length(pq) - .3 * (.4 + .6 * abs(sin(atan2(pq.y, pq.x) * 1.5))); d = max(d, -q.y - .3); } // lotus
+  return d;
+}
 const PAINTC = array<vec3f, 8>(vec3f(.045, .075, .3), vec3f(.07, .4, .38), vec3f(.42, .1, .05), vec3f(.6, .4, .14), vec3f(.04, .26, .13), vec3f(.82, .79, .72), vec3f(.03, .03, .03), vec3f(.86, .6, .22));
 const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(.42, .3, .66), vec3f(.26, .32, .66), vec3f(.7, .68, .62), vec3f(.6, .12, .34), vec3f(.52, .4, .72), vec3f(.84, .5, .58));
 @fragment fn fs(i: VO) -> GO {
@@ -430,13 +441,7 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
     if (fl > .9) {
       let along = select(p.z, p.x, abs(N.z) > abs(N.x)); let u = fract(along / .9); let id = floor(along / .9); let v = i.uv.z;
       let q = vec2f(u - .5, v - .5); let k = u32(h11(id + 7.) * 6.); let aa = fw * 1.6 / .9;
-      var d = 1e3;
-      if (k == 0u) { d = min(abs(length(vec2f(q.x, (q.y - .2) * 1.3)) - .1) - .035, max(abs(q.x) - .035, abs(q.y + .12) - .22)); d = min(d, max(abs(q.y - .07) - .035, abs(q.x) - .16)); } // ankh
-      else if (k == 1u) { d = max(abs(q.x) - .06, abs(q.y) - .34); d = min(d, max(max(abs(q.x) - .17, abs(q.y - .22) - .12), .25 - abs(fract(q.y * 14.) - .5) * 1.)); } // djed
-      else if (k == 2u) { d = abs(length(q * vec2f(1., 2.6)) - .26) - .03; d = min(d, length(q) - .07); d = min(d, max(abs(q.x + .08) - .03, abs(q.y + .2) - .1)); } // eye
-      else if (k == 3u) { d = length(q - vec2f(0., .05)) - .17; d = min(d, max(abs(q.y + .2) - .03, abs(q.x) - .3)); } // sun disc
-      else if (k == 4u) { d = length(q * vec2f(1.9, 1.25)) - .26; d = max(d, -max(abs(q.x) - .012, abs(q.y) - .3)); d = min(d, max(abs(q.y + .02) - .02, abs(q.x) - .3)); } // scarab
-      else { let pq = vec2f(q.x, q.y + .1); d = length(pq) - .3 * (.4 + .6 * abs(sin(atan2(pq.y, pq.x) * 1.5))); d = max(d, -q.y - .3); } // lotus
+      var d = glyphD(q, k);
       d = min(d, abs(u - .02) * 1.2 - .006);
       gm = (1. - ss(-aa, aa, d)) * ss(.1, .16, v) * ss(.9, .84, v) * sat(1.5 - fw / .06);
     } else if (fl > .7) { gm = ss(.4, .6, abs(fract(p.y * 2.2) - .5) * 2.) * sat(1. - fw / .15); }
@@ -454,12 +459,28 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
     let wall = 1. - abs(N.y); let cy = p.y / .9; let jy = line(min(fract(cy), 1. - fract(cy)) * .9, .006, fw) * wall;
     let ax = select(p.x, p.z, w.x > w.z) / 1.6 + h11(floor(cy)) * 7.; let jx = line(min(fract(ax), 1. - fract(ax)) * 1.6, .006, fw) * wall * ss(.6, .9, max(w.x, w.z));
     o.alb *= 1. - .3 * max(jy, jx);
+    if (i.uv.y > .9 && wall > .5) {
+      // pylon towers: columns of signs cut into the stone, every 3 m, shaded deeper than the joints
+      let la = select(i.lp.z, i.lp.x, abs(N.z) > abs(N.x)); let cu = fract(la / 3.) * 3.; let sc = max(i.sc.x, .2);
+      if (cu < .95 && i.lp.y > 2. && i.lp.y < 24.) {
+        let cy = i.lp.y / .95; let gq = vec2f(cu / .95 - .5, fract(cy) - .5); let gk = u32(h11(floor(cy) * 1.7 + floor(la / 3.) * 9.1) * 6.);
+        let aa = fw * 1.6 / .95 / sc; let gm = (1. - ss(-aa, aa, glyphD(gq, gk))) * sat(1.5 - fw / (.05 * sc));
+        o.alb *= 1. - .42 * gm; o.nb += vec3f(0., .25 * gm, 0.);
+      }
+    }
   } else if (mat == 20u) {
     // pink granite, polished: speckled with dark mica and pale feldspar
     let A = tri(tNoiseA, p, dx, dy, w, 1.1); let B = tri(tNoiseA, p, dx, dy, w, 6.); let C = tri(tNoiseA, p, dx, dy, w, .2);
     var c = vec3f(.6, .36, .31) * (.85 + .3 * C.r);
     c = mix(c, vec3f(.12, .1, .1), ss(.62, .72, B.r) * sat(1. - fw / .03) * .8); c = mix(c, vec3f(.82, .72, .66), ss(.66, .76, B.g) * sat(1. - fw / .03) * .6);
     o.alb = c * (.92 + .16 * A.a); o.rough = .22 + .1 * A.r; o.nb = triN(p, dx, dy, w, 4., false) * .02;
+    // a column of incised signs down the middle of each face, filled with gold
+    let al = select(i.lp.z, i.lp.x, abs(N.z) > abs(N.x));
+    if (abs(al) < .5 && i.lp.y > 4. && i.lp.y < 40.) {
+      let cy = i.lp.y / .9; let gq = vec2f(al / .9, fract(cy) - .5); let gk = u32(h11(floor(cy) + 3.) * 6.); let aa = fw * 1.6 / .9 / max(i.sc.x, .2);
+      let gm = (1. - ss(-aa, aa, glyphD(gq, gk))) * sat(1.5 - fw / (.05 * max(i.sc.x, .2)));
+      o.alb = mix(o.alb, vec3f(.92, .66, .26), gm); o.metal = gm * .9; o.rough = mix(o.rough, .32, gm);
+    }
   } else {
     // mountain stream and fall (uv.x across, uv.y bed steepness): white and streaked when falling, glassy with threads
     // when running; ragged edges move with the flow

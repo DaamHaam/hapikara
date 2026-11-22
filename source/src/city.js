@@ -83,7 +83,7 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
     const z = sz * 13.6; if (canalAt(x, z) || edgeDist(x, z) < 4.5 || onBridge(x, z, 3.5) || (x > 485 && x < 525) || (x > 552 && x < 568)) continue;
     sphinx(x, LAND, z, sz < 0 ? -PI / 2 : PI / 2);
   }
-  for (let x = 150; x <= 530; x += 30) for (const sz of [-1, 1]) { const z = sz * 21; if (canalAt(x, z) || edgeDist(x, z) < 3 || onBridge(x, z, 3) || (x > 488 && x < 522)) continue; tree('palm', x + 4.5, inCity(x, z) ? LAND : gH(x + 4.5, z), z, 1.05, 0.4, false); }
+  for (let x = 150; x <= 530; x += 18) for (const sz of [-1, 1]) { const z = sz * 21; if (canalAt(x, z) || edgeDist(x, z) < 3 || onBridge(x, z, 3) || (x > 488 && x < 522)) continue; tree('palm', x + 4.5, inCity(x, z) ? LAND : gH(x + 4.5, z), z, 1.05, 0.4, false); }
   put(type([rg.build()], K.SOLID, 1e9, 1e9, 1500), 0, 0, 0);
 
   // the Nile front: plaza, stepped quays down to the water, the great pylon, two obelisks
@@ -218,10 +218,10 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
       const x = rr(bx0, bx1), z = rr(bz0, bz1), k = rng();
       if (!inCity(x, z) || edgeDist(x, z) < 2.5 || abs(z) < AVE + 4 || abs(x) < AVE + 2 || (abs(x) < ACRO + 4 && abs(z) < ACRO + 4)) continue;
       if (cityH(x,z)>LAND || !free(x,z,5)) continue;
-      if (k < 0.095) tree('palm', x, cityH(x,z), z, rr(0.55, 1.35), 0.6);
-      else if (k < 0.13) tree('plane', x, cityH(x,z), z, 0.8, 0.8);
-      else if (k < 0.22) tree('olive', x, cityH(x,z), z, .9, 0.8);
-      else if (k < 0.36) tree('bloom', x, cityH(x,z), z, .85, 0.8);
+      if (k < 0.2) tree('palm', x, cityH(x,z), z, rr(0.5, 1.5), 0.6);
+      else if (k < 0.27) tree('plane', x, cityH(x,z), z, 0.8, 0.8);
+      else if (k < 0.35) tree('olive', x, cityH(x,z), z, .9, 0.8);
+      else if (k < 0.48) tree('bloom', x, cityH(x,z), z, .85, 0.8);
       else if (free(x, z, 1.5)) { shrub((rng() * 5) | 0, x, cityH(x,z), z, 1.5); paint(x, z, 2.2, 1, 255, 1.5); }
     }
     // palms along the quays

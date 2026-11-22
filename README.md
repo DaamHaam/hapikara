@@ -12,6 +12,12 @@ Pierre dorée, pierres précieuses et eau vert-jade qui ruisselle de partout, de
 
 ![La cité entre le Nil et le désert](.github/screenshots/aerial.jpg)
 
+## Atelier d'ambiance et plan de la cité
+
+L'accueil montre le **plan de la cité**, généré à partir du vrai tracé des canaux et des terrasses : choisissez un lieu pour y commencer la visite. Le bouton **Ambiance** (touche `L`) ouvre un atelier de réglages de la lumière : soleil, ombres, couleurs, brume, ciel, eau et cristal. Il propose trois ambiances de départ, une comparaison avec l'ouverture, une sauvegarde sur l'appareil et **« Copier mes réglages »** pour transmettre les valeurs retenues. Le bouton **i/s** (touche `H`) affiche les images par seconde.
+
+Les palmes sont désormais des feuilles pleines et dentelées, sans découpe transparente : elles ne clignotent plus. Des colonnes de hiéroglyphes sont gravées sur les pylônes et dorées sur les obélisques.
+
 ## Essayer
 
 En ligne : **https://daamhaam.github.io/hapikara/** — ou ouvrir `index.html` dans Chrome ou Edge (WebGPU). Entrée pour entrer, souris pour regarder, `W` `A` `S` `D` pour voler, `Q` / `E` pour descendre et monter, `Maj` pour accélérer, `1` à `6` pour les points de vue, `Échap` pour le menu (niveau de détail). Sur écran tactile : un doigt pour avancer et tourner.

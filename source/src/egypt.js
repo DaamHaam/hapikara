@@ -8,17 +8,18 @@ function meshPalm(seed, lod) {
   const n=[9,6,4,2,1][lod],pts=[];
   for(let i=0;i<=n;i++){const t=i/n;pts.push([lx*H*t*t,-.4+(H+.4)*t,lz*H*t*t,.3*(1-.3*t)+(i===0?.1:0)]);}
   mb.mat=M.PALMBARK;mb.tube(pts,[8,6,5,4,3][lod],false);
-  const top=pts[n],nf=[20,16,12,9,7][lod],steps=[9,7,5,4,3][lod];
+  const top=pts[n],nf=[20,16,12,9,7][lod],steps=[22,14,7,4,3][lod],teeth=lod<2;
   for(let f=0;f<nf;f++){
     const az=f/nf*TAU*2.618+rng()*.3,el=(60-96*pow(rng(),.75))*DEG,len=4.3+rng()*1.4,phase=rng();
     const side=[-sin(az),0,cos(az)],rows=[];
     for(let j=0;j<=steps;j++){
       const t=j/steps,reach=len*cos(el)*t,y=top[1]+.2+len*(sin(el)*t-.62*t*t);
-      const w=.82*pow(sin(PI*t),.8)*(1-.25*t),row=[];
+      // leaflet tips: the edge alternates out and in along the frond, so it reads feathered without any cutout
+      const w=.88*pow(sin(PI*t),.8)*(1-.25*t)*(teeth&&j>0&&j<steps?(j%2?1.18:.5):1),row=[];
       for(const k of [-1,0,1]){
         const x=top[0]+cos(az)*reach+side[0]*w*k,z=top[2]+sin(az)*reach+side[2]*w*k;
         mb.mat=M.PALM;mb.ea=round((k+1)*127.5);mb.eb=round(t*255);mb.ec=round(phase*255);
-        row.push(mb.v(x,y-abs(k)*w*.22,z,cos(az)*.25,.8,sin(az)*.25,.78+.2*t));
+        row.push(mb.v(x,y-abs(k)*w*.42,z,cos(az)*.25,.8,sin(az)*.25,.78+.2*t));
       }
       rows.push(row);
       if(j)for(let k=0;k<2;k++)mb.quad(rows[j-1][k],rows[j-1][k+1],row[k+1],row[k]);
@@ -92,7 +93,7 @@ function meshPylon(lod) {
   const mb = new MB(1 << 14), T = 30, G = 6.5;
   for (const sd of [-1, 1]) {
     const z0 = sd > 0 ? G : -28, z1 = sd > 0 ? 28 : -G;
-    battered(mb, -4.8, z0, 4.8, z1, 0, T, 1.6, M.SANDST);
+    mb.eb = 255; battered(mb, -4.8, z0, 4.8, z1, 0, T, 1.6, M.SANDST); mb.eb = 0;
     cornice(mb, -3.2, z0 + 1.6, 3.2, z1 - 1.6, T, 0.9, 1.4);
     bandRect(mb, -3.6, z0 + 1.2, 3.6, z1 - 1.2, T - 4.2, T - 1.2, PC.LAPIS, true, 0.02);
     // banner poles in front of the towers
@@ -136,7 +137,7 @@ function meshSphinx(lod) {
   for(const sg of [-1,1]) sculpt(2.9,y+.25,sg*.5,.55,.3,.34);
   // nemes: headcloth and lappets, striped lapis and gold
   mb.mat = M.PAINT; mb.ea = PC.LAPIS;
-  sculpt(1.35,y+2.62,0,.7,.62,.68);
+  sculpt(1.45,y+2.5,0,.6,.58,.64); // headcloth hugging the skull, the face left bare in front
   for (const sd of [-1, 1]) mb.box(1.05, y + 1.2, sd * 0.42, 1.75, y + 2.75, sd * 0.78, 0.08 * b);
   mb.ea = 0;
   if (!lod) { mb.mat = M.GOLD; for (const yy of [y + 1.55, y + 1.95, y + 2.35]) for (const sd of [-1, 1]) mb.box(1.04, yy, sd * 0.41, 1.76, yy + 0.1, sd * 0.79, 0); mb.box(1.0, y + 2.6, -0.57, 1.86, y + 2.68, 0.57, 0); }
