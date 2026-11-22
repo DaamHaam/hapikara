@@ -8,7 +8,7 @@
   const st = (a, n) => { const s = Array.from(a.subarray(0, n)).sort((x, y) => x - y); let sum = 0; for (const v of s) sum += v; return `avg ${(sum / n).toFixed(2)}  p99 ${s[min(n - 1, floor(n * 0.99))].toFixed(2)}  max ${s[n - 1].toFixed(2)} ms`; };
   const report = () => {
     const over = Array.from(logFrame.subarray(0, nFrame)).filter((v) => v > 16.7).length;
-    const s = `Fly-through ${W}x${H}, ${nFrame} frames in ${FLYT} s (${(nFrame / FLYT).toFixed(1)} fps)\nframe  ${st(logFrame, nFrame)}  ·  frames over 16.7 ms: ${over}${late}  ·  long main-thread tasks: ${longN} (max ${longMax.toFixed(0)} ms)\nGPU  ${nGpu ? st(logGpu, nGpu) : 'timestamp-query unavailable'}`;
+    const s = `Fly-through ${W}x${H}, ${nFrame} frames in ${FLYT} s (${(1000 * nFrame / logFrame.subarray(0,nFrame).reduce((a,b)=>a+b,0)).toFixed(1)} fps)\nframe  ${st(logFrame, nFrame)}  ·  frames over 16.7 ms: ${over}${late}  ·  long main-thread tasks: ${longN} (max ${longMax.toFixed(0)} ms)\nGPU  ${nGpu ? st(logGpu, nGpu) : 'timestamp-query unavailable'}`;
     info.textContent = s; if (finish) { finish(s); finish = null; }
   };
   // main-thread tasks over 50 ms during a benchmark: own stalls vs frames the browser delivered late
@@ -19,7 +19,7 @@
     if (flying) {
       const now = performance.now(), dtr = now - tPrev; tPrev = now;
       F[FLT] += F[DT]; flyAt(); F[VX] = F[VY] = F[VZ] = 0;
-      if (bench && F[FLT] > 0.5) { if (dtr > 16.7) late += ` ${dtr.toFixed(1)} ms at ${F[FLT].toFixed(1)} s;`; if (nFrame < LOGN) logFrame[nFrame++] = dtr; if (gpuN !== seenGpu && nGpu < LOGN) { seenGpu = gpuN; logGpu[nGpu++] = gpuMs[NP]; } }
+      if (bench && F[FLT] > 0.5) { if (dtr > 33) late += ` ${dtr.toFixed(1)} ms at ${F[FLT].toFixed(1)} s;`; if (nFrame < LOGN) logFrame[nFrame++] = dtr; if (gpuN !== seenGpu && nGpu < LOGN) { seenGpu = gpuN; logGpu[nGpu++] = gpuMs[NP]; } }
       if (soak) { if (nSoak++ > 30 && now - soakT0 > 3000 && dtr > soakMs) { performance.mark('stall'); soakLog.push(`${dtr.toFixed(0)} ms at ${((now - soakT0) / 1000).toFixed(1)} s (path ${F[FLT].toFixed(1)} s, camera ${F[CX].toFixed(0)},${F[CY].toFixed(0)},${F[CZ].toFixed(0)})`); } if (F[FLT] >= FLYT) { F[FLT] = 0; F[RESET] = 1; } }
       else if (F[FLT] >= FLYT) { if (bench) report(); stop(); }
     }
@@ -83,7 +83,7 @@
   window.__bench = () => new Promise((res) => { finish = res; menu = false; F[FLT] = 0; flyAt(); requestAnimationFrame((t) => { F[LAST] = t; requestAnimationFrame(frame); }); setTimeout(() => start(true), 2000); });
   // peak speed and turn rate of the path (limits: 80 m/s, 40 deg/s), and its lowest clearance over ground or water
   // (bridges, buildings, trees not counted)
-  const groundY = (x, z) => { if (inCity(x, z)) { const m = max(abs(x), abs(z)); return canalAt(x, z) ? WATER : m < T1.h ? max(T1.y, acroY(m)) : LAND; } return max(terrainH(x, z), 0); };
+  const groundY = (x, z) => { if (inCity(x, z)) { const m = max(abs(x), abs(z)); return canalAt(x, z) ? WATER : m < T1.h ? max(T1.y, acroY(m)) : cityH(x,z); } return max(terrainH(x, z), 0); };
   window.__path = () => {
     let vm = 0, wm = 0, px = 0, py = 0, pz = 0, pa = 0, lo = 1e9, lt = 0;
     for (let i = 0; i <= 3600; i++) {
@@ -137,4 +137,29 @@
   window.__stats = () => PASSES.map((p, i) => `${p} ${gpuMs[i].toFixed(2)}`).join('  ') + `  | total ${gpuMs[NP].toFixed(2)} ms`;
   if (AUTO) tsOn = hasTS;
   window.__ready = true;
+  // Reproducible local QA, opt-in and dev-only. No render loop between captures.
+  if (QP.has('qa')) setTimeout(async () => {
+    const stage = QP.get('qa'), send = async data => {
+      const response = await fetch('/__qa', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({stage,...data})});
+      if (!response.ok) throw Error('QA capture sink: '+response.status);
+    };
+    try {
+      const adapterInfo = adapter.info;
+      const report = {gpu: {vendor:adapterInfo.vendor, architecture:adapterInfo.architecture, device:adapterInfo.device, description:adapterInfo.description}, path:window.__path(), views:[]};
+      for (let pose=0;pose<6;pose++) {
+        const shots=await window.__shot({pose,frames:48,time:10});
+        await send({name:`P${pose+1}.png`,image:shots[0]});
+        report.views.push({pose,stats:window.__stats()});
+      }
+      const flicker=await window.__flicker({pose:4,time:10});
+      report.flicker=flicker[0]; await send({name:'flicker.png',image:flicker[1]});
+      for (const fly of [28,40,52]) {
+        const shots=await window.__shot({fly,pair:true});
+        for(let k=0;k<shots.length;k++) await send({name:`fly-${fly}-${k}.png`,image:shots[k]});
+      }
+      if(QP.has('bench')) report.benchmark=await window.__bench();
+      await send({name:'report.json',report});
+      document.getElementById('s').textContent='QA complete'; console.log('QA complete',report);
+    } catch(e) { await send({name:'error.json',report:{error:e.stack}}); console.error(e); }
+  },0);
 }

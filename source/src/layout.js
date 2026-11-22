@@ -15,8 +15,26 @@ const RB = {
   out: (t) => se(CITY_A, CITY_B, t), // ring canal | land outside
 };
 // canals: lines of constant x (running north-south) and constant z (east-west): [position, half width]
-const CXL = [[-310, 6], [-190, 6], [-130, 8], [130, 8], [250, 6], [370, 6]];
-const CZL = [[-250, 6], [-130, 8], [130, 8], [250, 6]];
+const CXL = [[-310, 9], [-130, 11], [130, 11], [266, 10], [370, 7]];
+const CZL = [[-250, 10], [-130, 11], [130, 11], [270, 8]];
+// Union of rectangular reaches: broad lagoons, doglegs and interrupted cross-canals.
+// This single plan drives the land partition, canal queries, planting and bridges.
+const CHANNELS = [
+  [-321, -420, -299, -170], [-321, -188, -255, -166], [-277, -188, -255, 180], [-321, 158, -255, 180], [-321, 158, -299, 420],
+  [-141, -420, -119, 420], [119, -420, 141, 420],
+  [256, -420, 276, -170], [256, -190, 320, -170], [300, -190, 320, 80], [256, 60, 320, 80], [256, 60, 276, 420],
+  [363, -420, 377, 420],
+  [-480, -260, -120, -240], [120, -260, 480, -240],
+  [-480, -141, 480, -119], [-480, 119, 145, 141], [256, 119, 480, 141],
+  [-480, 262, -120, 278], [119, 262, 480, 278],
+  [175, -320, 256, -300], [175, -280, 256, -260], [175, -300, 195, -280], [225, -300, 256, -280], [276, 170, 363, 230],
+];
+// Raised civic quarters; the last 18 m on the east are monumental stair ramps.
+const TERRACES = [[-255, -240, -141, -141, 22], [-255, -119, -141, 119, 16], [-119, -240, 119, -141, 16], [141, 141, 256, 262, 16]];
+const cityH = (x, z) => {
+  for (let i = 0; i < TERRACES.length; i++) { const b = TERRACES[i]; if (x >= b[0] && x <= b[2] && z >= b[1] && z <= b[3]) return LAND + (b[4] - LAND) * clamp((b[2] - x) / 18, 0, 1); }
+  return LAND;
+};
 const ACRO = 122; // the acropolis block: |x|, |z| < ACRO
 const AVE = 10; // half width of the processional avenue (z = 0, east to the Nile) and the north-south way (x = 0)
 const FLOOR_Y = 3.0; // canal floors
@@ -26,8 +44,7 @@ const inCity = (x, z) => hypot(x, z) < RB.out(atan2(z, x));
 const canalAt = (x, z) => {
   const r = hypot(x, z), t = atan2(z, x), g = RB.gar(t);
   if (r >= g) return r < RB.out(t);
-  for (const [c, w] of CXL) if (abs(x - c) < w) return true;
-  for (const [c, w] of CZL) if (abs(z - c) < w) return true;
+  for (let i = 0; i < CHANNELS.length; i++) { const b = CHANNELS[i]; if (x > b[0] && x < b[2] && z > b[1] && z < b[3]) return true; }
   return false;
 };
 // distance to the nearest canal edge, for things that must keep off quays (negative on water)
@@ -35,14 +52,25 @@ const edgeDist = (x, z) => {
   const r = hypot(x, z), t = atan2(z, x), g = RB.gar(t);
   if (r >= g) return r < RB.out(t) ? -1 : r - RB.out(t);
   let d = g - r;
-  for (const [c, w] of CXL) d = min(d, abs(x - c) - w);
-  for (const [c, w] of CZL) d = min(d, abs(z - c) - w);
+  for (let i = 0; i < CHANNELS.length; i++) { const b = CHANNELS[i], dx = max(b[0] - x, x - b[2]), dz = max(b[1] - z, z - b[3]); d = min(d, hypot(max(dx, 0), max(dz, 0)) + min(max(dx, dz), 0)); }
   return d;
 };
 // city blocks between canals, as [x0, z0, x1, z1] before clipping to the ring (meshes.js clips them)
 const BLOCKS = (() => {
-  const xs = [-1e4, ...CXL.map((c) => c[0]), 1e4], xw = [0, ...CXL.map((c) => c[1]), 0], zs = [-1e4, ...CZL.map((c) => c[0]), 1e4], zw = [0, ...CZL.map((c) => c[1]), 0], out = [];
-  for (let i = 0; i < xs.length - 1; i++) for (let j = 0; j < zs.length - 1; j++) out.push([xs[i] + xw[i], zs[j] + zw[j], xs[i + 1] - xw[i + 1], zs[j + 1] - zw[j + 1]]);
+  const xs = [...new Set([-500, 500, ...CHANNELS.flatMap(b => [b[0], b[2]]), ...TERRACES.flatMap(b => [b[0], b[2] - 18, b[2]])])].sort((a,b) => a-b);
+  const zs = [...new Set([-430, 430, ...CHANNELS.flatMap(b => [b[1], b[3]]), ...TERRACES.flatMap(b => [b[1], b[3]])])].sort((a,b) => a-b), out = [];
+  // Merge adjacent dry cells in each strip; all resulting polygons remain convex.
+  for (let j = 0; j < zs.length - 1; j++) {
+    let run = null;
+    for (let i = 0; i < xs.length - 1; i++) {
+      const x = (xs[i] + xs[i+1]) / 2, z = (zs[j] + zs[j+1]) / 2;
+      const wet = CHANNELS.some(b => x > b[0] && x < b[2] && z > b[1] && z < b[3]);
+      const split = TERRACES.some(b => xs[i] === b[0] || xs[i] === b[2] - 18 || xs[i] === b[2]);
+      if (run && (wet || split)) { out.push(run); run = null; }
+      if (!wet) { if (run) run[2] = xs[i+1]; else run = [xs[i], zs[j], xs[i+1], zs[j+1]]; }
+    }
+    if (run) out.push(run);
+  }
   return out;
 })();
 
@@ -141,9 +169,9 @@ const parcelUse = (b, s) => {
 const POSES = [
   [950, 330, 430, 0, 30, 0],
   [430, 24, 0, 0, 62, 0],
-  [310, 8.4, 130, 140, 14, 126],
+  [345, 8.4, 130, 150, 18, 126],
   [27, 111.4, 26, 0, 121, 0],
-  [300, 46, -330, 0, 46, 0],
+  [290, 58, -338, -80, 40, -140],
   [1060, 13, -230, 640, 22, 120],
 ];
 // 60 s path: position + look-at every 2.5 s on one Catmull-Rom spline (<= 150 m between points)
@@ -163,13 +191,13 @@ const FLY = new Float32Array([
   -25, 124, 58, 0, 124, 0, //    30 s  around the pyramidion
   -64, 130, -5, -40, 100, -120,
   -110, 80, -95, -300, 14, -250,
-  -190, 36, -190, -360, 10, -250,
+  -190, 49, -190, -360, 20, -250,
   -290, 14, -250, -460, 12, -250, // 40 s  low along a canal, west
   -400, 17, -250, -700, 30, -200,
   -520, 36, -200, -1900, 120, -50,
-  -640, 66, -120, -2000, 140, -20,
-  -700, 100, -40, -2000, 150, 0, //  50 s  towards the desert cliffs, then back
-  -640, 140, 40, -660, 60, 520,
+  -640, 66, -120, -1400, 120, 300,
+  -700, 100, -40, -1050, 100, 520, //  50 s  towards the desert cliffs, then back
+  -640, 140, 40, -400, 70, 540,
   -540, 190, 120, 0, 40, 0,
   -420, 240, 200, 0, 35, 0,
   -300, 280, 270, 0, 30, 0, //     60 s  the whole city from over the desert's edge

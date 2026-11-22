@@ -44,9 +44,9 @@ function prism(mb, pts, y0, y1, wm, tm, ao0 = 0.7, top = true) {
 }
 const rect = (x0, z0, x1, z1) => [[x0, z0], [x1, z0], [x1, z1], [x0, z1]];
 // quay coping along one edge (outward to the right of a -> b): a stone lip proud of the wall, 0.3 m above the ground
-function coping(mb, a, b, top) {
+function coping(mb, a, b, top, topB = top) {
   const dx = b[0] - a[0], dz = b[1] - a[1], l = hypot(dx, dz); if (l < 1e-4) return;
-  const nx = dz / l, nz = -dx / l, P = (p, o, y, n0, n1, n2) => mb.v(p[0] + nx * o, y, p[1] + nz * o, n0, n1, n2);
+  const nx = dz / l, nz = -dx / l, P = (p, o, y, n0, n1, n2) => mb.v(p[0] + nx * o, y + (p === b ? topB - top : 0), p[1] + nz * o, n0, n1, n2);
   mb.mat = M.TRIM;
   mb.quad(P(a, 0.07, top - 0.04, nx, 0, nz), P(b, 0.07, top - 0.04, nx, 0, nz), P(b, 0.07, top + 0.26, nx, 0.3, nz), P(a, 0.07, top + 0.26, nx, 0.3, nz));
   mb.quad(P(a, 0.07, top + 0.3, 0, 1, 0), P(b, 0.07, top + 0.3, 0, 1, 0), P(b, -0.62, top + 0.3, 0, 1, 0), P(a, -0.62, top + 0.3, 0, 1, 0));
@@ -59,10 +59,20 @@ function meshCityGround() {
   mb.mat = M.FLOOR; mb.poly(out.map((p) => [p[0], FLOOR_Y, p[1]]), [0, 1, 0], 0.8);
   for (const b of BLOCKS) {
     const poly = clipPoly(rect(b[0], b[1], b[2], b[3]), gar); if (poly.length < 3 || polyArea(poly) < 40) continue;
-    const acro = b[0] > -ACRO - 1 && b[2] < ACRO + 1 && b[1] > -ACRO - 1 && b[3] < ACRO + 1;
-    prism(mb, poly, FLOOR_Y, LAND - 0.04, M.QUAY, acro ? M.PAVE : M.GROUND, 0.62);
-    if (!acro) { mb.mat = M.GROUND; mb.poly(poly.map((p) => [p[0], LAND, p[1]]), [0, 1, 0]); }
-    for (let i = 0; i < poly.length; i++) coping(mb, poly[i], poly[(i + 1) % poly.length], LAND);
+    const cx = (b[0]+b[2])/2, cz = (b[1]+b[3])/2;
+    const height = p => cityH(mix(p[0], cx, 1e-5), mix(p[1], cz, 1e-5));
+    const elevated = cityH(cx, cz) > LAND + .01;
+    mb.mat = elevated ? (cityH(cx, cz) < cityH(b[0]+.01, cz) ? M.STEP : M.PAVE) : M.GROUND;
+    mb.eb = elevated && mb.mat === M.STEP ? 255 : 0;
+    mb.poly(poly.map(p => [p[0], height(p), p[1]]), [0, 1, 0]); mb.eb = 0;
+    for (let i = 0; i < poly.length; i++) {
+      const a = poly[i], q = poly[(i+1)%poly.length], dx=q[0]-a[0], dz=q[1]-a[1], l=hypot(dx,dz), nx=dz/l, nz=-dx/l;
+      const mx=(a[0]+q[0])/2+nx*.1, mz=(a[1]+q[1])/2+nz*.1, ya=height(a), yb=height(q);
+      if (!canalAt(mx,mz) && cityH(mx,mz) >= (ya+yb)/2-.1) continue;
+      mb.mat=M.QUAY;
+      mb.quad(mb.v(a[0],FLOOR_Y,a[1],nx,0,nz,.55),mb.v(q[0],FLOOR_Y,q[1],nx,0,nz,.55),mb.v(q[0],yb,q[1],nx,0,nz),mb.v(a[0],ya,a[1],nx,0,nz));
+      coping(mb,a,q,ya,yb);
+    }
   }
   // the ring's outer wall faces the city
   for (let j = 0; j < out.length; j++) {

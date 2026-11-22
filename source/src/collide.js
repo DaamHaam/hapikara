@@ -38,7 +38,7 @@ function surfaceAt(x, z, y0) {
   }
   if (inCity(x, z)) {
     if (canalAt(x, z)) { COL[0] = WATER + CLEAR_W; COL[2] = 1; return; }
-    let f = LAND; const m = max(abs(x), abs(z));
+    let f = cityH(x, z); const m = max(abs(x), abs(z));
     if (m < T1.h) { const a = acroY(m); if (a < 0) { if (abs(z) < 6.5 && x > 0) f = T2.y; else { COL[0] = T2.wy + CLEAR_W; COL[2] = 1; return; } } else f = a; }
     const b = builtY(x, z); if (b > f) f = b;
     COL[0] = f + CLEAR; return;

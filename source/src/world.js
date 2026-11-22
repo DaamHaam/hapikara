@@ -7,7 +7,7 @@ const Q0 = [0, 0, 0, 1];
 const rgb = (r, g, b, a = 1) => (round(clamp(a, 0, 1) * 255) << 24 | round(clamp(b, 0, 1) * 255) << 16 | round(clamp(g, 0, 1) * 255) << 8 | round(clamp(r, 0, 1) * 255)) >>> 0;
 // places paved in the city: the acropolis, the avenues, the temple blocks either side of the avenue, the quaysides
 const TEMPLE = [138, 244]; // x range of the temple blocks
-const pavedAt = (x, z) => (abs(x) < ACRO && abs(z) < ACRO) || abs(z) < AVE + 5 || abs(x) < AVE + 2 || (x > TEMPLE[0] && x < TEMPLE[1] && abs(z) < ACRO) || edgeDist(x, z) < 3.2;
+const pavedAt = (x, z) => cityH(x,z) > LAND || (abs(x) < ACRO && abs(z) < ACRO) || abs(z) < AVE + 5 || abs(x) < AVE + 2 || (x > TEMPLE[0] && x < TEMPLE[1] && abs(z) < ACRO) || edgeDist(x, z) < 3.2;
 
 function buildWorld() {
   const meshes = [], types = [];
@@ -57,6 +57,9 @@ function buildWorld() {
   const hard = { boxes: [], bridges: [] };
   const brm = new MB(1 << 16), DECK = LAND + 0.31;
   const span = (x0, z0, x1, z1, hw, hump, arches) => {
+    if (!canalAt((x0+x1)/2,(z0+z1)/2)) return;
+    // No deck at a junction or into an elevated quay: these crossings stay open for boats.
+    if (canalAt(x0,z0) || canalAt(x1,z1) || cityH(x0,z0) > LAND || cityH(x1,z1) > LAND) return;
     const b = bridge(brm, x0, z0, x1, z1, hw, DECK, DECK, hump, arches, FLOOR_Y), S = max(2, round(b.L / 7.8));
     for (const sd of [-1, 1]) for (let i = 0; i < S; i++) {
       const u0 = b.L * i / S, u1 = b.L * (i + 1) / S, v = sd * (hw - 0.3), P = (u) => [x0 + b.ux * u + b.vx * v, b.top(u) + 0.34, z0 + b.uz * u + b.vz * v];

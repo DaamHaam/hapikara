@@ -14,7 +14,7 @@ Ce fichier définit **à quoi la scène doit ressembler**. Il s'adresse au déve
 Une Égypte antique rêvée, jamais archéologique : neuve, intacte, lumineuse, aérienne et habitée. La technologie n'apparaît que sous forme de pierre précieuse, de verre, de lumière et d'eau, jamais de machines. L'eau est partout : elle coule le long des murs, déborde des vasques, descend des escaliers d'eau, remplit les bassins de lotus. La pierre est dorée, chaude, sculptée de symboles. Les palmiers, papyrus et jardins débordent des terrasses.
 
 **Principes**
-1. **Cohérence.** Un axe processionnel est-ouest (du Nil vers le désert) et une trame orthogonale de canaux gouvernent le plan, comme dans les vraies villes égyptiennes. Pas d'anneaux concentriques.
+1. **Cohérence.** Un axe processionnel est-ouest (du Nil vers le désert) et un réseau de canaux à coudes, interrompu par de grands îlots, gouvernent le plan, comme dans les vraies villes égyptiennes. Pas d'anneaux concentriques.
 2. **L'eau descend.** Toute l'eau part du sommet (la pyramide) et descend par gravité, en cascades, rigoles et escaliers d'eau, vers le Nil. On doit pouvoir suivre son trajet des yeux.
 3. **La lumière est franche.** Soleil haut et clair, ombres nettes mais jamais noires, rebonds dorés du sable et verts de l'eau. Les pierres précieuses brillent parce que le soleil les traverse, pas parce qu'elles sont « magiques ».
 4. **Les symboles sont de la sculpture.** Ankh, djed, œil oudjat, disque solaire ailé, scarabée, lotus et papyrus sont gravés en bas-relief ou incrustés en pierre précieuse dans l'architecture, jamais flottants ni lumineux.
@@ -103,7 +103,7 @@ Le Nil coule du **sud vers le nord**, à l'**est** de la cité. Le désert et le
 | Acropole sacrée | 0–90 m du centre | Pyramide à degrés (7 degrés), pyramidion d'émeraude, source jaillissante, bassin carré des lotus, quatre obélisques |
 | Terrasses des temples | 90–220 m | Trois terrasses descendant vers l'est : salles hypostyles ouvertes, pylônes, colonnades, escaliers d'eau |
 | Quartier des jardins | 220–450 m | Villas à toits-terrasses, palmiers, treilles, bassins, rigoles le long des rues, trame orthogonale irrégulière |
-| Canaux | partout | Trame de canaux est-ouest et nord-sud, larges de 8 à 30 m, qui convergent vers le Nil |
+| Canaux | partout | Biefs à coudes et redans, tronçons interrompus, largeurs de 14 à 22 m ; lagunes de 60 à 85 m, îlot-jardin au nord-est, convergeant vers le Nil |
 | Allée processionnelle | du centre jusqu'au Nil, plein est | 20 m de large, bordée de sphinx couchés et de rigoles, deux pylônes monumentaux |
 | Quais du Nil | à 500–600 m à l'est | Quais à degrés, nilomètre (escalier descendant dans l'eau), felouques amarrées |
 | Nil | 600–1100 m à l'est | Fleuve large (400–500 m), une ou deux îles de papyrus, rive opposée verte puis désert lointain |
@@ -112,8 +112,10 @@ Le Nil coule du **sud vers le nord**, à l'**est** de la cité. Le désert et le
 | Désert et falaises | 1–3 km à l'ouest | Dunes douces puis falaises de grès rose de 150–250 m, une ou deux cascades descendant des falaises vers une oasis |
 
 **Règles du plan**
-- **Un axe majeur** est-ouest (Nil → pyramide → désert), plus un axe secondaire nord-sud. Le reste suit une trame orthogonale qui se déforme doucement : jamais un quadrillage parfait.
-- **L'eau descend du centre vers le Nil** : la cité est une colline douce (centre à y = 30, quais à y = 4, Nil à y = 0).
+- **Un axe majeur** est-ouest (Nil → pyramide → désert), plus un axe secondaire nord-sud. Les canaux secondaires sont des segments de longueurs inégales : coudes, redans, grands îlots sans traversée et lagunes, jamais un quadrillage continu.
+- **Végétation par zones** : très peu de palmiers dans la cité, surtout des sycomores, tamaris, arbres fleuris et massifs bas. Esplanades sacrées dégagées. Palmeraies espacées hors les murs, rives du Nil et oasis.
+- **Relief par quartiers** : quais urbains à 10 m, quartiers sacrés à 16 et 22 m, acropole à 15 puis 20 m. De larges escaliers rejoignent les esplanades ; trois ensembles de temples et des groupes d’obélisques dégagent la silhouette. Les terrasses ne portent pas de palmeraie.
+- **L'eau descend du centre vers le Nil** : la majorité du réseau reste à 6,5 m ; des biefs sacrés surélevés débordent vers les canaux, puis le Nil à 0 m.
 - **Hiérarchie des hauteurs.** Le pyramidion (environ 110 m) domine, les obélisques montent à 45–55 m, les pylônes à 30 m, tout le reste sous 20 m. La pyramide est visible de presque partout.
 - **Test de lisibilité.** Vue d'en haut : désert ocre, ruban vert, cité dorée parcourue d'eau verte, fleuve. Au sol : la pointe d'émeraude dépasse des toits et des palmes.
 
