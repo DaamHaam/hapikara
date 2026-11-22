@@ -225,7 +225,7 @@ function meshCascades() {
   // over the east stair)
   for (let k = 0; k < PYR.n; k++) {
     const h = pyrH(k) + 0.02, y1 = pyrY(k + 1) + 0.06, y0 = k ? pyrY(k) + 0.06 : T2.wy, pool = k ? 2.2 : 4.5;
-    const n = max(1, round(2 * h / 17)), w = min(2 * h / n * 0.8, 13);
+    const n = max(1, round(2 * h / 30)), w = min(2 * h / n * 0.5, 8);
     for (const [nx, nz] of [[1, 0], [0, 1], [-1, 0], [0, -1]]) for (let i = 0; i < n; i++) {
       const c = -h + (i + 0.5 + (k % 2 ? 0.25 : -0.25) * (n > 1 ? 1 : 0)) * 2 * h / n, a = c - w / 2, b = c + w / 2;
       if (a < 5 && b > -5) continue;
@@ -234,7 +234,7 @@ function meshCascades() {
     }
   }
   // High biefs overflow into the low network; foam lands on actual canal water.
-  for(const [x0,x1,z,y] of BIEFS) for(let x=x0+5;x<x1-3;x+=14) fall(x-1.6,z+.12,x+1.6,z+.12,0,1,y+.64,WATER,3);
+  for(const [x0,x1,z,y] of BIEFS) for(let x=x0+5;x<x1-3;x+=28) fall(x-1.6,z+.12,x+1.6,z+.12,0,1,y+.64,WATER,3);
   // A single vertical drop stands in front of the cliff spur, with its toe inside the oasis.
   const f=OASIS_FALL,z=OASIS[1];
   fall(f.x,z-f.w/2,f.x,z+f.w/2,1,0,f.y+.15,2.6,7,192,6);

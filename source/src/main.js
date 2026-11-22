@@ -8,7 +8,8 @@ if (!adapter.features.has('indirect-first-instance')) fail('This graphics adapte
 const hasTS = adapter.features.has('timestamp-query');
 const device = await adapter.requestDevice({ requiredFeatures: hasTS ? ['timestamp-query', 'indirect-first-instance'] : ['indirect-first-instance'] });
 window.__info = `${adapter.info.vendor} · ${adapter.info.architecture} · ${adapter.info.description}${adapter.info.isFallbackAdapter ? ' · FALLBACK (software)' : ''} · ${LVN[LV]}`;
-device.addEventListener('uncapturederror', (e) => console.error('GPU: ' + e.error.message.slice(0, 900)));
+const GPU_ERRORS=[];
+device.addEventListener('uncapturederror', (e) => { const message=e.error.message.slice(0,900);if(GPU_ERRORS.length<8)GPU_ERRORS.push(message);console.error('GPU: '+message); });
 // device lost (out of memory, driver reset): restart a level lower; on Low, say so. atlantisLost tells the next load
 // why it may get no adapter (cleared once a load survives)
 device.lost.then((l) => {
@@ -53,7 +54,7 @@ const mipView = (t, m) => t.createView({ baseMipLevel: m, mipLevelCount: 1 });
 const genMips = (e, t) => { for (let i = 1; i < t.mipLevelCount; i++) { const r = e.beginRenderPass({ colorAttachments: [colorAtt(mipView(t, i), true)] }); r.setPipeline(pMip[t.format]); r.setBindGroup(0, blitBG(mipView(t, i - 1))); r.draw(3); r.end(); } };
 // load checkpoint: wait for the GPU so work never piles up on a slow chip (?log prints timings)
 const T0 = performance.now(), ck = async (m) => { await Q.onSubmittedWorkDone(); if (QP.has('log')) console.log(`${((performance.now() - T0) / 1000).toFixed(2)} s  ${m}`); };
-await say('Mixing marble…', 0.05);
+await say('Préparation des pierres…', 0.05);
 const mipsOf = (n) => 32 - Math.clz32(n); // full mip chain length for size n
 const tNoiseA = tex(NOISEPX, NOISEPX, 'rgba8unorm', RT, { mips: mipsOf(NOISEPX) }), tNoiseN = tex(NOISEPX, NOISEPX, 'rgba8unorm', RT, { mips: mipsOf(NOISEPX) }), tLeaf = tex(LEAFPX * 4, LEAFPX * 3, 'rgba8unorm', RT, { mips: mipsOf(LEAFPX) - 1 }); // leaf atlas: 4 x 3 tiles
 {
@@ -75,11 +76,14 @@ const waterBG = [0, 1, 2, 3, 4].map((m) => blitBG(mipView(tWater, m)));
 const NU = 216, V_MAIN = 0, V_MIR = 1, V_SH = 2;
 const UB = [0, 1, 2].map(() => new Float32Array(NU)), ubo = UB.map(() => device.createBuffer({ size: NU * 4, usage: BU.UNIFORM | BU.COPY_DST }));
 const O_SM = 48, O_CAM = 112, O_RES = 116, O_JIT = 120, O_SUN = 124, O_SUNC = 128, O_RIGHT = 132, O_UP = 136, O_FWD = 140, O_PL = 144, O_PULSE = 168, O_MISC = 172, O_LODC = 176, O_LODB = 180;
+const O_LOOK = 184;
 const TANH = tan(30 * DEG), NEAR = 0.3, EXPO = 0.72;
 // sun at the ground: atmospheric transmittance x 1.35 (keeps sunlit paving warm rather than grey)
 const AT = atmo(), SUNC = AT.Ts.map((t) => t * E0 * 1.35);
 if (AUTO) console.log('sun at ground ' + SUNC.map((v) => v.toFixed(2)) + ' · psi ' + AT.PSI.map((v) => v.toFixed(4)));
+const syncLook = () => { for(const U of UB){U.set(LOOK_ACTIVE.subarray(0,20),O_LOOK); for(let c=0;c<3;c++)U[O_SUNC+c]=SUNC[c]*LOOK_ACTIVE[0]*(1+LOOK_ACTIVE[1]*[.14,0,-.16][c]);U[O_SUNC+3]=LOOK_ACTIVE[4];} };
 for (const U of UB) { U.set(SUN, O_SUN); U.set(SUNC, O_SUNC); U[O_SUNC + 3] = EXPO; U[O_MISC + 2] = 1; U[O_LODC + 3] = 1; }
+syncLook();
 // camera matrices and frustum planes for a view at (cx, cy, cz), yaw / pitch
 function setCam(U, cx, cy, cz, yaw, pitch, W, H, jx, jy) {
   const cp = cos(pitch), fy = sin(pitch), rx = cos(yaw), rz = sin(yaw), fx = cp * rz, fz = -cp * rx;
@@ -119,7 +123,7 @@ function shadowMat(at, cx, cy, cz, R, d0, d1, size, cull) {
 }
 
 // sky table and environment light (baked once)
-await say('Lighting the sky…', 0.1);
+await say('Le ciel s’éclaire…', 0.1);
 const tSky = tex(256, 128, HDR, RT), tEnvRaw = tex(256, 256, HDR, RT, { layers: 6, mips: 9 }), tEnv = tex(256, 256, HDR, RT, { layers: 6, mips: 6 }), tIrr = tex(16, 16, HDR, RT, { layers: 6 });
 const cubeView = (t, o = {}) => t.createView({ dimension: 'cube', ...o });
 {
@@ -143,12 +147,12 @@ const cubeView = (t, o = {}) => t.createView({ dimension: 'cube', ...o });
 }
 
 // the world: meshes, instances, levels of detail
-await say('Raising the city…', 0.2);
+await say('La cité prend forme…', 0.2);
 keep('atlantisLoad', 1);
 addEventListener('pagehide', () => keep('atlantisLoad', ''));
 const Wd = buildWorld();
 landY = Wd.ground; setHard(Wd.hard); // collision ground: the terrain as this level draws it near the camera; and the buildings
-await say('Planting gardens…', 0.7);
+await say('Les jardins prennent racine…', 0.7);
 let nV = 0, nIx = 0;
 for (const m of Wd.meshes) { m.v0 = nV; m.i0 = nIx; m.ni = m.ib.length; nV += m.nv; nIx += m.ni; }
 // upload each mesh separately and drop it, so geometry never sits in memory twice (phones)
@@ -226,7 +230,7 @@ const pCrystal = fxPipe('fsCrystal', 'back', true), pWater = fxPipe('fsWater', '
 
 // shadow maps: three baked, one following the camera
 await ck('scene pipelines');
-await say('Casting shadows…', 0.8);
+await say('Les ombres se dessinent…', 0.8);
 // sizes: SHN in quality.js; with no cascade one texel stands in
 const D16 = 'depth16unorm', DFAR = SH32 ? DEPTH : D16;
 const tSh = [tex(SHN[0] || 1, SHN[0] || 1, DEPTH, RT), tex(SHN[1], SHN[1], D16, RT), tex(SHN[2], SHN[2], DFAR, RT), tex(SHN[3], SHN[3], DFAR, RT)];
@@ -411,7 +415,7 @@ function render() {
   // heartbeat: x = seconds since the last pulse, y = slow crystal breathing, z = flare as each pulse leaves
   const tp = t % PULSE, tq = (tp < PULSE / 2 ? tp : tp - PULSE) / 0.7;
   U[O_PULSE] = tp; U[O_PULSE + 1] = 0.5 + 0.5 * sin(t * TAU / 7); U[O_PULSE + 2] = exp(-tq * tq);
-  U[O_MISC] = F[RESET]; U[O_MISC + 1] = 0; U[O_MISC + 2] = LODK; U[O_MISC + 3] = 1; U[O_LODC] = cx; U[O_LODC + 1] = cy; U[O_LODC + 2] = cz; U[O_LODC + 3] = 1 / LODK;
+  U[O_MISC] = F[RESET]; U[O_MISC + 1] = 0; U[O_MISC + 2] = LODK; U[O_MISC + 3] = LOOK_ACTIVE[16]; U[O_LODC] = cx; U[O_LODC + 1] = cy; U[O_LODC + 2] = cz; U[O_LODC + 3] = 1 / LODK;
   // canal mirror only when canal water is in view and the camera is low enough (fades 170-235 m)
   let mir = MIRROR ? 1 - sstep(170, 235, cy) : 0;
   for (let k = 0; k < 5; k++) { const o = O_PL + k * 4; if (U[o + 1] * WATER + U[o + 3] < -445) mir = 0; }
@@ -420,7 +424,7 @@ function render() {
     // cascade: a 92 m box around the point 36 m ahead of the camera
     shadowMat(O_SM, cx + U[O_FWD] * 36, cy + U[O_FWD + 1] * 36, cz + U[O_FWD + 2] * 36, 46, -420, 700, CASC, true);
     // casters switch LODs only a little sooner, or shadows pop on their own
-    S[O_CAM + 3] = t; S[O_MISC + 1] = 2; S[O_MISC + 2] = 1.85 * LODK; S[O_MISC + 3] = 1; S[O_LODC] = cx; S[O_LODC + 1] = cy; S[O_LODC + 2] = cz;
+    S[O_CAM + 3] = t; S[O_MISC + 1] = 2; S[O_MISC + 2] = 1.85 * LODK; S[O_MISC + 3] = LOOK_ACTIVE[16]; S[O_LODC] = cx; S[O_LODC + 1] = cy; S[O_LODC + 2] = cz;
     Q.writeBuffer(ubo[V_SH], 0, S);
   }
   if (MIRROR) {
@@ -428,7 +432,7 @@ function render() {
     setCam(M, cx, 2 * WATER - cy, cz, F[YAW], -F[PIT], MW, MH, 0, 0);
     M[O_CAM + 3] = t; M[O_JIT + 2] = fr; M[O_JIT + 3] = WATER - 0.05; for (let i = 0; i < 4; i++) M[O_PULSE + i] = U[O_PULSE + i];
     // the rippled mirror gets by with lower LODs
-    M[O_MISC + 1] = 1; M[O_MISC + 2] = 3 * LODK; M[O_MISC + 3] = 1; M[O_LODC] = cx; M[O_LODC + 1] = cy; M[O_LODC + 2] = cz;
+    M[O_MISC + 1] = 1; M[O_MISC + 2] = 3 * LODK; M[O_MISC + 3] = LOOK_ACTIVE[16]; M[O_LODC] = cx; M[O_LODC + 1] = cy; M[O_LODC + 2] = cz;
     Q.writeBuffer(ubo[V_MIR], 0, M);
   }
   Q.writeBuffer(ubo[V_MAIN], 0, U);
@@ -585,7 +589,7 @@ const key = (e, v) => {
     }
   }
 };
-addEventListener('keydown', (e) => { if (!menu || e.code === 'KeyH') key(e, 1); });
+addEventListener('keydown', (e) => { if (!(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement) && (!menu || e.code === 'KeyH')) key(e, 1); });
 addEventListener('keyup', (e) => key(e, 0));
 const release = () => { kf = kb = kl = kr = ku = kd = ks = 0; tId = -1; tN = 0; };
 addEventListener('blur', release);
@@ -609,7 +613,7 @@ for (const n of ['touchstart', 'touchmove', 'touchend', 'touchcancel']) canvas.a
 // the scene keeps rendering, blurred, behind the menu
 const ui = (m) => { if (dead) return; menu = m; body.className = m ? 'm' : document.pointerLockElement ? 'g p' : 'g'; if (m) release(); };
 $('d').onclick = () => {
-  ui(false); $('d').textContent = 'Resume';
+  ui(false); $('d').textContent = 'Reprendre la visite';
   // phones: full screen and landscape; if refused the style sheet still rotates the page
   if (mob) document.documentElement.requestFullscreen?.()?.then(() => screen.orientation.lock('landscape')).catch(() => 0); else capture();
 };
@@ -621,7 +625,7 @@ $('q').querySelectorAll('button').forEach((b, i) => { if (i === 2 - LV) b.classN
 
 // draw the first frames and wait for the GPU (pipelines compile on first use) before revealing
 lookAt(...POSES[4]); // the scene opens on viewpoint 5: the inner island, domes and crystal against the sun
-await say('Letting the light in…', 1);
+await say('La lumière entre dans la cité…', 1);
 render(); await Q.onSubmittedWorkDone();
 setTimeout(() => { keep('atlantisLoad', ''); keep('atlantisLost', ''); }, 15e3); // the load counts as survived after 15 s
 if (!AUTO) { ui(true); requestAnimationFrame((t) => { F[LAST] = t; requestAnimationFrame(frame); }); } else { body.className = 'g'; window.__ready = true; }

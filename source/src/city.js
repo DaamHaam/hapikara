@@ -149,6 +149,8 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
     occ.push([x,z,15]); paint(x,z,12,0,255,2);
   }
   for (let v = 0; v < VAR; v++) { const L = [0, 1, 2].map((l) => meshVillaE(v + 1, l)); villas.push({ ty: type(L.map((o) => o.mesh), K.SOLID, 90, 260, 2600), boxes: L[0].boxes }); }
+  // Reserve the pocket gardens before placing houses.
+  for(const [x,z] of COURTYARDS)occ.push([x,z,20]);
   const VT = [[1,.8,.52],[.98,.86,.64],[.96,.92,.82],[1,.66,.43],[.86,.64,.45],[.97,.88,.72],[.8,.85,.76],[.92,.72,.65]];
   const gar = ringPoly(RB.gar), garden = [];
   for (const b of BLOCKS) {
@@ -180,6 +182,34 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
   for (const sz of [-1, 1]) for (const x of [150, 232]) basin(x, sz * 28);
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) basin(sx * 80, sz * 101, T1.y);
   for (let i = 0; i < 40; i++) { const x = rr(-430, 430), z = rr(-360, 360); if (inCity(x, z) && edgeDist(x, z) > 6 && abs(z) > AVE + 8 && abs(x) > AVE + 8 && !(abs(x) < ACRO + 4 && abs(z) < ACRO + 4) && free(x, z, 6)) { basin(x, z); paint(x, z, 5, 0, 230, 1.5); } }
+  // Five quiet walled gardens among the houses, each with a different planting.
+  for(let k=0;k<COURTYARDS.length;k++){
+    const [x,z]=COURTYARDS[k],y=cityH(x,z);
+    paint(x,z,17,0,220,2);
+    // Low walls on three sides; a generous opening faces the neighbourhood.
+    const walls=[[-15,-15,15,-14.2],[-15,-14.2,-14.2,14.2],[14.2,-14.2,15,14.2],[-15,14.2,-5,15],[5,14.2,15,15]];
+    for(const b of walls){bm.mat=M.SANDST;bm.box(x+b[0],y,z+b[1],x+b[2],y+1.6,z+b[3],.05);
+      box(x+b[0],z+b[1],x+b[2],z+b[3],y+1.6);}
+    // Existing procedural hieroglyph motifs, painted on the rear wall.
+    bandRect(bm,x-15,z-15,x+15,z-14.2,y+.7,y+1.35,k%2?PC.LAPIS:PC.CARN,true,.035);
+    basin(x,z,y);
+    // A pair of narrow channels belongs to the fountain, not a new city basin.
+    for(const sd of [-1,1]){
+      bm.mat=M.TRIM;bm.box(x-1,y+.02,z+sd*4-3,x+1,y+.22,z+sd*4+3,.03);
+      waterPoly(wm,rect(x-.65,z+sd*4-2.7,x+.65,z+sd*4+2.7),y+.24,1);
+    }
+    for(const dx of [-10,10])for(const dz of [-9,9]){
+      const palm=(k+round(dx+dz))%2===0;
+      tree(palm?'palm':k%2?'olive':'bloom',x+dx,y,z+dz,palm?rr(.65,1.3):.7,.55,false);
+      paint(x+dx,z+dz,3.8,1,255,1);
+      for(let j=0;j<5;j++)shrub((j+k)%5,x+dx+cos(j*TAU/5)*2.4,y,z+dz+sin(j*TAU/5)*2.4,.85);
+    }
+    for(const sd of [-1,1])vine(x+sd*12,y+1.5,z-14,PI,0);
+  }
+  // Small groups at the edges of the civic esplanades, leaving their centre open.
+  for(const [x0,z0,s]of [[-226,-218,.75],[-226,86,.9],[-65,-213,.7],[225,230,.8]])
+    for(const [dx,dz,sc]of [[0,0,.7],[13,2,1.1],[-2,13,.85],[12,15,1.3]])
+      if(edgeDist(x0+dx,z0+dz)>4&&free(x0+dx,z0+dz,3))tree('palm',x0+dx,cityH(x0+dx,z0+dz),z0+dz,s*sc,.5);
   // garden planting: palms, sycamores, flowering trees, shrubs; paths
   for (const poly of garden) {
     let bx0 = 1e9, bz0 = 1e9, bx1 = -1e9, bz1 = -1e9; for (const p of poly) { bx0 = min(bx0, p[0]); bz0 = min(bz0, p[1]); bx1 = max(bx1, p[0]); bz1 = max(bz1, p[1]); }
@@ -188,7 +218,7 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
       const x = rr(bx0, bx1), z = rr(bz0, bz1), k = rng();
       if (!inCity(x, z) || edgeDist(x, z) < 2.5 || abs(z) < AVE + 4 || abs(x) < AVE + 2 || (abs(x) < ACRO + 4 && abs(z) < ACRO + 4)) continue;
       if (cityH(x,z)>LAND || !free(x,z,5)) continue;
-      if (k < 0.035) tree('palm', x, cityH(x,z), z, rr(0.8, 1.25), 0.6);
+      if (k < 0.095) tree('palm', x, cityH(x,z), z, rr(0.55, 1.35), 0.6);
       else if (k < 0.13) tree('plane', x, cityH(x,z), z, 0.8, 0.8);
       else if (k < 0.22) tree('olive', x, cityH(x,z), z, .9, 0.8);
       else if (k < 0.36) tree('bloom', x, cityH(x,z), z, .85, 0.8);
@@ -197,7 +227,7 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
     // palms along the quays
     for (let i = 0; i < poly.length; i++) {
       const a = poly[i], b = poly[(i + 1) % poly.length], L = hypot(b[0] - a[0], b[1] - a[1]), nx = (b[1] - a[1]) / L, nz = -(b[0] - a[0]) / L;
-      for (let u = 4; u < L - 4; u += rr(8, 12)) { const x = a[0] + (b[0] - a[0]) * u / L - nx * 3.6, z = a[1] + (b[1] - a[1]) * u / L - nz * 3.6; if (onBridge(x, z, 5) || abs(z) < AVE + 4 || abs(x) < AVE + 2) continue; if (!canalAt(x+nx*4,z+nz*4) || cityH(x,z)>LAND) continue; if (rng() < 0.08) tree('palm', x, cityH(x,z), z, rr(0.8, 1.2), 0.6); else if (rng() < 0.6) { shrub((rng() * 5) | 0, x, cityH(x,z), z, 1.5); if(rng()<.5) vine(x+nx*3.5,cityH(x,z)-.6,z+nz*3.5,atan2(nx,nz),0); } }
+      for (let u = 4; u < L - 4; u += rr(8, 12)) { const x = a[0] + (b[0] - a[0]) * u / L - nx * 3.6, z = a[1] + (b[1] - a[1]) * u / L - nz * 3.6; if (onBridge(x, z, 5) || abs(z) < AVE + 4 || abs(x) < AVE + 2) continue; if (!canalAt(x+nx*4,z+nz*4) || cityH(x,z)>LAND) continue; if (rng() < 0.16) tree('palm', x, cityH(x,z), z, rr(0.6, 1.3), 0.6); else if (rng() < 0.6) { shrub((rng() * 5) | 0, x, cityH(x,z), z, 1.5); if(rng()<.5) vine(x+nx*3.5,cityH(x,z)-.6,z+nz*3.5,atan2(nx,nz),0); } }
     }
   }
   // the water: lilies near the quays, papyrus at the edges
@@ -237,6 +267,8 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
   // feluccas on the Nile and the ring canal
   const tBoat = type([meshFelucca()], K.SOLID, 1e9, 1e9, 4000);
   put(tBoat,EAST_QUAY[0]-75,.05,-165,1,qYaw(-PI/2));
+  // Three static feluccas in existing lagoons and at a quiet canal quay.
+  for(const [x,z,a,s]of [[321,195,0,.5],[235,-310,PI/2,.45],[-130,215,0,.45]])put(tBoat,x,WATER+.02,z,s,qYaw(a));
   for (let i = 0; i < 16; i++) { const z = rr(-1800, 1800), x = nileX(z) + rr(70, NILE_W - 70); put(tBoat, x, 0.05, z, 1, qYaw((rng() < 0.5 ? 1 : -1) * PI / 2 + rr(-0.35, 0.35))); }
   for (let i = 0; i < 6; i++) { const t = rr(0, TAU), r = (RB.gar(t) + RB.out(t)) / 2, x = r * cos(t), z = r * sin(t); if (onBridge(x, z, 12)) continue; put(tBoat, x, WATER + 0.02, z, 0.8, qYaw(-t + PI / 2 * (rng() < 0.5 ? 1 : -1))); }
   if (AUTO) {window.__planting={trees:nTree,palms:nPalm,palmsInCity:nCityPalm};console.log(`${nTree} trees, ${nCityPalm} city palms, ${hard.boxes.length / 5} solid boxes`);}

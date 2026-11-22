@@ -46,8 +46,8 @@ fn sunBRDF(N: vec3f, V: vec3f, alb: vec3f, f0: vec3f, rough: f32) -> vec3f {
 }
 // aerial perspective: humid haze thinning with height, lit by the horizon sky in that direction
 fn hazeOD(ro: vec3f, rd: vec3f, d: f32) -> f32 {
-  let k = rd.y / 650.; var od = d; if (abs(k * d) > 1e-3) { od = (1. - exp(-k * d)) / k; }
-  return exp(-max(ro.y, 0.) / 650.) * od;
+  let k = rd.y / view.look2.y; var od = d; if (abs(k * d) > 1e-3) { od = (1. - exp(-k * d)) / k; }
+  return exp(-max(ro.y, 0.) / view.look2.y) * od * view.look2.x;
 }
 fn aerial(c: vec3f, ro: vec3f, rd: vec3f, d: f32) -> vec3f {
   let od = hazeOD(ro, rd, min(d, 150000.));
@@ -193,14 +193,14 @@ fn shafts(fc: vec2f, z: f32, rd: vec3f) -> vec3f {
   if (view.misc.y > .5) { return vec3f(0.); }
   let mu = dot(rd, view.sun.xyz); let g = .78; let hg = (1. - g * g) / (4. * PI * pow(1. + g * g - 2. * g * mu, 1.5));
   // Low: no shaft texture, haze taken as fully sunlit
-  if (LV > 1) { return view.sunc.rgb * (min(hg, .8) * 1.2e-5 + 1e-6) * min(z / max(dot(rd, view.fwd.xyz), 1e-3), 800.) * exp(-max(view.cam.y, 0.) / 650.) * .85; }
+  if (LV > 1) { return view.sunc.rgb * (min(hg, .8) * 1.2e-5 + 1e-6) * min(z / max(dot(rd, view.fwd.xyz), 1e-3), 800.) * exp(-max(view.cam.y, 0.) / 650.) * .85 * view.look2.z; }
   let h = fc * .25 - .5; let b = floor(h); let f = h - b; let mx = vec2i(textureDimensions(tVol)) - 1; var acc = 0.; var ws = 0.;
   for (var k = 0; k < 4; k++) {
     let o = vec2i(k & 1, k >> 1); let r = textureLoad(tVol, clamp(vec2i(b) + o, vec2i(0), mx), 0).rg;
     let w = (mix(1. - f.x, f.x, f32(o.x)) * mix(1. - f.y, f.y, f32(o.y)) + .03) / (.03 + abs(min(r.g, 800.) - min(z, 800.)) / min(z, 800.));
     acc += r.r * w; ws += w;
   }
-  return view.sunc.rgb * (min(hg, .8) * 1.2e-5 + 1e-6) * acc / ws * 800.;
+  return view.sunc.rgb * (min(hg, .8) * 1.2e-5 + 1e-6) * acc / ws * 800. * view.look2.z;
 }
 @fragment fn fs(@builtin(position) fc: vec4f) -> @location(0) vec4f {
   let px = vec2i(fc.xy); let dp = textureLoad(tD, px, 0);
@@ -216,8 +216,8 @@ fn shafts(fc: vec2f, z: f32, rd: vec3f) -> vec3f {
   let alb = g0.rgb * g0.rgb; let N = normalize(g1.xyz); let rough = g1.a; let metal = g2.g; let trans = g2.b;
   let V = -rd; let L = view.sun.xyz;
   let sh = shadow(wp, N);
-  var ao = g2.r;
-  if (LV < 2 && view.misc.y < .5) { ao *= pow(ssao(fc.xy, z), 2.3); }
+  var ao = pow(g2.r, view.look0.w);
+  if (LV < 2 && view.misc.y < .5) { ao *= pow(ssao(fc.xy, z), 2.3 * view.look0.w); }
   let sv = skyVis(wp, N);
   // window glass (g2.a): a bit more mirror than real glass, to read face-on
   let glass = g2.a > .5; let f0 = select(mix(vec3f(.04), alb, metal), vec3f(.085), glass); let dc = alb * (1. - metal);
@@ -252,7 +252,7 @@ fn shafts(fc: vec2f, z: f32, rd: vec3f) -> vec3f {
   let aoA = pow(ao * sv, 1.25); let aa = 2.04 * dc - .33; let bb = -4.8 * dc + .64; let cc = 2.75 * dc + .69;
   let aoc = max(vec3f(aoA), ((aoA * aa + bb) * aoA + cc) * aoA);
   let nv = max(dot(N, V), 1e-3);
-  col += dc * textureSampleLevel(tIrr, sLin, N, 0.).rgb * aoc;
+  col += dc * textureSampleLevel(tIrr, sLin, N, 0.).rgb * aoc * view.look0.z * mix(vec3f(1.),vec3f(.77,.93,1.12),view.look4.w);
   // sunlit sand and stone bounce warm light up into shadows and under eaves
   col += dc * view.sunc.rgb * vec3f(.9, .66, .4) * .055 * sat(.55 - .45 * N.y) * aoc;
   let R = reflect(rd, N); var so = sat(pow(nv + aoA, exp2(-16. * rough - 1.)) - 1. + aoA) * mix(sv, 1., .3);
@@ -332,12 +332,15 @@ fn agx(c: vec3f) -> vec3f {
   let nb = (textureLoad(tC, clamp(px + vec2i(1, 0), vec2i(0), mx), 0).rgb + textureLoad(tC, clamp(px - vec2i(1, 0), vec2i(0), mx), 0).rgb
           + textureLoad(tC, clamp(px + vec2i(0, 1), vec2i(0), mx), 0).rgb + textureLoad(tC, clamp(px - vec2i(0, 1), vec2i(0), mx), 0).rgb) * .25;
   let k = 1. / (1. + lum(c)); let kn = 1. / (1. + lum(nb));
-  c = max(c + (c * k - nb * kn) * .3 / k, vec3f(0.));
+  c = max(c + (c * k - nb * kn) * view.look4.y / k, vec3f(0.));
   let bl = textureSampleLevel(tB, sLin, uv, 0.).rgb;
-  c = mix(c, bl, .04);
+  c = mix(c, bl, view.look4.z);
   // exposure, soft vignette, white balance for the warm low sun
   let q = uv - .5; c *= (1. - dot(q, q) * .3) * view.sunc.w * vec3f(1.02, 1., .99);
   c = agx(c);
+  let l=lum(c); c=l+(c-l)*view.look1.z;
+  c=(c-.18)*view.look1.y+.18;
+  c*=vec3f(1.+view.look1.w*.1,1.,1.-view.look1.w*.12); c=sat3(c);
   let n = ign(fc.xy) + ign(fc.xy + 37.) - 1.;
   return vec4f(c + n / 255., 1.);
 }

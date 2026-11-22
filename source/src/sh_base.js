@@ -62,6 +62,11 @@ struct View {
   misc: vec4f, // 1 = drop TAA history, view kind (0 main, 1 mirror, 2 shadow), lod scale, wind on/off
   lodc: vec4f, // LOD reference point; w: 1 / the level's distance scale
   lodb: vec4f, // x: minimum LOD distance (baked maps on Medium/Low: never the finest)
+  look0: vec4f, // sun intensity/warmth, ambient, contact shadows
+  look1: vec4f, // exposure, contrast, saturation, temperature
+  look2: vec4f, // haze density/height, shafts, clouds
+  look3: vec4f, // cloud density, water refraction/reflection, emerald absorption
+  look4: vec4f, // wind, sharpening, bloom, shadow coolness
 }
 `;
 // full-screen triangle
@@ -317,7 +322,7 @@ fn clouds(rd: vec3f, base: vec3f) -> vec3f {
   let q = p / 3400.;
   let sh = textureSampleLevel(tNoiseA, sRep, q * .23 + .21, 0.).r;
   let n = textureSampleLevel(tNoiseA, sRep, q, 0.).r * .62 + textureSampleLevel(tNoiseA, sRep, q * 3.1 + .4, 0.).r * .38;
-  let cov = .71 - .08 * ss(.4, .62, sh);
+  let cov = .77 - .3 * view.look2.w - .08 * ss(.4, .62, sh);
   // puffs: a firm edge eaten by finer noise
   let dn = ss(cov, cov + .07, n - .05 * textureSampleLevel(tNoiseA, sRep, q * 9.7, 0.).a);
   if (dn <= 0.) { return base; }
@@ -329,7 +334,7 @@ fn clouds(rd: vec3f, base: vec3f) -> vec3f {
   let cool = skyLut(vec3f(-view.sun.x, .9, -view.sun.z)) * 1.5;
   let col = mix(cool, warm + cool * .6, lit);
   let far = exp(-t / 26000.);
-  return mix(base, col, dn * .93 * far * ss(.012, .05, rd.y));
+  return mix(base, col, dn * view.look3.x * 1.43 * far * ss(.012, .05, rd.y) * ss(0.,.06,view.look2.w));
 }
 fn sky(rd: vec3f, disc: bool) -> vec3f {
   var c = skyLut(rd);

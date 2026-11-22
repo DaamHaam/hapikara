@@ -1,138 +1,35 @@
 <!doctype html>
-<html lang=en>
-<head>
-<meta charset=utf-8>
-<title>Hapikara</title>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<meta name=theme-color content=#05222b>
+<html lang=fr><head><meta charset=utf-8><title>Hapikara — Les jardins du Nil</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=theme-color content=#092d36>
 <style>
-/* The class on <body> is the state of the page: l = loading, m = menu, g = in the scene (g p while the mouse is captured),
-   l e = failed to start. Palette: marble #f2eadb, gold inlay #e2bf6e, deep lagoon #05222b */
-html { background: #05222b; }
-body {
-  --x: max(6vw, 2em); --cut: polygon(.6em 0, 100% 0, 100% calc(100% - .6em), calc(100% - .6em) 100%, 0 100%, 0 .6em);
-  --gold: linear-gradient(#fbe6a8, #e2bf6e 45%, #b08236);
-  position: fixed; inset: 0; margin: 0; overflow: hidden; background: radial-gradient(at 65%, #1d4a66, #05222b 75%);
-  font: 700 clamp(13px, .6vw + .8vh, 26px)/1.4 system-ui, sans-serif; color: #f2eadb; user-select: none;
-}
-/* a phone held upright gets the whole page turned on its side, so the scene is always landscape */
-@media (orientation: portrait) and (pointer: coarse) {
-  body { right: auto; bottom: auto; width: 100dvh; height: 100dvw; transform-origin: 0 0; transform: rotate(90deg) translateY(-100%); }
-}
-canvas { position: absolute; width: 100%; height: 100%; cursor: crosshair; touch-action: none; transition: filter 1s, opacity 2s; }
-body:not(.g) canvas { filter: blur(.4vmax) brightness(.75); }
-.l canvas { opacity: 0; }
-
-/* menu: one column on the left as wide as the name, over a shade that leaves the city visible on the right */
-#m {
-  position: absolute; inset: 0; display: grid; align-content: center; justify-content: start; padding: 0 var(--x) 3em;
-  background: linear-gradient(90deg, #05222bcc, #05222b00 65%); transition: opacity .5s, visibility .5s;
-}
-.g #m, .m #s, .l #g, .l #k, .l #h { opacity: 0; visibility: hidden; }
-h1, #d, #q { font-family: "Palatino Linotype", Palatino, "Book Antiqua", Constantia, Georgia, serif; text-transform: uppercase; }
-h1 {
-  margin: 0 -.12em 0 0; font-size: 4.8em; line-height: 1; letter-spacing: .12em; color: #0000; background: var(--gold);
-  -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 .03em 0 #05222b) drop-shadow(0 .08em .25em #000c);
-}
-/* the gold line under the name is the loading bar */
-#p { height: 3px; margin: .5em 0 1.6em; background: #e2bf6e40; }
-#b { display: block; height: 100%; background: #e2bf6e; box-shadow: 0 0 .8em #e2bf6e; transform: scaleX(0); transform-origin: 0; transition: transform .4s; }
-.e #p { visibility: hidden; }
-p { margin: 0; }
-#a { display: grid; }
-#a > * { grid-area: 1/1; transition: opacity .8s, visibility .8s; }
-#s { font-size: .85em; letter-spacing: .15em; text-transform: uppercase; color: #e2bf6e; }
-.e #s { letter-spacing: 0; text-transform: none; color: #f2eadb; }
-
-button, a { padding: 0; border: 0; background: none; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; text-decoration: none; cursor: pointer; }
-:focus-visible { outline: 2px solid #fbe6a8; outline-offset: .2em; }
-#g { display: grid; gap: .8em; }
-/* plates with cut corners: a gold frame (the plate) around a dark face (::before) */
-#d, #q, #q .on, #f a { clip-path: var(--cut); }
-#d, #q, #f a { position: relative; isolation: isolate; background: var(--gold); }
-#d::before, #q::before, #f a:first-child::before { content: ''; position: absolute; inset: 2px; z-index: -1; clip-path: var(--cut); background: linear-gradient(#0e3c49, #06222b); }
-/* Enter: the selected entry, lit gold, with an engraved line inside its frame */
-#d { padding: .7em; font-size: 1.6em; letter-spacing: .25em; text-indent: .25em; color: #05222b; transition: filter .15s; }
-#d::before { inset: .22em; z-index: 0; background: none; box-shadow: inset 0 0 0 1px #05222b59; }
-#d:hover, #f a:hover { filter: brightness(1.12); }
-#d:active { filter: brightness(.95); }
-#d:focus-visible { outline-color: #05222b; outline-offset: -.35em; }
-/* detail level: three segments, the current one lit, the others reload the page with theirs */
-#q { display: flex; align-items: center; gap: .3em; padding: .35em; font-size: 1.05em; letter-spacing: .12em; }
-#q span { padding: 0 .8em 0 .6em; color: #e2bf6e; }
-#q button { flex: 1; padding: .55em .2em; color: #f2eadbb3; transition: background .15s, color .15s; }
-#q button:hover { background: #e2bf6e2e; color: #f2eadb; }
-#q .on { background: var(--gold); color: #05222b; pointer-events: none; }
-
-/* the hint bar along the bottom: controls on the left, GitHub and Ko-fi on the right */
-#r {
-  position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 1em 1.5em; padding: .55em var(--x);
-  background: #05222bd9; box-shadow: 0 -1px #e2bf6e66; font-size: .85em; color: #f2eadbd9;
-}
-/* when the controls or the hint need two lines, the lines come out even */
-#k, #h { text-wrap: balance; transition: opacity .8s, visibility .8s; }
-#k span { display: inline-flex; align-items: center; gap: .25em; margin: .2em 1.1em .2em 0; }
-#k b {
-  min-width: 1.1em; padding: .15em .4em; border-radius: .2em; background: #f2eadb; box-shadow: inset 0 -.18em #05222b4d;
-  color: #05222b; text-align: center;
-}
-#k b:last-of-type { margin-right: .35em; }
-#h { display: none; }
-@media (pointer: coarse) { #k { display: none; } #h { display: block; } }
-/* GitHub on a framed dark plate, Ko-fi lit in its own colour */
-#f { display: flex; gap: .8em; margin-left: auto; white-space: nowrap; }
-#f a { display: flex; align-items: center; gap: .5em; padding: .5em 1em; color: #f2eadb; transition: filter .15s; }
-#f a + a { background: linear-gradient(#ff7d7a, #e8433f); color: #fff; }
-svg { width: 1.5em; height: 1.5em; fill: currentColor; }
-
-/* in the scene: a small menu button (hidden while the mouse is captured, Esc does the same) and the stats panel */
-#o {
-  position: absolute; top: .8em; right: .8em; display: none; width: 2em; height: 2em; clip-path: var(--cut);
-  background: #05222bcc; box-shadow: inset 0 0 0 2px #e2bf6e; font-size: 1.3em; line-height: 1; color: #e2bf6e;
-}
-.g #o { display: block; }
-.p #o { display: none; }
-#i {
-  position: absolute; top: 1em; left: 1.2em; margin: 0; font: .75em/1.5 ui-monospace, Consolas, monospace;
-  white-space: pre-wrap; text-shadow: 0 1px 3px #000, 0 0 2px #000; pointer-events: none;
-}
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-</style>
-</head>
-<body class=l>
-<canvas id=c></canvas>
-<div id=m>
-  <h1>Hapikara</h1>
-  <div id=p><i id=b></i></div>
-  <div id=a>
-    <p id=s>Raising the city…</p>
-    <div id=g>
-      <button id=d>Enter</button>
-      <p id=q><span>Detail</span><button>Low</button><button>Medium</button><button>High</button></p>
-    </div>
-  </div>
-  <div id=r>
-    <p id=k>
-      <span><b>W</b><b>A</b><b>S</b><b>D</b>Fly</span>
-      <span><b>Q</b><b>E</b>Down / up</span>
-      <span><b>Shift</b>Faster</span>
-      <span><b>Wheel</b>Speed</span>
-      <span><b>1</b>–<b>6</b>Viewpoints</span>
-      <span><b>H</b>Stats</span>
-      <span><b>C</b>Collision</span>
-      <span><b>M</b>Music</span>
-      <span><b>Esc</b>Menu</span>
-    </p>
-    <p id=h>Hold a finger down to fly, slide it to steer, add a second finger to go faster.</p>
-    <p id=f>
-      <a href=https://github.com/DaamHaam/hapikara target=_blank><svg viewBox="0 0 16 16"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>GitHub</a>
-    </p>
-  </div>
-</div>
-<button id=o aria-label=Menu>≡</button>
-<pre id=i></pre>
-<script>
-/*SCRIPT*/
-</script>
-</body>
-</html>
+:root{color-scheme:dark;--ink:#092d36;--gold:#dcb974;--paper:#f1e5cc;--jade:#40b8a3}*{box-sizing:border-box}[hidden]{display:none!important}
+html{background:var(--ink)}body{position:fixed;inset:0;margin:0;overflow:hidden;background:var(--ink);color:var(--paper);font:15px/1.5 system-ui,sans-serif}
+button,a,input,textarea{font:inherit}button,a{color:inherit}button{cursor:pointer;background:#103d47;border:1px solid #dcb97455;padding:.65em 1em;border-radius:2px}button:hover{background:#20535c;border-color:var(--gold)}:focus-visible{outline:2px solid var(--gold);outline-offset:3px}button[aria-pressed=true],button.on{background:var(--gold);color:var(--ink)}button:disabled{opacity:.45;cursor:default}a{text-decoration:none}svg{display:block}
+#c{position:absolute;width:100%;height:100%;touch-action:none;cursor:crosshair;transition:filter .4s,opacity 1s}.l #c{opacity:0}body:not(.g) #c{filter:brightness(.45)}
+#m{position:absolute;inset:0;padding:clamp(18px,4vw,64px);display:grid;grid-template-columns:minmax(250px,.8fr) minmax(370px,1.2fr);gap:5vw;align-items:center;background:linear-gradient(90deg,#092d36e8,#092d36a8 55%,#092d3680);overflow:auto}.g #m{display:none}.l #g,.l #atlas-card,.l #tools{visibility:hidden}
+.brand-kicker{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin:0 0 20px}.brand-mark{width:64px;height:30px;margin-bottom:20px;fill:none;stroke:var(--gold);stroke-width:1.3}
+h1{font:normal clamp(42px,5.5vw,86px)/1.05 Palatino,"Book Antiqua",Georgia,serif;letter-spacing:.1em;text-transform:uppercase;margin:0}.subtitle{font:italic clamp(19px,2vw,29px)/1.4 Palatino,Georgia,serif;color:var(--gold);margin:14px 0 18px}.intro{max-width:34ch;color:#d5d9cb;font-size:14px}
+#p{height:2px;background:#dcb97430;margin:26px 0;max-width:380px}#b{display:block;height:100%;background:var(--gold);transform:scaleX(0);transform-origin:0;transition:transform .4s}#s{color:var(--gold)}.m #s{display:none}#g{display:flex;flex-wrap:wrap;gap:12px;align-items:center}#d{background:var(--gold);color:var(--ink);font-weight:600;padding:13px 25px}#q{flex-basis:100%;display:flex;gap:5px;align-items:center;margin-top:10px;font-size:12px}#q span{margin-right:8px;color:#bdc9c6}
+#atlas-card{border:1px solid #dcb97466;background:#082a32da;padding:18px;max-width:720px}.atlas-heading{display:flex;justify-content:space-between;align-items:center;gap:15px;border-bottom:1px solid #dcb97444;padding-bottom:9px}.atlas-heading h2{font:normal 23px Palatino,Georgia,serif;margin:0}.atlas-heading span{font-size:10px;letter-spacing:.15em;color:var(--gold);text-transform:uppercase}
+#atlas{width:100%;height:clamp(210px,38vh,400px);margin:10px 0}.map-water{fill:#174e58}.map-land{fill:#857d59;stroke:#dcb974;stroke-width:1}.map-channel{fill:#46a496}.map-terrace{fill:#b19b68;stroke:#dac491;stroke-width:1}.map-monument{fill:#dbb66a}.map-point{fill:#082a32;stroke:#f1d99c;stroke-width:2}.map-number{fill:#f1e5cc;font:28px system-ui;text-anchor:middle;dominant-baseline:central}
+#map-places{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}#map-places button{text-align:left;font-size:11px;padding:8px 5px}#map-places b{color:var(--gold);margin-right:5px}#map-places button.on b{color:var(--ink)}.map-caption{font-size:11px;color:#b5cbc6;margin:11px 0 0}
+#r{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px 25px;color:#b5cbc6;font-size:11px;align-self:end}#r a{margin-left:auto;color:var(--gold)}#h{display:none}kbd{font:inherit;color:var(--paper);border-bottom:1px solid #dcb97466}
+#tools{position:absolute;top:14px;right:14px;display:flex;gap:7px;z-index:3}#tools button{background:#092d36df;font-size:12px;padding:8px 13px}.p #tools{opacity:0;pointer-events:none}#i{position:absolute;top:16px;left:16px;margin:0;padding:8px 11px;background:#082a32d9;border-left:2px solid var(--gold);font:11px/1.5 ui-monospace,monospace;white-space:pre-wrap;pointer-events:none;max-width:calc(100% - 32px)}#i:empty{display:none}
+#look-panel{position:absolute;right:14px;top:60px;bottom:14px;width:min(360px,calc(100% - 28px));background:#082a32f5;border:1px solid #dcb97488;box-shadow:0 15px 60px #0008;z-index:4;display:flex;flex-direction:column}.panel-head{display:flex;align-items:center;justify-content:space-between;padding:15px;border-bottom:1px solid #dcb97444}.panel-head h2{font:normal 25px Palatino,Georgia,serif;margin:0}.panel-head button{padding:4px 10px}
+.panel-body{overflow:auto;padding:14px;overscroll-behavior:contain}.panel-body p{font-size:11px;color:#b5cbc6;margin:0 0 12px}.presets{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}.presets button{font-size:11px;padding:6px 8px}fieldset{border:0;border-top:1px solid #dcb97444;margin:12px 0 0;padding:12px 0 0}legend{padding-right:10px;color:var(--gold);font-size:12px;letter-spacing:.04em}.slider-label{display:flex;justify-content:space-between;gap:8px;font-size:12px}.slider-label output{font:11px ui-monospace,monospace;color:#b8d5c9}input[type=range]{width:100%;accent-color:var(--gold);height:27px;margin:2px 0 8px;cursor:ew-resize}
+.panel-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:15px}.panel-actions button{font-size:11px;padding:7px 9px}#look-status{min-height:1.5em;color:var(--gold);margin-top:9px}#look-data{width:100%;height:90px;font:10px/1.4 ui-monospace,monospace;background:#061f27;color:var(--paper);border:1px solid #dcb97466;padding:8px;margin-top:9px;user-select:text}
+html[data-look=open] #m{display:none}html[data-look=open] #c{filter:none}html[data-look=open] #tools{opacity:1;pointer-events:auto}html[data-look=open] #i{max-width:calc(100% - 405px)}
+@media(max-width:900px){#m{grid-template-columns:minmax(210px,.85fr) minmax(320px,1.15fr);gap:20px;padding:24px}.intro{font-size:12px}.brand-kicker{margin-bottom:10px}.brand-mark{margin-bottom:12px}#atlas-card{padding:12px}}
+@media(max-width:650px) and (orientation:portrait){#m{grid-template-columns:1fr;align-content:start;gap:20px;padding:65px 22px 22px}h1{font-size:43px}.brand-mark,.intro{display:none}.subtitle{font-size:20px;margin:8px 0}#p{margin:15px 0}#g{gap:8px}#q{margin:0;flex-basis:auto}#atlas{height:215px}#r{font-size:10px}#i{top:58px}html[data-look=open] #i{display:none}}
+@media(max-height:550px){#m{padding:20px 25px;gap:12px 25px;align-content:center}.brand-mark,.intro{display:none}.brand-kicker{margin:0 0 10px}.subtitle{margin:8px 0}#p{margin:15px 0}#atlas{height:150px}#atlas-card{padding:10px}#q{margin:0}#r{font-size:10px}#map-places button{padding:5px}#tools{top:8px;right:10px}#look-panel{top:48px}}
+@media(pointer:coarse){#k{display:none}#h{display:block}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head>
+<body class=l><canvas id=c aria-label="La cité de Hapikara en trois dimensions"></canvas>
+<main id=m><section><p class=brand-kicker>Une cité entre Nil et désert</p>
+<svg class=brand-mark viewBox="0 0 64 30" aria-hidden=true><path d="M2 27H62M8 24L32 3L56 24M22 24L32 3L42 24M18 27V21M46 27V21"/><circle cx=32 cy=3 r=2/></svg>
+<h1>Hapikara</h1><p class=subtitle>Les jardins du Nil</p><p class=intro>Des cours secrètes, des temples dorés et l’eau verte des canaux. Choisissez un lieu, puis laissez-vous porter.</p><div id=p><i id=b></i></div><p id=s>La cité prend forme…</p>
+<div id=g><button id=d>Explorer la cité</button><button id=home-look>Régler l’ambiance</button><div id=q><span>Détail</span><button>Léger</button><button>Équilibré</button><button>Détaillé</button></div></div></section>
+<section id=atlas-card aria-labelledby=atlas-title><div class=atlas-heading><h2 id=atlas-title>Le plan de la cité</h2><span>Nil · Est →</span></div><svg id=atlas viewBox="-530 -445 1110 890" role=img aria-label="Plan des canaux, des terrasses et des six points de vue"></svg><div id=map-places></div><p class=map-caption>Choisissez un lieu pour y commencer votre visite.</p></section>
+<footer id=r><span id=k><kbd>W A S D</kbd> avancer · <kbd>Q E</kbd> monter / descendre · souris pour regarder · <kbd>Échap</kbd> plan · <kbd>L</kbd> ambiance · <kbd>H</kbd> performances</span><span id=h>Glissez un doigt pour avancer et regarder. Deux doigts pour accélérer.</span><a href=https://github.com/DaamHaam/hapikara target=_blank rel=noopener>Le projet ↗</a></footer></main>
+<nav id=tools aria-label="Outils de visite"><button id=look-open aria-expanded=false aria-controls=look-panel>Ambiance</button><button id=stats-toggle aria-pressed=false>i/s</button><button id=o>Plan</button></nav>
+<aside id=look-panel aria-labelledby=look-title hidden><header class=panel-head><h2 id=look-title>Atelier d’ambiance</h2><button id=look-close aria-label="Fermer l’atelier">×</button></header><div class=panel-body><p>Réglez la lumière en regardant la cité. Vos essais restent enregistrés sur cet appareil.</p><div class=presets><button data-look=royal>Soleil royal</button><button data-look=gardens>Jardins du Nil</button><button data-look=sanctuary>Sanctuaire voilé</button></div><div id=look-fields></div><div class=panel-actions><button id=look-compare aria-pressed=false>Comparer à l’ouverture</button><button id=look-reset>Tout réinitialiser</button><button id=water-reset>Réinitialiser l’eau</button><button id=look-copy>Copier mes réglages</button><button id=look-import>Importer des réglages</button></div><textarea id=look-data aria-label="Réglages à copier ou importer" hidden spellcheck=false></textarea><p id=look-status role=status aria-live=polite></p></div></aside>
+<pre id=i aria-live=off></pre><script>/*SCRIPT*/</script></body></html>

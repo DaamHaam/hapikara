@@ -67,17 +67,17 @@
   // temporal stability: the camera creeps along o.move per frame at 180 fps; returns mean green-channel change per pixel,
   // the share changing by > 6 levels (visible shimmer), and a map of them (white = 24+ levels)
   window.__flicker = async (o) => {
-    const dt = 1 / 180, mv = o.move || [0.01, 0, 0.004], n = o.frames || 90, N = W * H, acc = new Float32Array(N), K = 10;
+    const dt = o.dt || 1 / 180, mv = o.move || [0.01, 0, 0.004], n = o.frames || 90, N = W * H, acc = new Float32Array(N), K = 10;
     if (o.time !== undefined) F[TIME] = o.time;
     if (o.pose !== undefined) lookAt(...POSES[o.pose]); else lookAt(...o.cam);
     const step = () => { F[CX] += mv[0]; F[CY] += mv[1]; F[CZ] += mv[2]; F[TIME] += dt; draw(); };
     for (let i = 0; i < n; i++) { step(); if (i % 8 === 7) await Q.onSubmittedWorkDone(); }
     c2.width = W; c2.height = H; const g = c2.getContext('2d', { willReadFrequently: true }); let prev = null;
     for (let k = 0; k <= K; k++) { step(); g.drawImage(canvas, 0, 0); const d = g.getImageData(0, 0, W, H).data; if (prev) for (let i = 0; i < N; i++) acc[i] += abs(d[i * 4 + 1] - prev[i * 4 + 1]); prev = d; }
-    let sum = 0, hot = 0; const im = g.createImageData(W, H);
-    for (let i = 0; i < N; i++) { const a = acc[i] / K; sum += a; if (a > 6) hot++; const v = min(255, a * 10.6); im.data[i * 4] = v; im.data[i * 4 + 1] = v; im.data[i * 4 + 2] = v; im.data[i * 4 + 3] = 255; }
+    let sum = 0, hot = 0, counted=0; const im = g.createImageData(W, H), area=o.area||[0,0,W,H];
+    for (let i = 0; i < N; i++) { const x=i%W,y=floor(i/W);if(x<area[0]||x>=area[2]||y<area[1]||y>=area[3])continue;counted++;const a = acc[i] / K; sum += a; if (a > 6) hot++; const v = min(255, a * 10.6); im.data[i * 4] = v; im.data[i * 4 + 1] = v; im.data[i * 4 + 2] = v; im.data[i * 4 + 3] = 255; }
     g.putImageData(im, 0, 0);
-    return [`mean ${(sum / N).toFixed(3)}  hot ${(hot / N * 100).toFixed(2)}%`, c2.toDataURL('image/png')];
+    return [`mean ${(sum / max(counted,1)).toFixed(3)}  hot ${(hot / max(counted,1) * 100).toFixed(2)}%`, c2.toDataURL('image/png')];
   };
   // starts after 2 s of ordinary frames, like a session already running
   window.__bench = () => new Promise((res) => { finish = res; menu = false; F[FLT] = 0; flyAt(); requestAnimationFrame((t) => { F[LAST] = t; requestAnimationFrame(frame); }); setTimeout(() => start(true), 2000); });
@@ -155,13 +155,18 @@
       const palmCam=[169,21,39,154.5,25,21];
       await send({name:'palms.png',image:(await window.__shot({cam:palmCam,time:10}))[0]});
       const palmFlicker=await window.__flicker({cam:palmCam,time:10});report.palmFlicker=palmFlicker[0];await send({name:'palms-flicker.png',image:palmFlicker[1]});
+      const palmStill=await window.__flicker({cam:palmCam,time:10,move:[0,0,0],dt:1/60});report.palmStill=palmStill[0];await send({name:'palms-still.png',image:palmStill[1]});
+      await send({name:'garden.png',image:(await window.__shot({cam:[240,17,-188,220,12,-215],time:10}))[0]});
+      report.palmCrownArea=[560,330,900,620];const crown=await window.__flicker({cam:palmCam,time:10,move:[0,0,0],dt:1/60,area:[560*W/1440,330*H/900,900*W/1440,620*H/900]});report.palmCrownStill=crown[0];await send({name:'palms-crown-still.png',image:crown[1]});
       report.flicker=flicker[0]; await send({name:'flicker.png',image:flicker[1]});
       await send({name:'oasis.png',image:(await window.__shot({cam:[OASIS[0]+300,110,40,OASIS[0]-55,100,0]}))[0]});
       for (const fly of [28,40,52]) {
         const shots=await window.__shot({fly,pair:true});
         for(let k=0;k<shots.length;k++) await send({name:`fly-${fly}-${k}.png`,image:shots[k]});
       }
+      if(QP.has('looks'))for(const [name,preset]of Object.entries(LOOK_PRESETS)){LOOK_ACTIVE.set(LOOK);for(let i=0;i<20;i++)if(preset[LOOK_FIELDS[i][0]]!==undefined)LOOK_ACTIVE[i]=preset[LOOK_FIELDS[i][0]];syncLook();F[RESET]=1;await send({name:'look-'+name+'.png',image:(await window.__shot({pose:2,time:10}))[0]});}LOOK_ACTIVE.set(LOOK);syncLook();F[RESET]=1;
       if(QP.has('bench')) report.benchmark=await window.__bench();
+      if(GPU_ERRORS.length)throw Error(GPU_ERRORS.join('\n'));
       await send({name:'report.json',report});
       document.getElementById('s').textContent='QA complete'; console.log('QA complete',report);
     } catch(e) { await send({name:'error.json',report:{error:e.stack}}); console.error(e); }

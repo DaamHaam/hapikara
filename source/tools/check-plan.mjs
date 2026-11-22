@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 const read = f => readFileSync(new URL('../src/'+f,import.meta.url),'utf8');
-const source = ['math.js','layout.js'].map(read).join('\n') + '\n' + read('sh_scene.js').split('// per view')[0] + '\nconst LEAFK=1;\n' + ['meshes.js','egypt.js','collide.js'].map(read).join('\n');
+const source = ['math.js'].map(read).join('\n') + '\nconst LOOK=new Float32Array(22);LOOK[20]=32.51;LOOK[21]=-44.06;\n' + ['layout.js'].map(read).join('\n') + '\n' + read('sh_scene.js').split('// per view')[0] + '\nconst LEAFK=1;\n' + ['meshes.js','egypt.js','collide.js'].map(read).join('\n');
 vm.runInNewContext(source + `
 const assert = (b,m) => {if(!b) throw Error(m)};
 setHard({boxes:[],bridges:[]}); landY=terrainH;

@@ -3,7 +3,7 @@
 const WATER = 6.5, LAND = 10; // canal water and city ground; the Nile is at y = 0
 const PULSE = 14; // seconds between the flood waves running down the pyramid
 const SEA_GROW = 1.034; // each water ring this much wider than the last (meshSea, and the swell's fade in the shader)
-const SUN = vnorm([-0.6, 0.55, 0.62]); // towards the sun: 32 degrees up, south-west (afternoon): three-quarter backlight on the views west
+const SUN = [sin(LOOK[21]*DEG)*cos(LOOK[20]*DEG),sin(LOOK[20]*DEG),cos(LOOK[21]*DEG)*cos(LOOK[20]*DEG)]; // angles from the ambiance panel; rebuilt with the sky/shadows
 const angd = (a, b) => { let d = (a - b) % TAU; if (d > PI) d -= TAU; if (d < -PI) d += TAU; return d; };
 const bump = (x) => (abs(x) < 1 ? cos(x * PI / 2) ** 2 : 0);
 
@@ -41,6 +41,7 @@ const FLOOR_Y = 3.0; // canal floors
 const PDN = { h: 11, H: 26 }; // pyramidion dimensions, also used by the refraction shader
 // Sacred terrace biefs: x extent, south lip, terrace height. Most water stays at WATER.
 const BIEFS = [[-246,-174,-141,22],[-240,-180,119,16],[157,219,262,16],[324,350,119,10]];
+const COURTYARDS = [[-355,-325],[-210,215],[220,-215],[330,315],[-70,320]];
 const QUAY_STEPS = [[355,119,-PI/2],[-345,-141,-PI/2],[-40,119,-PI/2]];
 const quayStepY = (x,z) => {
   for(let i=0;i<QUAY_STEPS.length;i++) {const b=QUAY_STEPS[i],dx=x-b[0],dz=z-b[1],c=cos(b[2]),s=sin(b[2]),u=dx*c-dz*s,v=dx*s+dz*c;if(u>=0&&u<=9&&abs(v)<=3) return mix(LAND,WATER+.5,u/9);}

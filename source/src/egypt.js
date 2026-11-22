@@ -3,33 +3,28 @@
 
 // palm: ringed trunk with a gentle lean, a crown of feathered fronds arching out and down (leaf tile PALM)
 function meshPalm(seed, lod) {
-  const mb = new MB(4096), rng = RNG(seed * 131 + 7), H = 11 + rng() * 6, lx = (rng() - 0.5) * 0.3, lz = (rng() - 0.5) * 0.3;
-  const N = [9, 6, 4, 2, 1][lod], pts = [];
-  for (let i = 0; i <= N; i++) { const t = i / N; pts.push([lx * H * t * t, -0.4 + (H + 0.4) * t, lz * H * t * t, 0.3 * (1 - 0.3 * t) + (i === 0 ? 0.1 : 0)]); }
-  mb.mat = M.BARK; mb.tube(pts, [8, 6, 5, 4, 3][lod], false);
-  const top = pts[N];
-  const nF = [24, 15, 10, 7, 5][lod], S = [7, 4, 3, 2, 1][lod], wk = [1, 1.25, 1.5, 1.9, 2.4][lod] * LEAFK;
-  for (let f = 0; f < nF; f++) {
-    const r = [rng(), rng(), rng(), rng()], az = f / nF * TAU * 2.618 + r[0] * 0.4, el = (62 - 100 * pow(r[1], 0.75)) * DEG, len = (4.3 + 1.3 * r[2]) * (el > 0.6 ? 0.8 : 1);
-    let d = [cos(el) * cos(az), sin(el), cos(el) * sin(az)], p = [top[0] + d[0] * 0.3, top[1] + 0.25, top[2] + d[2] * 0.3];
-    const side = vnorm([-sin(az), 0, cos(az)]), roll = (r[3] - 0.5) * 0.7;
-    for (let i = 0; i < S; i++) {
-      const t = (i + 0.5) / S, sl = len / S;
-      // the rachis bends down more towards its tip
-      d = vnorm([d[0], d[1] - 0.55 * sl / len * (1 + t), d[2]]);
-      const c = [p[0] + d[0] * sl / 2, p[1] + d[1] * sl / 2, p[2] + d[2] * sl / 2];
-      // two cards crossed along the rachis, each leaning down: the leaflets hang in a shallow V
-      const wid = 0.95 * sin(PI * (0.12 + 0.82 * t)) * wk, sp = vnorm(vcross(d, [0, 1, 0])), up = vcross(sp, d);
-      const N0 = vnorm([c[0] - top[0], c[1] - top[1] + 1.2, c[2] - top[2]]), ec = rng() * 255 | 0;
-      for (const rl of [0]) {
-        const a = rl + roll * 0.4 - (lod < 2 ? 0 : 0.2), sx = [sp[0] * cos(a) + up[0] * sin(a), sp[1] * cos(a) + up[1] * sin(a) - 0.18, sp[2] * cos(a) + up[2] * sin(a)];
-        mb.mat = M.LEAF + LT.PALM; mb.ec = ec;
-        mb.card(c, [sx[0] * wid, sx[1] * wid, sx[2] * wid], [d[0] * sl * 0.56, d[1] * sl * 0.56, d[2] * sl * 0.56], N0, (0.55 + 0.45 * t) * (rl < 0 ? 0.85 : 1));
+  // Opaque folded fronds: continuous silhouette, no alpha cutout or wind at any quality.
+  const mb=new MB(4096),rng=RNG(seed*131+7),H=11+rng()*6,lx=(rng()-.5)*.3,lz=(rng()-.5)*.3;
+  const n=[9,6,4,2,1][lod],pts=[];
+  for(let i=0;i<=n;i++){const t=i/n;pts.push([lx*H*t*t,-.4+(H+.4)*t,lz*H*t*t,.3*(1-.3*t)+(i===0?.1:0)]);}
+  mb.mat=M.PALMBARK;mb.tube(pts,[8,6,5,4,3][lod],false);
+  const top=pts[n],nf=[20,16,12,9,7][lod],steps=[9,7,5,4,3][lod];
+  for(let f=0;f<nf;f++){
+    const az=f/nf*TAU*2.618+rng()*.3,el=(60-96*pow(rng(),.75))*DEG,len=4.3+rng()*1.4,phase=rng();
+    const side=[-sin(az),0,cos(az)],rows=[];
+    for(let j=0;j<=steps;j++){
+      const t=j/steps,reach=len*cos(el)*t,y=top[1]+.2+len*(sin(el)*t-.62*t*t);
+      const w=.82*pow(sin(PI*t),.8)*(1-.25*t),row=[];
+      for(const k of [-1,0,1]){
+        const x=top[0]+cos(az)*reach+side[0]*w*k,z=top[2]+sin(az)*reach+side[2]*w*k;
+        mb.mat=M.PALM;mb.ea=round((k+1)*127.5);mb.eb=round(t*255);mb.ec=round(phase*255);
+        row.push(mb.v(x,y-abs(k)*w*.22,z,cos(az)*.25,.8,sin(az)*.25,.78+.2*t));
       }
-      p = [p[0] + d[0] * sl, p[1] + d[1] * sl, p[2] + d[2] * sl];
+      rows.push(row);
+      if(j)for(let k=0;k<2;k++)mb.quad(rows[j-1][k],rows[j-1][k+1],row[k+1],row[k]);
     }
   }
-  return mb.build();
+  mb.ea=mb.eb=mb.ec=0;return mb.build();
 }
 // papyrus clump: thin upright stems, each with a fan umbel
 function meshPapyrus(seed, lod) {

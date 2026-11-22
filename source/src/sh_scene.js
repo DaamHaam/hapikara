@@ -1,6 +1,6 @@
 // shaders 2/4: instancing, GPU culling, materials (G-buffer) and shadow casters
 // material ids, shared by mesh generators and shaders
-const M = { MARBLE: 0, PAVE: 1, PLASTER: 2, GOLD: 3, QUAY: 4, FLOOR: 5, WINDOW: 6, BARK: 7, ALLOY: 8, TRIM: 9, TERRAIN: 10, CORE: 11, TERRACE: 12, GROUND: 13, STEP: 14, ROCK: 15, FALL: 16, SEA: 17, PAINT: 18, SANDST: 19, GRANITE: 20, LEAF: 32 };
+const M = { MARBLE: 0, PAVE: 1, PLASTER: 2, GOLD: 3, QUAY: 4, FLOOR: 5, WINDOW: 6, BARK: 7, ALLOY: 8, TRIM: 9, TERRAIN: 10, CORE: 11, TERRACE: 12, GROUND: 13, STEP: 14, ROCK: 15, FALL: 16, SEA: 17, PAINT: 18, SANDST: 19, GRANITE: 20, PALM: 21, PALMBARK: 22, LEAF: 32 };
 // leaf atlas tiles (material = M.LEAF + tile): crowns, then vines (TRAIL fringe, VLEAF / VBLOSSOM carpets)
 const LT = { OLIVE: 0, BROAD: 1, PINE: 2, CYPRESS: 3, BLOSSOM: 4, HYDRANGEA: 5, TRAIL: 6, LAVENDER: 7, VLEAF: 8, VBLOSSOM: 9, PALM: 10, LILY: 11 };
 
@@ -334,6 +334,13 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
       petal = FLOWERS[u32(i.tint.a * 255. + .5) & 7u] * (.75 + .6 * c.r) * (.85 + .3 * v); o.rough = .5;
     }
     if (c.g > .5) { o.alb = petal; o.trans = .4; } else { o.trans = .75; }
+  } else if (mat == 21u) {
+    // Broad continuous leaf; veins are shading only, derivative filtered, never holes.
+    let q=i.uv.xy; let v=q.y*10.+abs(q.x-.5)*3.; let fwv=max((abs(uvx.y)+abs(uvy.y))*10.+(abs(uvx.x)+abs(uvy.x))*3.,.02);
+    let vein=1.-ss(.03,.03+fwv,abs(fract(v)-.5));
+    let ridge=1.-ss(.015,.05+abs(uvx.x)+abs(uvy.x),abs(q.x-.5));
+    o.alb=i.tint.rgb*i.tint.rgb*(.68+.3*q.y+.08*i.uv.z)*mix(vec3f(.9,1.,.72),vec3f(1.05,1.,.8),q.y)*(1.-.12*vein+.09*ridge);
+    o.rough=.82;o.trans=.25;
   } else if (mat == 0u || mat == 4u || mat == 9u) {
     // marble: honed walls in courses, smooth trim, quay walls with a waterline
     let m = marble(p, dx, dy, w, vec3f(0.));
@@ -402,7 +409,7 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
         o.alb = mix(o.alb, cur, 1. - ss(cw - fu, cw + fu, cu));
       }
     }
-  } else if (mat == 7u) {
+  } else if (mat == 7u || mat == 22u) {
     let s = vec3f(1., .22, 1.); let A = tri(tNoiseA, i.lp * s, dx * s, dy * s, w, 1.3); let B = tri(tNoiseA, p, dx, dy, w, 4.);
     o.alb = mix(vec3f(.13, .1, .075), vec3f(.3, .27, .22), A.r * A.r * 1.6) * (.6 + .7 * B.a) * (.5 + .5 * i.tint.g); o.rough = .9; o.nb = triN(i.lp * s, dx * s, dy * s, w, 2.2, true) * 1.4;
   } else if (mat == 8u) { o.alb = vec3f(.84, .86, .88); o.metal = 1.; o.rough = .2; }
@@ -508,7 +515,8 @@ const W_GBUF_LOW = W_GBUF.replace(/discard;/g, '') + /*wgsl*/`
 @fragment fn fsLeafLow(i: VO) -> GO {
   let mat = i.mi.x; let tile = max(mat, 32u) - 32u; let c = textureSample(tLeaf, sLin, atlasUV(tile, i.uv.xy));
   let tn = i.tint.rgb * i.tint.rgb; let v = i.uv.z; var alb = tn * .22; var rough = .9; var trans = .2;
-  if (mat == 7u) { alb = vec3f(.19, .16, .125) * (.5 + .5 * i.tint.g); trans = 0.; }
+  if (mat == 7u || mat == 22u) { alb = vec3f(.19, .16, .125) * (.5 + .5 * i.tint.g); trans = 0.; }
+  else if(mat==21u){alb=tn*(.68+.3*i.uv.y+.08*v)*vec3f(.95,1.,.76);rough=.82;trans=.25;}
   else if (mat >= 32u) {
     var petal: vec3f; trans = .75;
     if (onWall(tile)) { alb = tn * (.4 + .9 * c.r) * mix(vec3f(1.16, 1.05, .78), vec3f(.8, .94, 1.03), c.b) * (.92 + .16 * fract(v * 7.31)); petal = FLOWERS[u32(i.tint.a * 255. + .5) & 7u] * (.75 + .6 * c.r) * (.82 + .36 * c.b); rough = .42; }

@@ -119,7 +119,7 @@ const W_FX2 = /*wgsl*/`
   let F = .02 + .98 * pow(1. - nv, 5.);
   // under the surface: the scene behind, bent and coloured by the water depth
   let zs = viewZ(suv); let zw = 1. / i.clip.w; let thick0 = max(zs - zw, 0.); // fragment w is 1 / view depth
-  var uv2 = suv + N.xz * vec2f(1., -1.) * .035 * sat(thick0 * .6) / (1. + dist * .02);
+  var uv2 = suv + N.xz * vec2f(1., -1.) * (.035 * view.look3.y) * sat(thick0 * .6) / (1. + dist * .02);
   var z2 = viewZ(uv2); if (z2 < zw) { uv2 = suv; z2 = zs; }
   let bed = worldAt(uv2, z2); let path = max(z2 - zw, 0.) * dist / zw; let depth = max(p.y - bed.y, 0.);
   var under = textureSampleLevel(tScene, sLin, uv2, 0.).rgb; var sig: vec3f; var scat: vec3f; var sA = .2;
@@ -143,7 +143,7 @@ const W_FX2 = /*wgsl*/`
     if (LV < 2 && view.misc.y < .5 && fw < 1.5) { let h = ssr(p, Rs, nz); refl = mix(refl, h.rgb, h.a * (1. - ss(.7, 1.5, fw))); }
   }
   
-  var col = mix(under, refl, F);
+  var col = mix(under, refl, sat(F * view.look3.z));
   // dark line where water meets stone
   if (kind < 2u) { col *= mix(.5, 1., ss(0., .35, thick0)); }
   // sun glitter
@@ -264,7 +264,7 @@ fn behind(pe: vec3f, d: vec3f, zf: f32, disp: f32, far: f32) -> vec3f {
   travel=min(travel,60.); let pe=p+d1*travel; let exitN=qrot(i.q,ne);
   var d2=refract(d1,-exitN,1.57); var tir=false;
   if(dot(d2,d2)<.5) {d2=reflect(d1,-exitN);tir=true;}
-  let absorption=exp(-travel*vec3f(.135,.008,.065));
+  let absorption=exp(-travel*vec3f(.135,.008,.065)*view.look3.w);
   var bg=behind(pe,d2,1./i.clip.w,.0015,65.)*absorption*vec3f(.52,1.,.72);
   if(tir) {bg=textureSampleLevel(tEnv,sLin,d2,.3).rgb*absorption*vec3f(.38,.86,.57);}
   // Quiet static cleavage planes, illuminated only by sky and sun.
