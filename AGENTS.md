@@ -20,6 +20,8 @@ Cité égyptienne imaginaire entre le Nil et le désert, survolable dans le navi
 - Construire `index.html` (minifié) : `npm run build`
 - Version lisible : `npm run build:readable` ; outils de dev (`F` survol, `B` benchmark) : `npm run build:dev` → `dev.html`
 - Servir : `python3 -m http.server 8137` à la racine, puis ouvrir `http://localhost:8137/dev.html` dans Chrome
+- Vérifier le contrat plan/maillage/collisions : `cd source && npm run check:plan` (CPU, sans navigateur).
+- Captures et mesures : `python3 source/tools/qa-server.py` à la racine, puis `dev.html?auto&lv=1&w=1440&h=900&qa=release-medium&bench`. Les résultats sont écrits dans `/tmp/hapikara-qa/release-medium/`. Un seul onglet de test ; arrêter le serveur après usage. Pour un benchmark représentatif, relever l'état de l'économiseur Chrome ; ne modifier ce réglage qu'avec l'accord de l'utilisateur, puis le rétablir.
 
 ## Architecture
 
@@ -29,6 +31,9 @@ Cité égyptienne imaginaire entre le Nil et le désert, survolable dans le navi
 - `GUIDE.md` : démarche et choix du projet.
 - `source/src/` : modules (voir le tableau du README d'Atlantis). Moteur à garder : `main.js`, `quality.js`, `math.js`, `collide.js`, `dev.js`, `sh_base.js`, `sh_light.js`. Monde à remplacer : `layout.js`, `city.js`, `plants.js`, `meshes.js`, `world.js`, plus matériaux de `sh_scene.js`/`sh_fx.js` et `music.js`.
 - `source/build.mjs` : concatène `src/` dans l'ordre donné et écrit `../index.html`.
+- `layout.js` est la source du réseau rectangulaire segmenté `CHANNELS`, des cellules convexes `BLOCKS`, des terrasses `TERRACES`/`cityH`, des biefs `BIEFS` et des escaliers de quai `QUAY_STEPS`. Sol, plantations, masques et collisions s'y réfèrent. L'enveloppe extérieure reste la superellipse 470 × 400, également utilisée par `sh_light.js`.
+- `source/src/egypt.js` : générateurs des bâtiments, végétaux et ornements égyptiens ; `PDN` dans `layout.js` fournit les dimensions du pyramidion à la géométrie et à la réfraction.
+- `source/tools/qa-export.py` exporte les captures vérifiées et les rapports bruts dans `.github/screenshots/` (Pillow, uniquement pour les outils). `qa-palm-control.mjs` fabrique dans `/tmp` une variante de contrôle avec les anciennes palmes, sans modifier le livrable.
 - `reference/atlantis/` : clone du projet d'origine, ignoré par git, en lecture seule.
 
 ## Invariants métier

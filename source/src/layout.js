@@ -15,7 +15,7 @@ const RB = {
   out: (t) => se(CITY_A, CITY_B, t), // ring canal | land outside
 };
 // canals: lines of constant x (running north-south) and constant z (east-west): [position, half width]
-const CXL = [[-310, 9], [-130, 11], [130, 11], [266, 10], [370, 7]];
+const CXL = [[-310, 11], [-130, 11], [130, 11], [266, 10], [370, 7]];
 const CZL = [[-250, 10], [-130, 11], [130, 11], [270, 8]];
 // Union of rectangular reaches: broad lagoons, doglegs and interrupted cross-canals.
 // This single plan drives the land partition, canal queries, planting and bridges.
@@ -38,6 +38,14 @@ const cityH = (x, z) => {
 const ACRO = 122; // the acropolis block: |x|, |z| < ACRO
 const AVE = 10; // half width of the processional avenue (z = 0, east to the Nile) and the north-south way (x = 0)
 const FLOOR_Y = 3.0; // canal floors
+const PDN = { h: 11, H: 26 }; // pyramidion dimensions, also used by the refraction shader
+// Sacred terrace biefs: x extent, south lip, terrace height. Most water stays at WATER.
+const BIEFS = [[-246,-174,-141,22],[-240,-180,119,16],[157,219,262,16],[324,350,119,10]];
+const QUAY_STEPS = [[355,119,-PI/2],[-345,-141,-PI/2],[-40,119,-PI/2]];
+const quayStepY = (x,z) => {
+  for(let i=0;i<QUAY_STEPS.length;i++) {const b=QUAY_STEPS[i],dx=x-b[0],dz=z-b[1],c=cos(b[2]),s=sin(b[2]),u=dx*c-dz*s,v=dx*s+dz*c;if(u>=0&&u<=9&&abs(v)<=3) return mix(LAND,WATER+.5,u/9);}
+  return -1e9;
+};
 // on water inside the city (canal or ring), not counting bridges
 const inRing = (x, z) => { const r = hypot(x, z), t = atan2(z, x); return r >= RB.gar(t) && r < RB.out(t); };
 const inCity = (x, z) => hypot(x, z) < RB.out(atan2(z, x));
@@ -77,6 +85,7 @@ const BLOCKS = (() => {
 // the Nile: west bank along nileX(z), 480 m wide, flowing north
 const NILE_W = 480;
 const nileX = (z) => 600 + 34 * sin(z / 640 + 0.6) + 18 * sin(z / 230 + 2.1);
+const EAST_QUAY = [nileX(-220)+NILE_W,-220];
 // signed distance from the water's edge, positive on land (either bank)
 const nileD = (x, z) => { const w = nileX(z); return x < w ? w - x : x > w + NILE_W ? x - w - NILE_W : -min(x - w, w + NILE_W - x); };
 // the harbour front: stepped quays where the avenue meets the river (city.js), |z| < QZ
@@ -90,6 +99,8 @@ const cliffX = (z) => -2050 + 160 * sin(z / 520 + 1.2) + 70 * sin(z / 170);
 // the oasis below the waterfall, at the cliff foot
 const OASIS = [-1880, 0, 0]; // x, z set below to the cliff's foot
 OASIS[0] = cliffX(OASIS[1]) + 120;
+const OASIS_FALL = {x:cliffX(OASIS[1])+78,y:190,w:14};
+const oasisD=(x,z)=>{const dx=x-OASIS[0],dz=z-OASIS[1],a=atan2(dz,dx);return hypot(dx,dz)/(1+.13*sin(a*3)+.06*sin(a*7));};
 
 // height of the land outside the city
 const terrainH = (x, z) => {
@@ -116,8 +127,10 @@ const terrainH = (x, z) => {
         h = mix(h, p, pow(face, 0.7));
       }
       // the oasis: a hollow at the cliff's foot holding a pool (city.js puts its water at y = 6)
-      const od = hypot(x - OASIS[0], z - OASIS[1]);
+      const od = oasisD(x,z);
       if (od < 260) h = mix(h, 4 - 6 * (1 - sstep(0, 70, od)), 1 - sstep(80, 260, od));
+      const sx=cliffX(OASIS[1]);
+      if(x>sx-120&&x<sx+72) h=mix(h,OASIS_FALL.y,(1-sstep(12,50,abs(z-OASIS[1])))*sstep(sx-120,sx-90,x)*(1-sstep(sx+64,sx+72,x)));
     }
   } else {
     // east bank: fields, then low desert hills
@@ -167,12 +180,12 @@ const parcelUse = (b, s) => {
 // camera: review shots and the scripted fly-through
 // position + look-at; keys 1-6
 const POSES = [
-  [950, 330, 430, 0, 30, 0],
+  [900, 330, 430, 30, 25, 0],
   [430, 24, 0, 0, 62, 0],
   [345, 8.4, 130, 150, 18, 126],
-  [27, 111.4, 26, 0, 121, 0],
-  [290, 58, -338, -80, 40, -140],
-  [1060, 13, -230, 640, 22, 120],
+  [30, 117, 29, 0, 123, 0],
+  [281, 31, -225, -60, 42, -110],
+  [EAST_QUAY[0]-6,8,-244,EAST_QUAY[0]-440,65,130],
 ];
 // 60 s path: position + look-at every 2.5 s on one Catmull-Rom spline (<= 150 m between points)
 const FLY = new Float32Array([

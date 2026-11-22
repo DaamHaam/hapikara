@@ -5,7 +5,7 @@
 
 Ce fichier définit **à quoi la scène doit ressembler**. Il s'adresse au développeur et au critique visuel, et ne contient aucune consigne d'implémentation. Les images de référence sont dans `concept-art/` (les huit images du premier niveau seulement ; ignorer les sous-dossiers `rejected/` et `source/`). La section 3 dit comment s'en servir.
 
-**La scène en une phrase :** Hapikara au milieu de la matinée, une cité-oasis de grès doré, de calcaire blanc et de pierres précieuses, posée sur une île en terrasses entre le Nil et le désert, où une eau vert-jade claire jaillit du sommet d'une pyramide de cristal émeraude et ruisselle partout, de bassin en bassin, jusqu'au fleuve. Elle doit respirer **l'abondance, la lumière et la fraîcheur**.
+**La scène en une phrase :** Hapikara au début de l’après-midi, une cité-oasis de grès doré, de calcaire blanc et de pierres précieuses, posée sur une île en terrasses entre le Nil et le désert, où une eau vert-jade claire jaillit du sommet d'une pyramide de cristal émeraude et ruisselle partout, de bassin en bassin, jusqu'au fleuve. Elle doit respirer **l'abondance, la lumière et la fraîcheur**.
 
 ---
 
@@ -105,7 +105,7 @@ Le Nil coule du **sud vers le nord**, à l'**est** de la cité. Le désert et le
 | Quartier des jardins | 220–450 m | Villas à toits-terrasses, palmiers, treilles, bassins, rigoles le long des rues, trame orthogonale irrégulière |
 | Canaux | partout | Biefs à coudes et redans, tronçons interrompus, largeurs de 14 à 22 m ; lagunes de 60 à 85 m, îlot-jardin au nord-est, convergeant vers le Nil |
 | Allée processionnelle | du centre jusqu'au Nil, plein est | 20 m de large, bordée de sphinx couchés et de rigoles, deux pylônes monumentaux |
-| Quais du Nil | à 500–600 m à l'est | Quais à degrés, nilomètre (escalier descendant dans l'eau), felouques amarrées |
+| Quais du Nil | à 500–600 m à l'est | Quais à degrés, nilomètre (escalier descendant dans l'eau), felouques amarrées ; petit débarcadère sur la rive opposée pour regarder la ville face au soleil |
 | Nil | 600–1100 m à l'est | Fleuve large (400–500 m), une ou deux îles de papyrus, rive opposée verte puis désert lointain |
 | Ceinture agricole | 450–900 m, nord et sud | Champs et palmeraies en bandes, canaux d'irrigation, petits bassins |
 | Lisière du désert | ouest, à partir de 700 m | Une ligne nette : dernier canal, dernier palmier, puis le sable |
@@ -121,7 +121,7 @@ Le Nil coule du **sud vers le nord**, à l'**est** de la cité. Le désert et le
 
 ## 6. Éléments phares
 
-**A. Pyramide à degrés.** Sept degrés de calcaire blanc poli, à arêtes adoucies, base de 120 m, sommet à environ 95 m. Sur chaque degré, l'eau déborde en **nappes minces et lisses** vers le degré inférieur (comme une fontaine à débordement), sur les quatre faces, en laissant des escaliers secs au milieu de chaque face. Bandeaux de symboles sculptés et incrustés de lapis et d'or sur chaque contremarche.
+**A. Pyramide à degrés.** Sept degrés de grès doré clair, à arêtes adoucies, base de 126 m, sommet à environ 110 m. Sur chaque degré, l'eau déborde en **nappes minces et lisses** vers le degré inférieur (comme une fontaine à débordement), sur les quatre faces, en laissant des escaliers secs au milieu de chaque face. Deux petits kiosques ouverts occupent les angles arrière du sommet, en laissant le point focal dégagé. Bandeaux de symboles sculptés et incrustés de lapis et d'or sur chaque contremarche.
 
 **B. Pyramidion d'émeraude (point focal).** Pointe pyramidale de 15 m de haut en émeraude claire et réfractante, sertie d'une fine résille d'or. Une source jaillit de sa base sur les quatre côtés. Il est **clair et réfractant** : le ciel et la cité se voient déformés à travers, des plans de clivage et inclusions internes accrochent la lumière, des franges vertes et dorées apparaissent sur les arêtes. C'est l'objet le plus brillant de la scène, mais comme une gemme au soleil, pas comme une lampe.
 
@@ -131,7 +131,7 @@ Le Nil coule du **sud vers le nord**, à l'**est** de la cité. Le désert et le
 
 **E. Escaliers d'eau et rigoles.** Signature de la cité : des escaliers où l'eau descend en marches miroitantes, des rigoles taillées dans la pierre le long des rues et des murs, des vasques en forme de lotus qui débordent, des gargouilles à tête de lion d'où l'eau tombe en filets.
 
-**F. Villas des jardins** (environ 150–250). Un à trois niveaux (5–12 m), murs de calcaire enduit blanc-crème ou ocre clair, fruit léger, corniches à gorge, fenêtres à claustra, toits-terrasses avec pergolas de lin, treilles de vigne et jarres. Plans variés, disposés le long des canaux et des rues, jamais en grille parfaite. **Les palmes dépassent des toits.**
+**F. Villas des jardins** (environ 150–250, vingt familles de formes). Un à trois niveaux (5–12 m), murs de calcaire enduit blanc-crème ou ocre clair, fruit léger, corniches à gorge, fenêtres à claustra, toits-terrasses avec pergolas de lin, treilles de vigne et jarres. Plans en L, en U ou à cour, maisons-tours de trois niveaux, portiques, jarres et treilles sur les toits ; petits sanctuaires et greniers ronds entre les habitations. Disposition irrégulière le long des canaux et des rues. **Les palmes dépassent des toits.**
 
 **G. Allée des sphinx et pylônes d'entrée.** Dallage de calcaire poli à incrustations d'or et de lapis, sphinx couchés tous les 8 m, rigoles des deux côtés, deux pylônes monumentaux vers le Nil.
 
@@ -166,7 +166,7 @@ L'eau est le deuxième héros après le pyramidion. Elle est **légèrement vert
 
 ## 9. Lumière, ciel, atmosphère et couleur
 
-**Heure fixe : début d'après-midi, très lumineux.**
+**Heure fixe : début d'après-midi, très lumineux.** Le ciel garde son bleu jusqu’à l’horizon ; le voile doré et la perspective aérienne sont réservés au lointain, sans filtre jaune sur les premiers plans.
 - **Soleil :** environ 32° d'élévation, venant du **sud-ouest** (au-dessus du désert). Lumière blanc-doré (environ #FFE9C4), ombres nettes. Dans les plans phares, qui regardent vers l'ouest, le soleil est de trois-quarts face : le pyramidion, l'eau, les palmes et le lin sont partiellement en contre-jour.
 - **Ciel :** clair et lumineux, zénith bleu franc (#3F86C8) dégradé vers un bleu pâle (#A8D0EA) puis un horizon crème lumineux (#F4E6C8). Quelques nuages légers très hauts. Pas de lune, pas d'étoiles.
 - **Atmosphère :** chaude, sèche sur le désert (brume dorée légère, chaleur qui tremble au loin), plus humide et fraîche au-dessus de l'eau. Les falaises lointaines sont adoucies et teintées de rose-violet. Halo doux autour du soleil, rayons de lumière subtils à travers les palmes et les colonnades.

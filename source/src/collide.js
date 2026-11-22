@@ -30,15 +30,29 @@ function acroY(m) {
   if (m < PDN.h + 0.5) return PYR_TOP + 1.5 + PDN.H * max(0, 1 - m / PDN.h);
   return pyrY(min(PYR.n, floor((PYR.h0 - m) / PYR.step) + 1));
 }
+// Same four stair ramps as meshAcropolis/meshPyramid, including the pool causeways.
+function acroStairY(x,z) {
+  const ax=abs(x),az=abs(z),r=max(ax,az),v=min(ax,az),east=ax>=az&&x>0;
+  const run1=(T1.y-LAND)/.18*.34,run2=(T2.y-T1.y)/.18*.34;
+  if(r>=T1.h&&r<=T1.h+run1&&v<(east?10:7))return mix(T1.y,LAND,(r-T1.h)/run1);
+  if(r>=T2.h&&r<=T2.h+run2&&v<(east?8:6))return mix(T2.y,T1.y,(r-T2.h)/run2);
+  const sl=PYR.rise/PYR.step,xa=PYR.h0+(pyrY(1)-T2.y)/sl,xb=pyrH(PYR.n-1);
+  if(r>=xb&&r<=xa&&v<3.4)return mix(PYR_TOP,T2.y,(r-xb)/(xa-xb));
+  return -1e9;
+}
 function surfaceAt(x, z, y0) {
   COL[1] = 1e9; COL[2] = 0;
   for (let i = 0; i < HR.length; i += 7) if (x > HR[i] && x < HR[i + 2] && z > HR[i + 1] && z < HR[i + 3]) {
     const u = HR[i + 5] ? (z - HR[i + 1]) / (HR[i + 3] - HR[i + 1]) : (x - HR[i]) / (HR[i + 2] - HR[i]);
-    deck(LAND + 0.31 + HR[i + 6] * sin(PI * u), WATER, y0); return;
+    deck(HR[i+4] + HR[i+6] * (sin(PI*u)-1), WATER, y0); return;
   }
   if (inCity(x, z)) {
+    const qs=quayStepY(x,z); if(qs>-1e8){COL[0]=qs+CLEAR;return;}
+    for(let i=0;i<BIEFS.length;i++){const b=BIEFS[i];if(x>b[0]&&x<b[1]&&z>b[2]-7&&z<b[2]){COL[0]=max(b[3]+.64+CLEAR_W,builtY(x,z)+CLEAR);return;}}
     if (canalAt(x, z)) { COL[0] = WATER + CLEAR_W; COL[2] = 1; return; }
     let f = cityH(x, z); const m = max(abs(x), abs(z));
+    const ramp=acroStairY(x,z);
+    if(ramp>-1e8) {COL[0]=max(ramp,builtY(x,z))+CLEAR;return;}
     if (m < T1.h) { const a = acroY(m); if (a < 0) { if (abs(z) < 6.5 && x > 0) f = T2.y; else { COL[0] = T2.wy + CLEAR_W; COL[2] = 1; return; } } else f = a; }
     const b = builtY(x, z); if (b > f) f = b;
     COL[0] = f + CLEAR; return;
@@ -47,7 +61,7 @@ function surfaceAt(x, z, y0) {
   let h = landY(x, z), nat = 1;
   if (abs(z) < QZ && x >= QX0 && x <= quayX(z) + 0.5) { h = quayY(x, z); nat = 0; }
   const b = builtY(x, z); if (b > h) { h = b; nat = 0; }
-  let w = 0; if (hypot(x - OASIS[0], z - OASIS[1]) < 58) w = 2.6;
+  let w = 0; if (oasisD(x,z) < 58) w = 2.6;
   if (h < w) { COL[0] = w + CLEAR_W; COL[2] = 1; } else { COL[0] = h + CLEAR; COL[2] = nat; }
 }
 // move the camera from (px, py, pz) towards F[CX..CZ] (velocity F[VX..VZ]), correcting both in place. Natural ground

@@ -12,7 +12,7 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
   for (const k of ['olive', 'plane', 'bloom']) trees[k] = [0, 1].map((v) => treeType(k, v, (l) => meshTree(k.length * 97 + v * 31 + 5, SPECIES[k], l), ...QL([85, 215, 3400, 0, 0, 330], [110, 280, 3400, 0, 0, 430], [90, 220, 3400, 1500, 0, 500])));
   trees.palm = [0, 1].map((v) => treeType('palm', v, (l) => meshPalm(11 + v * 7, l), ...QL([95, 240, 4000, 0, 0, 380], [120, 300, 4000, 0, 0, 470], [95, 230, 4000, 1500, 0, 520])));
   // crowns may overlap by `lap` of their radii at most
-  const CELL = 12, planted = new Map(); let nTree = 0;
+  const CELL = 12, planted = new Map(); let nTree = 0, nPalm = 0, nCityPalm = 0;
   const roomFor = (x, z, r, lap) => {
     const cx = floor(x / CELL), cz = floor(z / CELL), n = ceil((r + 14) * lap / CELL);
     for (let i = cx - n; i <= cx + n; i++) for (let j = cz - n; j <= cz + n; j++) { const c = planted.get(i * 8192 + j); if (c) for (let q = 0; q < c.length; q += 3) if ((x - c[q]) ** 2 + (z - c[q + 1]) ** 2 < ((r + c[q + 2]) * lap) ** 2) return false; }
@@ -24,7 +24,7 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
   const tree = (k, x, y, z, s = 1, lap = 0.6, walls = true) => {
     const seed = (rng() * 256) | 0, ty = trees[k][seed & 1], sc = s * rr(0.85, 1.2), q = qYaw(rng() * TAU), tint = tintOf(k, seed), sy = rr(0.9, 1.15);
     if ((walls && !free(x, z, k === 'palm' ? 0.8 : crowns[ty] * sc * 0.45 - 1.2)) || !roomFor(x, z, crowns[ty] * sc * (k === 'palm' ? 0.55 : 1), lap)) return false;
-    put(ty, x, y, z, sc, q, tint, sy); nTree++; return true;
+    put(ty, x, y, z, sc, q, tint, sy); nTree++; if(k==='palm'){nPalm++;if(inCity(x,z))nCityPalm++;} return true;
   };
   const shrubDef = [[0.9, 0.8, LT.HYDRANGEA, 40, 0.34, { tile2: LT.BROAD, frac2: 0.5 }], [0.6, 0.55, LT.LAVENDER, 30, 0.34, { up: 1 }], [1.1, 0.9, LT.BLOSSOM, 44, 0.36, { tile2: LT.BROAD, frac2: 0.5 }], [1.0, 1.1, LT.BROAD, 30, 0.46, {}], [0.8, 0.5, LT.BLOSSOM, 30, 0.32, { tile2: LT.LAVENDER, frac2: 0.5 }]];
   const shrubs = shrubDef.map((d, i) => type([meshShrub(11 + i, d[0], d[1], d[2], d[3], d[4] * LEAFK, d[5]), meshShrub(11 + i, d[0], d[1], d[2], ceil(d[3] / 3), d[4] * 1.7 * LEAFK, d[5]), meshShrub(11 + i, d[0], d[1], d[2], 4, d[4] * 3.1 * LEAFK, d[5])], K.LEAF, 120, 290, 1400, 420));
@@ -100,11 +100,21 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
     qm.eb = 0; qm.mat = M.QUAY; const xe = X(z, 1), xf = X(z1, 1); qm.quad(qm.v(xe, 0.9, z, 1, 0, 0), qm.v(xf, 0.9, z1, 1, 0, 0), qm.v(xf, -4, z1, 1, 0, 0, 0.6), qm.v(xe, -4, z, 1, 0, 0, 0.6));
   }
   for (const sz of [-1, 1]) { const z = sz * QZ, pts = [[QX0, LAND + 0.02], ...US.slice(1).map((u) => [QX0 + (quayX(z) - QX0) * u, quayY(QX0 + (quayX(z) - QX0) * u - 1e-3, z)])]; qm.mat = M.QUAY; for (let i = 0; i < pts.length - 1; i++) qm.quad(qm.v(pts[i][0], pts[i][1], z, 0, 0, sz), qm.v(pts[i + 1][0], pts[i + 1][1], z, 0, 0, sz), qm.v(pts[i + 1][0], -4, z, 0, 0, sz, 0.6), qm.v(pts[i][0], -4, z, 0, 0, sz, 0.6)); }
+  // A small landing on the opposite bank lets P6 see quays and the south-west sun across the Nile.
+  const ex=EAST_QUAY[0];
+  prism(qm,rect(ex-21,-250,ex+24,-190),-3,3.6,M.QUAY,M.PAVE,.55);
+  box(ex-21,-250,ex+24,-190,3.6);
+  for(const [a,b]of [[[ex-21,-250],[ex+24,-250]],[[ex-21,-190],[ex+24,-190]]])coping(qm,a,b,3.6);
   put(type([qm.build()], K.SOLID), 0, 0, 0);
   pylon(505, LAND, 0, 0, 1.1);
   const tPort = type([meshHall(9, 1, 7, 9, 0), meshHall(9, 1, 7, 9, 1), meshHall(9, 1, 7, 9, 2)], K.SOLID, 200, 600, 1e9);
   for (const sz of [-1, 1]) { const zc = sz * 68; put(tPort, QX0 - 7, LAND, zc, 1, qYaw(PI / 2)); box(QX0 - 12, zc - 31, QX0 - 2, zc + 31, LAND + 12); occ.push([QX0 - 7, zc, 32]); }
   obelisk(560, LAND, -40, 0.55); obelisk(560, LAND, 40, 0.55);
+  const landingHall=type([meshHall(5,1,6,7,0),meshHall(5,1,6,7,1),meshHall(5,1,6,7,2)],K.SOLID,150,450,1800);
+  put(landingHall,601,6.2,-68,1,qYaw(PI/2));
+  put(landingHall,ex-14,3.6,-213,1,qYaw(PI/2));
+  for(let z=-225;z<=-201;z+=6)box(ex-14.9,z-.9,ex-13.1,z+.9,10.6);
+  for(let z=-80;z<=-56;z+=6)box(600.1,z-.9,601.9,z+.9,13.2);
   for (let x = 480; x < QX0 - 6; x += 11) for (let z = -QZ + 6; z <= QZ - 6; z += 11) if (abs(z) > 30 && !(abs(z - 44) < 6 || abs(z + 44) < 6) && rng() < 0.6) tree('palm', x + rr(-2, 2), LAND, z + rr(-2, 2), 1, 0.4, false);
   for (let x = 480; x < QX0 - 4; x += 3) for (const sz of [-1, 1]) if (rng() < 0.3) shrub((rng() * 5) | 0, x, LAND, sz * rr(27, 60), 1.1);
 
@@ -118,8 +128,28 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
     paint(x,z,42*s,0,255,2);
   }
   const VAR = 20, villas = [];
+  const nearHall=type([meshHall(5,1,6,8,0),meshHall(5,1,6,8,1),meshHall(5,1,6,8,2)],K.SOLID,150,500,2200);
+  put(nearHall,333,LAND,151);box(318,145,348,157,LAND+11.3);occ.push([333,151,21]);
+  const lionSpout=type([meshLionSpout()],K.SOLID,1e9,1e9,1200),basinFlow=type([meshFountainFlow()],K.CASCADE,1e9,1e9,400);
+  for(const [x0,x1,z,y]of BIEFS) {
+    bm.mat=M.FLOOR;bm.box(x0,y-.1,z-7,x1,y+.12,z,.02);
+    bm.mat=M.SANDST;bm.box(x0-.5,y,z-7.5,x1+.5,y+1,z-7,.05);
+    bm.box(x0-.5,y,z-7,x0,y+1,z,.05);bm.box(x1,y,z-7,x1+.5,y+1,z,.05);
+    bandRect(bm,x0-.5,z-7.5,x1+.5,z,y+.15,y+.6,PC.CARN,true,.03);
+    waterPoly(wm,rect(x0,z-7,x1,z),y+.64,0);
+    box(x0-.5,z-7.5,x1+.5,z-7,y+1);box(x0-.5,z-7,x0,z,y+1);box(x1,z-7,x1+.5,z,y+1);
+    for(let x=x0+5;x<x1-3;x+=14){put(lionSpout,x,y-.8,z-.82);box(x-.85,z-1.4,x+.85,z+.12,y+1.9);}
+    occ.push([(x0+x1)/2,z-3,(x1-x0)/2+3]);
+  }
+  const civic=[0,1].map(k=>{const a=meshPublic(k,0),b=meshPublic(k,1);return {ty:type([a.mesh,b.mesh],K.SOLID,180,1e9,2600),boxes:a.boxes};});
+  for(const [x,z,k] of [[-355,-190,0],[-355,55,1],[-45,190,0],[55,-192,1],[205,320,1],[325,-210,0]]) {
+    if(canalAt(x,z) || edgeDist(x,z)<12 || !free(x,z,15)) continue;
+    const y=cityH(x,z); put(civic[k].ty,x,y,z);
+    for(const b of civic[k].boxes) boxAt(b,x,y,z,0);
+    occ.push([x,z,15]); paint(x,z,12,0,255,2);
+  }
   for (let v = 0; v < VAR; v++) { const L = [0, 1, 2].map((l) => meshVillaE(v + 1, l)); villas.push({ ty: type(L.map((o) => o.mesh), K.SOLID, 90, 260, 2600), boxes: L[0].boxes }); }
-  const VT = [[1, 0.8, 0.52], [0.98, 0.86, 0.64], [0.96, 0.92, 0.82], [1, 0.76, 0.58], [0.92, 0.74, 0.5], [0.97, 0.88, 0.72]];
+  const VT = [[1,.8,.52],[.98,.86,.64],[.96,.92,.82],[1,.66,.43],[.86,.64,.45],[.97,.88,.72],[.8,.85,.76],[.92,.72,.65]];
   const gar = ringPoly(RB.gar), garden = [];
   for (const b of BLOCKS) {
     const poly = clipPoly(rect(b[0], b[1], b[2], b[3]), gar); if (poly.length < 3 || polyArea(poly) < 400) continue;
@@ -136,11 +166,17 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
       for (const bx of villas[v].boxes) boxAt(bx, px, y, pz, a);
       occ.push([px, pz, 10]);
       paint(px, pz, 7, 0, 150, 3); // a paved yard round the house
+      // Continuous low beds and trellises replace empty lawn between separate houses.
+      for(let j=0;j<7;j++) {
+        const sx=px-7+j*2.1,sz=pz-9;
+        if(edgeDist(sx,sz)>2 && abs(cityH(sx,sz)-y)<.1) {shrub(j%3===0?0:2,sx,y,sz,1.2);paint(sx,sz,1.8,1,255,.8);}
+      }
+      if(rng()<.55) tree(rng()<.5?'bloom':'olive',px-9,y,pz+8,.7,.75,false);
       // bougainvillea over a wall, a tree or two in the garden
       if (rng() < 0.7) { const f = (rng() * 4) | 0, ang = a + f * PI / 2, nx = round(cos(ang)), nz = -round(sin(ang)); vine(px + nx * 4.6, y + 4.2, pz + nz * 4.6, atan2(nx, nz)); }
     }
   // lotus basins with water, on the temple blocks and in the gardens
-  const basin = (x, z, y = cityH(x,z)) => { put(tBasin, x, y, z, 1.3, qYaw(rng() * TAU)); const pts = []; for (let i = 0; i < 16; i++) { const a = i / 16 * TAU; pts.push([x + 1.62 * cos(a), z + 1.62 * sin(a)]); } waterPoly(wm, pts, y + 1.3 * 1.62, 1); occ.push([x, z, 2.2]); box(x - 1.8, z - 1.8, x + 1.8, z + 1.8, y + 2.3); };
+  const basin = (x, z, y = cityH(x,z)) => { put(tBasin, x, y, z, 1.3, qYaw(rng() * TAU)); put(basinFlow,x,y,z,1.3); const pts = []; for (let i = 0; i < 16; i++) { const a = i / 16 * TAU; pts.push([x + 1.62 * cos(a), z + 1.62 * sin(a)]); } waterPoly(wm, pts, y + 1.3 * 1.62, 1); occ.push([x, z, 2.2]); box(x - 1.8, z - 1.8, x + 1.8, z + 1.8, y + 2.3); };
   for (const sz of [-1, 1]) for (const x of [150, 232]) basin(x, sz * 28);
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) basin(sx * 80, sz * 101, T1.y);
   for (let i = 0; i < 40; i++) { const x = rr(-430, 430), z = rr(-360, 360); if (inCity(x, z) && edgeDist(x, z) > 6 && abs(z) > AVE + 8 && abs(x) > AVE + 8 && !(abs(x) < ACRO + 4 && abs(z) < ACRO + 4) && free(x, z, 6)) { basin(x, z); paint(x, z, 5, 0, 230, 1.5); } }
@@ -189,13 +225,19 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
     const grove = woodAt(px, pz) > 0.6, d = hypot(px, pz);
     if (grove ? rng() < 0.48 : rng() < 0.04 * (1 - sstep(900, 1500, d))) tree('palm', px, gH(px, pz), pz, rr(0.85, 1.2), 0.5, false);
   }
+  // Rock lip connected to the cliff spur; the falling sheet starts at its outer edge.
+  const spring=new MB(512),sf=OASIS_FALL,sz=OASIS[1];
+  prism(spring,rect(sf.x-42,sz-8,sf.x,sz+8),sf.y-3,sf.y,M.ROCK,M.FLOOR,.65);
+  put(type([spring.build()],K.SOLID),0,0,0);box(sf.x-42,sz-8,sf.x,sz+8,sf.y);
+  waterPoly(wm,rect(sf.x-42,sz-7,sf.x,sz+7),sf.y+.15,0);
   // the oasis at the cliff's foot: a pool ringed by palms
-  { const pts = []; for (let i = 0; i < 48; i++) { const a = i / 48 * TAU; pts.push([OASIS[0] + 58 * cos(a), OASIS[1] + 58 * sin(a)]); } waterPoly(wm, pts, 2.6, 0);
-    for (let i = 0; i < 70; i++) { const a = rng() * TAU, r = rr(62, 130), x = OASIS[0] + r * cos(a), z = OASIS[1] + r * sin(a); tree('palm', x, gH(x, z), z, rr(0.9, 1.3), 0.45, false); }
+  { const pts = []; for (let i = 0; i < 48; i++) { const a = i / 48 * TAU; pts.push([OASIS[0] + 72 * cos(a), OASIS[1] + 72 * sin(a)]); } waterPoly(wm, pts, 2.6, 0);
+    for (let i = 0; i < 150; i++) { const a = rng() * TAU, r = rr(58, 125), x = OASIS[0] + r * cos(a), z = OASIS[1] + r * sin(a), y=gH(x,z); if(y>3 && y<14 && abs(gH(x+3,z)-gH(x-3,z))<3 && abs(gH(x,z+3)-gH(x,z-3))<3) tree('palm', x, y, z, rr(.8, 1.3), .55, false); }
     for (let i = 0; i < 40; i++) { const a = rng() * TAU, x = OASIS[0] + rr(56, 61) * cos(a), z = OASIS[1] + rr(56, 61) * sin(a); papyrus(x, gH(x, z) - 0.2, z); } }
   // feluccas on the Nile and the ring canal
   const tBoat = type([meshFelucca()], K.SOLID, 1e9, 1e9, 4000);
+  put(tBoat,EAST_QUAY[0]-75,.05,-165,1,qYaw(-PI/2));
   for (let i = 0; i < 16; i++) { const z = rr(-1800, 1800), x = nileX(z) + rr(70, NILE_W - 70); put(tBoat, x, 0.05, z, 1, qYaw((rng() < 0.5 ? 1 : -1) * PI / 2 + rr(-0.35, 0.35))); }
   for (let i = 0; i < 6; i++) { const t = rr(0, TAU), r = (RB.gar(t) + RB.out(t)) / 2, x = r * cos(t), z = r * sin(t); if (onBridge(x, z, 12)) continue; put(tBoat, x, WATER + 0.02, z, 0.8, qYaw(-t + PI / 2 * (rng() < 0.5 ? 1 : -1))); }
-  if (AUTO) console.log(`${nTree} trees, ${hard.boxes.length / 5} solid boxes`);
+  if (AUTO) {window.__planting={trees:nTree,palms:nPalm,palmsInCity:nCityPalm};console.log(`${nTree} trees, ${nCityPalm} city palms, ${hard.boxes.length / 5} solid boxes`);}
 }

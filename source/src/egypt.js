@@ -21,7 +21,7 @@ function meshPalm(seed, lod) {
       // two cards crossed along the rachis, each leaning down: the leaflets hang in a shallow V
       const wid = 0.95 * sin(PI * (0.12 + 0.82 * t)) * wk, sp = vnorm(vcross(d, [0, 1, 0])), up = vcross(sp, d);
       const N0 = vnorm([c[0] - top[0], c[1] - top[1] + 1.2, c[2] - top[2]]), ec = rng() * 255 | 0;
-      for (const rl of lod < 2 ? [-0.5, 0.5] : [0]) {
+      for (const rl of [0]) {
         const a = rl + roll * 0.4 - (lod < 2 ? 0 : 0.2), sx = [sp[0] * cos(a) + up[0] * sin(a), sp[1] * cos(a) + up[1] * sin(a) - 0.18, sp[2] * cos(a) + up[2] * sin(a)];
         mb.mat = M.LEAF + LT.PALM; mb.ec = ec;
         mb.card(c, [sx[0] * wid, sx[1] * wid, sx[2] * wid], [d[0] * sl * 0.56, d[1] * sl * 0.56, d[2] * sl * 0.56], N0, (0.55 + 0.45 * t) * (rl < 0 ? 0.85 : 1));
@@ -123,16 +123,25 @@ function meshSphinx(lod) {
   mb.box(-3.85, 1.5, -1.4, 3.85, 1.75, 1.4, 0.05 * b);
   if (!lod) bandRect(mb, -3.7, -1.25, 3.7, 1.25, 0.35, 1.25, PC.LAPIS, true, 0.02);
   mb.mat = M.SANDST; const y = 1.75;
-  mb.box(-3.1, y, -0.85, -1.5, y + 1.55, 0.85, 0.45 * b); // haunches
-  mb.box(-2.6, y, -0.78, 1.0, y + 1.3, 0.78, 0.35 * b); // body
-  mb.box(0.55, y, -0.74, 1.75, y + 2.0, 0.74, 0.3 * b); // chest
+  const sculpt=(x,y,z,rx,ry,rz)=>{
+    const ns=lod?8:16,nt=lod?5:9; let prev=null;
+    for(let j=0;j<=nt;j++){
+      const ph=-PI/2+j/nt*PI, ring=[];
+      for(let i=0;i<=ns;i++){const t=i/ns*TAU,nx=cos(ph)*cos(t),ny=sin(ph),nz=cos(ph)*sin(t);ring.push(mb.v(x+rx*nx,y+ry*ny,z+rz*nz,nx/rx,ny/ry,nz/rz,.8+.2*j/nt));}
+      if(prev)for(let i=0;i<ns;i++)mb.quad(prev[i],prev[i+1],ring[i+1],ring[i]); prev=ring;
+    }
+  };
+  sculpt(-2.1,y+.7,0,1.35,.95,.94);
+  sculpt(-.8,y+.75,0,2.1,.72,.77);
+  sculpt(1.05,y+1.05,0,.8,1.2,.8);
   for (const sd of [-1, 1]) mb.box(0.9, y, sd * 0.2, 3.35, y + 0.45, sd * 0.72, 0.15 * b); // forelegs
   for (const sd of [-1, 1]) mb.box(-2.9, y, sd * 0.55, -1.3, y + 0.35, sd * 1.0, 0.12 * b); // hind legs
-  mb.box(1.15, y + 1.85, -0.42, 2.0, y + 2.85, 0.42, 0.2 * b); // head
-  if (!lod) { mb.box(1.98, y + 2.15, -0.09, 2.12, y + 2.5, 0.09, 0.04); mb.box(1.85, y + 1.45, -0.13, 2.05, y + 1.9, 0.13, 0.05); mb.mat = M.GOLD; mb.box(1.9, y + 2.85, -0.07, 2.08, y + 3.2, 0.07, 0.03); mb.mat = M.SANDST; } // nose, beard, uraeus
+  sculpt(1.55,y+2.35,0,.65,.75,.56);
+  sculpt(2.04,y+2.12,0,.4,.32,.44); // smooth animal muzzle, no human face
+  for(const sg of [-1,1]) sculpt(2.9,y+.25,sg*.5,.55,.3,.34);
   // nemes: headcloth and lappets, striped lapis and gold
   mb.mat = M.PAINT; mb.ea = PC.LAPIS;
-  mb.box(0.95, y + 2.6, -0.56, 1.85, y + 3.05, 0.56, 0.18 * b);
+  sculpt(1.35,y+2.62,0,.7,.62,.68);
   for (const sd of [-1, 1]) mb.box(1.05, y + 1.2, sd * 0.42, 1.75, y + 2.75, sd * 0.78, 0.08 * b);
   mb.ea = 0;
   if (!lod) { mb.mat = M.GOLD; for (const yy of [y + 1.55, y + 1.95, y + 2.35]) for (const sd of [-1, 1]) mb.box(1.04, yy, sd * 0.41, 1.76, yy + 0.1, sd * 0.79, 0); mb.box(1.0, y + 2.6, -0.57, 1.86, y + 2.68, 0.57, 0); }
@@ -179,7 +188,7 @@ function meshHall(nx, nz, sp, H, lod) {
 // pergola, painted frieze under the cornice, latticed windows. Returns the mesh and its solid boxes [x0, z0, x1, z1, top]
 // in its own frame. Tinted per instance (M.PLASTER).
 function meshVillaE(seed, lod) {
-  const mb = new MB(1 << 13), rng = RNG(seed * 991 + 17), W = 9 + rng() * 5, D = 8 + rng() * 4, two = rng() < 0.6, H1 = 4.2, H = two ? 8 : H1;
+  const mb = new MB(1 << 13), rng = RNG(seed * 991 + 17), W = 9 + rng() * 5, D = 8 + rng() * 4, levels = 1 + seed % 3, two = levels > 1, H1 = 4.2, H = H1 + (levels - 1) * 3.8;
   const boxes = [];
   const block = (x0, z0, x1, z1, h, fr) => {
     prism(mb, rect(x0, z0, x1, z1), -0.4, h, M.PLASTER, M.TERRACE, 0.7);
@@ -189,17 +198,38 @@ function meshVillaE(seed, lod) {
     if (lod < 2) { mb.mat = M.PLASTER; for (const [a, b, c, d] of [[x0 - 0.3, z0 - 0.3, x1 + 0.3, z0], [x0 - 0.3, z1, x1 + 0.3, z1 + 0.3], [x0 - 0.3, z0, x0, z1], [x1, z0, x1 + 0.3, z1]]) mb.box(a, h + 0.5, b, c, h + 1.4, d, 0.04, false); }
     boxes.push([x0 - 0.35, z0 - 0.35, x1 + 0.35, z1 + 0.35, h + 1.4]);
   };
-  const fr = [PC.TURQ, PC.LAPIS, PC.OCHRE, PC.MALA][(rng() * 4) | 0];
+  const fr = [PC.TURQ, PC.LAPIS, PC.OCHRE, PC.MALA, PC.CARN, PC.GOLDP][seed % 6];
   block(-W / 2, -D / 2, W / 2, D / 2, H, fr);
   // the wing, to one side
   const ws = rng() < 0.5 ? -1 : 1, WW = 4 + rng() * 3, WD = D * (0.5 + 0.3 * rng());
   block(ws > 0 ? W / 2 : -W / 2 - WW, -WD / 2, ws > 0 ? W / 2 + WW : -W / 2, WD / 2, H1 - 0.6, fr);
+  // L, U and enclosed courtyard plans, with lower wings around a paved court.
+  if (seed % 4 > 0) {
+    const ex = W/2 + 5.2;
+    block(W/2-.3,-D/2,ex,-D/2+2.8,H1,fr);
+    if(seed%4>1) block(W/2-.3,D/2-2.8,ex,D/2,H1,fr);
+    if(seed%4===3) block(ex-2,-D/2,ex,D/2,H1+1.8,fr);
+    mb.mat=M.PAVE; mb.box(W/2,.01,-D/2,ex,.15,D/2);
+    if(lod<2 && seed%4!==3) {
+      for(const zz of [-D/2+1,D/2-1]) column(mb,ex+.7,zz,3.8,.3,lod,[fr,PC.CARN,PC.LAPIS]);
+      mb.mat=M.SANDST; mb.box(ex+.2,3.8,-D/2,ex+1.2,4.3,D/2,.04);
+    }
+  }
+  if(lod<2) {
+    // Roof jars and planted faience tubs make the terraces feel occupied without people.
+    for(let j=0;j<2+seed%3;j++) {
+      const x=-W/2+1+j*1.25,z=D/2-1;
+      mb.mat=j%2?M.PAINT:M.SANDST; mb.ea=fr;
+      mb.lathe([[.32,H+.05],[.56,H+.55],[.48,H+1],[.22,H+1.15],[.25,H+1.25]],{seg:8,cx:x,cz:z});
+      mb.ea=0;
+    }
+  }
   // windows (two rows when two storeys) and a door on the front (+x)
   if (lod < 2) {
     const faces = [[W / 2, 0, 1, 0, D], [-W / 2, 0, -1, 0, D], [0, D / 2, 0, 1, W], [0, -D / 2, 0, -1, W]];
     for (const [x, z, nx, nz, L] of faces) {
-      const n = max(1, floor(L / 3.2));
-      for (let i = 0; i < n; i++) { const u = (i - (n - 1) / 2) * L / n; if (nx > 0 && abs(u) < 1.6) continue; windowAt(mb, x, z, nx, nz, u, 2.0, 0.9, 1.1); if (two) windowAt(mb, x, z, nx, nz, u, H1 + 1.6, 0.9, 1.2); }
+      const n = max(1, floor(L / (2.8 + (seed % 4) * .55)));
+      for (let i = 0; i < n; i++) { const u = (i - (n - 1) / 2) * L / n; if (nx > 0 && abs(u) < 1.6) continue; for(let level=0;level<levels;level++) windowAt(mb,x,z,nx,nz,u,1.5+level*3.8,.7+.15*(seed%3),1+.2*(seed%2)); }
     }
     mb.mat = M.WINDOW; mb.quad(mb.v(W / 2 + 0.03, -0.1, -0.8, 1, 0, 0), mb.v(W / 2 + 0.03, -0.1, 0.8, 1, 0, 0), mb.v(W / 2 + 0.03, 2.5, 0.8, 1, 0, 0), mb.v(W / 2 + 0.03, 2.5, -0.8, 1, 0, 0));
     mb.mat = M.SANDST; mb.box(W / 2, -0.1, -1.15, W / 2 + 0.2, 2.9, -0.8); mb.box(W / 2, -0.1, 0.8, W / 2 + 0.2, 2.9, 1.15); mb.box(W / 2, 2.5, -1.3, W / 2 + 0.25, 3.1, 1.3, 0.03);
@@ -241,5 +271,56 @@ function meshBasin() {
   mb.mat = M.SANDST; mb.lathe([[1.0, 0], [1.0, 0.25], [0.45, 0.4], [0.35, 0.9]], { seg: 12 });
   mb.mat = M.PAINT; mb.ea = PC.TURQ; mb.eb = 200; mb.lathe([[0.35, 0.9], [0.9, 1.05], [1.25, 1.35], [1.38, 1.7], [1.3, 1.72], [1.15, 1.45]], { seg: 16 }); mb.eb = 0;
   mb.mat = M.GOLD; mb.lathe([[1.4, 1.68], [1.4, 1.76], [1.3, 1.76]], { seg: 16 }); mb.ea = 0;
+  return mb.build();
+}
+
+// Public buildings: round grain stores or a small painted shrine with an open portico.
+function meshPublic(kind, lod) {
+  const mb=new MB(4096), boxes=[];
+  if(kind===0) {
+    for(const x of [-3.6,3.6]) for(const z of [-3.6,3.6]) {
+      mb.mat=M.PLASTER;
+      mb.lathe([[3,0],[3.1,.5],[2.9,5.5],[2.2,7.3],[1.5,7.7],[1.5,8]],{seg:lod?10:20,cx:x,cz:z});
+      mb.mat=M.PAINT; mb.ea=PC.CARN; mb.lathe([[3.02,.7],[3.01,1.2]],{seg:lod?10:20,cx:x,cz:z}); mb.ea=0;
+      mb.mat=M.WINDOW; mb.box(x+2.8,.1,z-.6,x+3.05,2,z+.6);
+      boxes.push([x-3.1,z-3.1,x+3.1,z+3.1,8]);
+    }
+  } else {
+    prism(mb,rect(-5,-6,3,6),-.2,7,M.SANDST,M.TERRACE,.55);
+    cornice(mb,-5,-6,3,6,7,.6,.8);
+    bandRect(mb,-5,-6,3,6,5.2,6.7,PC.CARN,!lod);
+    for(const z of [-5,0,5]) column(mb,7,z,6,.6,lod,[PC.LAPIS,PC.TURQ,PC.CARN]);
+    mb.mat=M.SANDST; mb.box(2,6,-6,8,7,6,.05);
+    mb.mat=M.PAINT; mb.ea=PC.LAPIS; mb.eb=128;
+    mb.quad(mb.v(3,5.99,-6,0,-1,0),mb.v(8,5.99,-6,0,-1,0),mb.v(8,5.99,6,0,-1,0),mb.v(3,5.99,6,0,-1,0)); mb.ea=mb.eb=0;
+    windowAt(mb,3,0,1,0,0,0,2,4);
+    boxes.push([-5,-6,3,6,7.8]);
+    for(const z of [-5,0,5]) boxes.push([6.3,z-.7,7.7,z+.7,7]);
+  }
+  return {mesh:mb.build(),boxes};
+}
+
+// Sculpted lion waterspout. Its dark mouth aligns with the bief's sheet origin.
+function meshLionSpout() {
+  const mb=new MB(2048);
+  const oval=(x,y,z,rx,ry,rz)=>{let prev=null;for(let j=0;j<=7;j++){const p=-PI/2+j/7*PI,ring=[];for(let k=0;k<=12;k++){const a=k/12*TAU,nx=cos(p)*cos(a),ny=sin(p),nz=cos(p)*sin(a);ring.push(mb.v(x+rx*nx,y+ry*ny,z+rz*nz,nx/rx,ny/ry,nz/rz,.8));}if(prev)for(let k=0;k<12;k++)mb.quad(prev[k],prev[k+1],ring[k+1],ring[k]);prev=ring;}};
+  mb.mat=M.SANDST;oval(0,1.7,0,.82,.92,.63);
+  for(const sd of [-1,1]){oval(sd*.65,2.35,.05,.29,.34,.23);oval(sd*.23,1.55,.56,.32,.3,.35);}
+  mb.mat=M.GRANITE;oval(0,1.76,.83,.18,.13,.11);
+  mb.mat=M.WINDOW;mb.box(-.23,1.27,.9,.23,1.57,.95,.03);
+  for(const sd of [-1,1])mb.box(sd*.3-.06,1.98,.55,sd*.3+.06,2.06,.68,.02);
+  return mb.build();
+}
+
+// Thin overflow ribbons and foam around a lotus bowl, in the basin's own frame.
+function meshFountainFlow() {
+  const mb=new MB(512);
+  for(let k=0;k<8;k++) {
+    const a=k/8*TAU,b=a+.18;
+    const v=(t,y,r)=>{mb.ea=3;mb.eb=round(y/16*255);mb.ec=round((1.62-y)/16*255);return mb.v(cos(t)*r,y,sin(t)*r,cos(t),.2,sin(t));};
+    mb.quad(v(a,1.62,1.39),v(b,1.62,1.39),v(b,.08,1.8),v(a,.08,1.8));
+    mb.ea=4;mb.eb=90;mb.ec=0;const x=mb.v(cos(a)*1.7,.07,sin(a)*1.7,0,1,0),y=mb.v(cos(b)*1.7,.07,sin(b)*1.7,0,1,0);
+    mb.ec=255;mb.quad(x,y,mb.v(cos(b)*2.2,.07,sin(b)*2.2,0,1,0),mb.v(cos(a)*2.2,.07,sin(a)*2.2,0,1,0));
+  }
   return mb.build();
 }

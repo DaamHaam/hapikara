@@ -6,6 +6,17 @@ from pathlib import Path
 
 
 class Handler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path.split('?')[0] == '/__palm-control.html':
+            data = Path('/tmp/hapikara-qa/palm-control.html').read_bytes()
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Content-Length', str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+        else:
+            super().do_GET()
+
     def do_POST(self):
         if self.path != '/__qa':
             self.send_error(404)

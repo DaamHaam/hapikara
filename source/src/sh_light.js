@@ -51,16 +51,14 @@ fn hazeOD(ro: vec3f, rd: vec3f, d: f32) -> f32 {
 }
 fn aerial(c: vec3f, ro: vec3f, rd: vec3f, d: f32) -> vec3f {
   let od = hazeOD(ro, rd, min(d, 150000.));
-  let tr = exp(-od * vec3f(1.7e-4, 2.e-4, 2.5e-4));
+  let tr = exp(-od * vec3f(6.e-5, 7.e-5, 9.e-5));
   // near haze is open-sky blue, far haze the horizon's colour, so distant sea and hills dissolve into the sky
   let ins = mix(skyLut(normalize(vec3f(rd.x, max(rd.y, 0.) + .035, rd.z))), skyLut(normalize(vec3f(-view.sun.z, .1, view.sun.x))) * vec3f(.9, 1., 1.12), .62 * exp(-od * 1.5e-4));
-  return c * tr + ins * (1. - exp(-od * 2.e-4));
+  return c * tr + ins * (1. - exp(-od * 7.e-5));
 }
-// energy pulse: two rings (the second fainter) running out at 60 m/s, carried by gold inlay, lighting what they pass
-fn pulseK(r: f32, x: f32) -> f32 { return exp(-sq((r - 22. - 60. * x) / 14.)) * ss(0., .35, x); }
+// No emissive energy rings: the inlaid stone and emerald are lit by the sun.
 fn pulseAt(r: f32) -> vec3f {
-  let k = (pulseK(r, view.pulse.x) + .55 * pulseK(r, view.pulse.x - .75)) * exp(-r / 420.);
-  return mix(vec3f(1., .88, .66), vec3f(.55, .35, 1.), sat(r / 340.)) * k;
+  return vec3f(0.);
 }
 `;
 
@@ -251,7 +249,7 @@ fn shafts(fc: vec2f, z: f32, rd: vec3f) -> vec3f {
     col += dc / PI * sun * trans * sat(dot(N, L) * .5 + .5) * .25;
   }
   // sky and bounce light, multi-bounce AO keeps bright stone's colour
-  let aoA = ao * sv; let aa = 2.04 * dc - .33; let bb = -4.8 * dc + .64; let cc = 2.75 * dc + .69;
+  let aoA = pow(ao * sv, 1.25); let aa = 2.04 * dc - .33; let bb = -4.8 * dc + .64; let cc = 2.75 * dc + .69;
   let aoc = max(vec3f(aoA), ((aoA * aa + bb) * aoA + cc) * aoA);
   let nv = max(dot(N, V), 1e-3);
   col += dc * textureSampleLevel(tIrr, sLin, N, 0.).rgb * aoc;
@@ -262,11 +260,6 @@ fn shafts(fc: vec2f, z: f32, rd: vec3f) -> vec3f {
   // a recessed pane still mirrors what's in front: the reveal dims it only a little
   if (glass) { env = surround(R, env, wp); so = mix(so, 1., .6); }
   col += env * envBRDF(f0, rough, nv) * so;
-  // the crystal's own light, close by: breathing and flaring with the pulse
-  let lc = vec3f(0., 60., 0.) - wp; let dl = dot(lc, lc);
-  col += dc * vec3f(.75, .9, 1.) * (.5 + .5 * view.pulse.y + 1.6 * view.pulse.z) * 28. / (dl + 90.) * sat(dot(N, lc) * inverseSqrt(dl) * .7 + .3) * ao;
-  // the pulse runs along gold inlay and sweeps a ring of light near the ground
-  col += pu * g0.a * 9. + dc * pu * .55 * exp(-max(wp.y - 12., 0.) / 40.) * (.4 + .6 * ao);
   return vec4f(aerial(col, view.cam.xyz, rd, dist) + shafts(fc.xy, z, rd), 1.);
 }
 `;
@@ -343,7 +336,7 @@ fn agx(c: vec3f) -> vec3f {
   let bl = textureSampleLevel(tB, sLin, uv, 0.).rgb;
   c = mix(c, bl, .04);
   // exposure, soft vignette, white balance for the warm low sun
-  let q = uv - .5; c *= (1. - dot(q, q) * .3) * view.sunc.w * vec3f(1.07, 1., .9);
+  let q = uv - .5; c *= (1. - dot(q, q) * .3) * view.sunc.w * vec3f(1.02, 1., .99);
   c = agx(c);
   let n = ign(fc.xy) + ign(fc.xy + 37.) - 1.;
   return vec4f(c + n / 255., 1.);

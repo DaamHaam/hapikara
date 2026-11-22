@@ -70,12 +70,14 @@ function buildWorld() {
   // the avenues over every canal they cross (east, west, north, south), and the ring
   const ringAt = (t) => [RB.gar(t) - 0.4, RB.out(t) + 0.4];
   for (const [c, w] of CXL) span(c - w - 0.4, 0, c + w + 0.4, 0, AVE, 0.6, abs(c) === 130 ? 3 : 1);
+  for(const c of [-266,310]) span(c-11.4,0,c+11.4,0,AVE,.6,1);
   for (const [c, w] of CZL) span(0, c - w - 0.4, 0, c + w + 0.4, AVE, 0.6, abs(c) === 130 ? 3 : 1);
   for (const t of [0, PI / 2, PI, -PI / 2]) { const [a, b] = ringAt(t), c = round(cos(t)), s = round(sin(t)); span(a * c, a * s, b * c, b * s, AVE, 0.9, 3); }
   // footbridges half way along every canal stretch between crossings
   const xs = [-CITY_A, ...CXL.map((c) => c[0]), CITY_A], zs = [-CITY_B, ...CZL.map((c) => c[0]), CITY_B];
   for (const [c, w] of CXL) for (let j = 0; j < zs.length - 1; j++) { const m = (zs[j] + zs[j + 1]) / 2; if (abs(m) > 40 && inCity(c, m) && !inRing(c, m) && !inRing(c, m - 20) && !inRing(c, m + 20)) span(c - w - 0.4, m, c + w + 0.4, m, 3.2, 0.9, 1); }
   for (const [c, w] of CZL) for (let i = 0; i < xs.length - 1; i++) { const m = (xs[i] + xs[i + 1]) / 2; if (abs(m) > 40 && inCity(m, c) && !inRing(m, c) && !inRing(m - 20, c) && !inRing(m + 20, c)) span(m, c - w - 0.4, m, c + w + 0.4, 3.2, 0.9, 1); }
+  for(const [x,z,a]of QUAY_STEPS) stair(brm,a,9,WATER+.5,0,LAND,3,true,x,z);
   put(type([brm.build()], K.SOLID), 0, 0, 0);
 
   // water

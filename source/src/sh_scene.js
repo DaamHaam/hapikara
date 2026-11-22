@@ -95,7 +95,7 @@ fn transform(v: VI) -> VO {
     wp = vec3f(lp.x + view.lodc.x, 0., lp.z + view.lodc.z);
     wp.y = seaWave(wp.xz, clamp(vec4f(2.) - length(lp.xz) * ${((SEA_GROW - 1) * SEAK).toFixed(4)} * vec4f(.1765, .2857, .4615, .75), vec4f(0.), vec4f(1.))).x;
   }
-  if (mat == 7u || mat == 11u || mat >= 32u) { wp += sway(wp, lp.y, v.ext.w, mat >= 32u); }
+  if (mat == 7u || mat == 11u || mat >= 32u) { wp += sway(wp, lp.y, v.ext.w, mat >= 32u) * select(1., .28, mat == 42u); }
   var n = qrot(q, v.nrm.xyz / s);
   if (mat == 8u) {
     // hovering craft loop around the rings; moored ones only bob
@@ -280,7 +280,7 @@ fn terrain(p: vec3f, dx: vec3f, dy: vec3f, fw: f32, n: vec3f, tv: vec3f) -> Mt {
   // the desert: fine sand with ripples, pale on crests, warmer in hollows; sandstone where steep
   if (dk > 0.) {
     let ph = (p.x * .9 + p.z * .38) * 2.6 + M.r * 6. + A.r * 2.; let rf = sat(1. - fw / .4);
-    var sand = mix(vec3f(.8, .62, .4), vec3f(.9, .75, .53), ss(.3, .8, L.r + (R.g - .5) * .6 - hollow * .3)) * (.9 + .12 * B.a);
+    var sand = mix(vec3f(.48, .29, .14), vec3f(.66, .45, .25), ss(.3, .8, L.r + (R.g - .5) * .6 - hollow * .3)) * (.9 + .12 * B.a);
     sand *= 1. + .05 * sin(ph) * rf;
     let sk = dk * (1. - rk);
     o.alb = mix(o.alb, sand, sk); o.rough = mix(o.rough, .92, sk);

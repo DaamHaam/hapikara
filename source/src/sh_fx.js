@@ -181,8 +181,9 @@ const W_FX2 = /*wgsl*/`
   // froth and mist: droplets, pale lilac in sky and sun light, with a little of the liquid's glow
   let froth = vec3f(.75, .82, .8) * (skyLut(vec3f(0., 1., 0.)) * .8 + view.sunc.rgb * (.03 + .09 * sh)) * (1. + 1.5 * pl);
   var col: vec3f; var al: f32;
-  if (kind == 3u) {
-    let h = i.uv.z * 16.; let hb = i.uv.y * 16.; // metres fallen from the lip, metres left to the pool
+  if (kind == 3u || kind == 6u) {
+    let span=select(16.,192.,kind==6u);
+    let h = i.uv.z * span; let hb = i.uv.y * span; // metres fallen from the lip, metres left to the pool
     // falling liquid speeds up: patterns laid out in (angle, tau = sqrt(h)) slide along tau, fine and slow at the lip,
     // long and fast at the foot
     let tau = sqrt(h + .06); let gv = dq.y * .5 / tau;
@@ -198,8 +199,9 @@ const W_FX2 = /*wgsl*/`
     let tg = normalize(vec3f(-N.z, 0., N.x)); N = normalize(N + tg * ((a.r - .5) * .3 + (b.a - .5) * (.12 + .75 * grow)) + vec3f(0., (b.r - .5) * .25 * grow, 0.));
     let nv = max(dot(N, V), 1e-3); let F = .03 + .97 * pow(1. - nv, 5.);
     // clear water over stone: the stone behind shows green through the thin sheet, white where it gathers into ropes
-    let behind = vec3f(.6, .56, .46) * (view.sunc.rgb * .1 * sh + skyLut(vec3f(0., 1., 0.)) * .6);
-    col = mix(behind * vec3f(.55, .85, .72), froth * (.6 + .5 * b.r), rope * .8 + thin * .15) * (.85 + .3 * a.r);
+    var behind = vec3f(.6, .56, .46) * (view.sunc.rgb * .1 * sh + skyLut(vec3f(0., 1., 0.)) * .6);
+    if(view.misc.y<.5) {behind=textureSampleLevel(tScene,sLin,clamp(fc*view.res.zw+vec2f((a.r-.5)*.0015,0.),vec2f(.001),vec2f(.999)),0.).rgb;}
+    col = mix(behind * vec3f(.72, .96, .86), froth * (.6 + .5 * b.r), rope * .5 + thin * .08) * (.95 + .1 * a.r);
     col = col * (1. - F) + sky(reflect(-V, N), false) * min(F, .6);
     col += view.sunc.rgb * sh * sunBRDF(N, V, vec3f(.02), vec3f(.02), mix(.08, .3, rope)) * .35;
     col += vec3f(.6, 1., .8) * pl * .4;
@@ -207,7 +209,8 @@ const W_FX2 = /*wgsl*/`
     let foot = ss(min(2.4, .28 * (h + hb)) * (.55 + .9 * a.r), 0., hb) * (.72 + .2 * rope + .28 * b.a);
     col = mix(col, froth * (.7 + .5 * b.r), sat(foot));
     // one continuous sheet hiding the marble (a tenth of sunlit marble showing turns it pale); clear only at the slot
-    al = (.68 + .3 * rope + .15 * a.r) * mix(.6, 1., ss(0., .12, h));
+    al = (.38 + .4 * rope + .08 * a.r) * mix(.7, 1., ss(0., .12, h));
+    if(kind==6u){col=mix(col,froth*(.9+.25*b.r),.6);al=max(al,.85);}
   } else if (kind == 4u) {
     // foam: thick where the sheet lands, torn into patches further out
     let tv = i.uv.z; let gr = dq.x / 4.;
@@ -244,112 +247,45 @@ fn behind(pe: vec3f, d: vec3f, zf: f32, disp: f32, far: f32) -> vec3f {
   let c = vec3f(textureSampleLevel(tScene, sLin, q.xy - o, 0.).r, textureSampleLevel(tScene, sLin, q.xy, 0.).g, textureSampleLevel(tScene, sLin, q.xy + o, 0.).b);
   return mix(env, c, ss(0., .06, e));
 }
+// Exact exit intersection for the square pyramid, not the former hexagonal crystal.
 @fragment fn fsCrystal(i: VO) -> FO {
-  let p = i.wp; let fc = i.clip.xy; let toC = view.cam.xyz - p; let dist = length(toC); let V = toC / dist; let rd = -V;
-  var N = normalize(i.n); let slab = i.uv.x > .002; if (dot(N, V) < 0.) { N = -N; }
-  let fwp = max(length(dpdx(p)), length(dpdy(p)));
-  let qc = vec4f(-i.q.xyz, i.q.w); let size = i.sc.w; let s = clamp(size / 100., .08, 1.4);
-  let nz = ign(fc + view.jit.z * 5.588);
-  // LOD cross-fade, the G-buffer's dither
-  let fb = i.mi.y;
-  if ((fb & 127u) != 127u) { let f = f32(fb & 127u) / 127.; if ((fb & 128u) != 0u) { if (nz < 1. - f) { discard; } } else if (nz >= f) { discard; } }
-  let nv = max(dot(N, V), 1e-3); let F = .045 + .955 * pow(1. - nv, 5.);
-  let R = reflect(rd, N);
-  var col = textureSampleLevel(tEnv, sLin, R, .6).rgb * F;
-  let sh = shadow(p, N); let L = view.sun.xyz; let H = normalize(V + L);
-  col += view.sunc.rgb * sh * (min(ggxD(sat(dot(N, H)), .01), 300.) + min(ggxD(sat(dot(N, H)), .3), 8.)) * .25 * sat(dot(N, L)) * F;
-  // into the crystal
-  let d1 = refract(rd, N, 1. / 1.52); let o = i.lp * i.sc.xyz; let dl = qrot(qc, d1); let nl = qrot(qc, N);
-  var tex = 1.; var ne = -nl;
-  if (!slab) {
-    let ap = max(dot(o.xz, normalize(nl.xz + 1e-5)), .3); tex = 1e9;
-    for (var k = 0; k < 6; k++) { let dn = dot(dl.xz, HEXN[k]); if (dn > 1e-4) { let t = (ap * 1.02 - dot(o.xz, HEXN[k])) / dn; if (t < tex) { tex = t; ne = vec3f(HEXN[k].x, .05, HEXN[k].y); } } }
-    tex = min(tex, ap * 6.);
-  } else {
-    // petals exit through their far face's mirrored facet; thin panels through a nearly flat back
-    ne = normalize(vec3f(nl.x * .45, nl.y * .45, -nl.z)); if (size < 6.) { ne = normalize(vec3f(nl.x * .25, nl.y * .25, -sign(nl.z))); }
-    tex = i.uv.y * i.sc.x / max(abs(dl.z), .25);
+  let p=i.wp; let delta=view.cam.xyz-p; let dist=length(delta); let V=delta/dist; let rd=-V;
+  var N=normalize(i.n); if(dot(N,V)<0.) { N=-N; }
+  let nv=max(dot(N,V),.001); let F=.045+.955*pow(1.-nv,5.);
+  let qc=vec4f(-i.q.xyz,i.q.w); let o=i.lp*i.sc.xyz;
+  let d1=refract(rd,N,1./1.57); let dl=qrot(qc,d1);
+  let slope=${PDN.h / PDN.H}; let baseH=${PDN.h}.;
+  let planes=array<vec4f,5>(vec4f(1.,slope,0.,baseH),vec4f(-1.,slope,0.,baseH),vec4f(0.,slope,1.,baseH),vec4f(0.,slope,-1.,baseH),vec4f(0.,-1.,0.,0.));
+  var travel=1e5; var ne=-qrot(qc,N);
+  for(var k=0;k<5;k++) {
+    let plane=planes[k]; let dn=dot(dl,plane.xyz);
+    if(dn>.0001) { let t=(plane.w-dot(o,plane.xyz))/dn; if(t>.001 && t<travel) {travel=t;ne=normalize(plane.xyz);} }
   }
-  let oe = o + dl * tex; let pe = p + d1 * tex; let nw = qrot(i.q, normalize(ne));
-  var d2 = refract(d1, -nw, 1.52); var inner = 0.;
-  if (dot(d2, d2) < .5) { d2 = reflect(d1, -nw); inner = 1.; } // total internal reflection
-  // a tone per facet from its normal (offsets keep floor() off exact zeros, which made facets sizzle)
-  let facet = h21(floor(nw.xz * 3.1 + nw.y * 1.7 + .23) + floor(nl.xz * 2.3 + .37));
-  // the crystals breathe with the city and flash as the pulse passes
-  let live = .55 + .45 * view.pulse.y + 1.2 * view.pulse.z; let pu = pulseAt(length(p.xz));
-  let tint = mix(vec3f(.3, 1., .52), vec3f(.42, 1., .45), facet) * exp(-tex * vec3f(.22, .02, .13));
-  var bg: vec3f;
-  if (slab && size < 6. && view.misc.y < .5) {
-    // thin panels: the scene behind nudged by facet tilt, a hint of dispersion
-    let q = fc * view.res.zw + vec2f(nl.x, -nl.y) * .045 / (1. + dist * .08); let e = vec2f(nl.x, -nl.y) * .0012;
-    bg = vec3f(textureSampleLevel(tScene, sLin, q - e, 0.).r, textureSampleLevel(tScene, sLin, q, 0.).g, textureSampleLevel(tScene, sLin, q + e, 0.).b) * tint;
-  } else { bg = behind(pe, d2, 1. / i.clip.w, select(.012 + .06 * sq(1. - nv), .012, slab), select(90., 3.5, slab)) * tint * mix(1., .8, inner); }
-  // fracture veils: planes of trapped light, each catching the sky at its own angle
-  var veil = 0.;
-  for (var k = 0; k < 2; k++) {
-    let pn = normalize(select(vec3f(.62, .55, .56), vec3f(-.5, .7, .51), k == 1)); let sp = select(17., 11., k == 1) * (.4 + s * 1.2);
-    let a0 = dot(o, pn) / sp; let a1 = dot(oe, pn) / sp;
-    if (floor(a0) != floor(a1)) {
-      let pk = max(floor(a0), floor(a1)); let t = (pk * sp - dot(o, pn)) / dot(dl, pn); let hp = o + dl * t;
-      let m = textureSampleLevel(tNoiseA, sRep, (hp.xy + hp.zz * vec2f(.6, -.4)) / (9. * (.4 + s)) + pk * .37 + view.cam.w * vec2f(.004, .011), 1.5); // veils drift slowly upwards
-      let v = ss(.5, .72, m.r) * (.5 + .5 * m.b) + .25 * ss(.6, .9, m.g);
-      veil += v * (.35 + .65 * pow(1. - abs(dot(dl, pn)), 2.));
-      bg += textureSampleLevel(tEnv, sLin, qrot(i.q, reflect(dl, pn)), 1.5).rgb * vec3f(.4, 1., .6) * v * .12;
-    }
+  travel=min(travel,60.); let pe=p+d1*travel; let exitN=qrot(i.q,ne);
+  var d2=refract(d1,-exitN,1.57); var tir=false;
+  if(dot(d2,d2)<.5) {d2=reflect(d1,-exitN);tir=true;}
+  let absorption=exp(-travel*vec3f(.135,.008,.065));
+  var bg=behind(pe,d2,1./i.clip.w,.0015,65.)*absorption*vec3f(.52,1.,.72);
+  if(tir) {bg=textureSampleLevel(tEnv,sLin,d2,.3).rgb*absorption*vec3f(.38,.86,.57);}
+  // Quiet static cleavage planes, illuminated only by sky and sun.
+  let hp=o+dl*travel*.45;
+  let veins=textureSampleLevel(tNoiseA,sRep,(hp.xy+hp.zz*vec2f(.37,.21))*.09,1.5).r;
+  bg*=.88+.18*veins;
+  // Intersected cleavage veils reflect a different part of the world, with quiet dark inclusions.
+  for(var k=0;k<3;k++) {
+    let pn=normalize(vec3f(.61+f32(k)*.09,.43,-.59+f32(k)*.47));
+    let q=dot(hp,pn)/4.7+f32(k)*.31;let cell=floor(q);let edge=fract(q);
+    let weight=ss(.12,.38,edge)*ss(.98,.72,edge)*(.035+.11*h11(cell+f32(k)*13.));
+    let reflected=textureSampleLevel(tEnv,sLin,qrot(i.q,reflect(dl,pn)),.5).rgb*absorption*vec3f(.4,.92,.6);
+    bg=mix(bg,reflected,weight);
+    bg*=1.-.13*ss(.66,.73,veins+sin(q*2.3)*.08);
   }
-  // core: a soft white glow along the axis, strongest low, breathing
-  if (!slab) {
-    let dxz = max(dot(dl.xz, dl.xz), 1e-4); let tc = clamp(-dot(o.xz, dl.xz) / dxz, 0., tex); let pc = o + dl * tc;
-    let ap = max(dot(o.xz, normalize(nl.xz + 1e-5)), .3);
-    // light climbs the axis in slow waves
-    let g = exp(-dot(pc.xz, pc.xz) / sq(ap * .3)) * (.2 + .8 * exp(-max(pc.y / size, 0.) * 2.6)) * live * (.72 + .28 * sin(pc.y * .16 - view.cam.w * 1.1));
-    bg += vec3f(.55, 1., .7) * g * view.sunc.g * .3;
-  }
-  // the great crystal answers each pulse: clear most of the cycle, a white glow builds in the whole body over the last
-  // seconds, then one bright flash gone in half a second as the ring leaves. Added light, never a tint.
-  var memit = vec3f(0.);
-  if (!slab && dot(p.xz, p.xz) < 100.) {
-    let tp = view.pulse.x; let amt = select(pow(ss(${PULSE - 4.5}, ${PULSE}., tp), 1.6), 2.3 * exp(-tp / .2), tp < ${PULSE / 2}.);
-    // brighter veils drift up through it, so the glow is alive
-    let pm = o + dl * tex * .4; let fa = atan2(pm.z, pm.x) / (2. * PI); let tm = view.cam.w;
-    let f1 = textureSampleLevel(tNoiseA, sRep, vec2f(fa * 2. + pm.y * .004, pm.y * .011 - tm * .035), 1.).b;
-    let f2 = textureSampleLevel(tNoiseA, sRep, vec2f(fa * 3. + .4 - pm.y * .006, pm.y * .019 - tm * .06), 1.).b;
-    // added below, once the rest of the body is in place
-    memit = vec3f(.6, 1., .72) * amt * (.42 + .5 * f1 + .35 * f2 + .5 * veil) * view.sunc.g * .17;
-  }
-  // light caught in the body: quartz is never dark; grows with distance as inner planes average out
-  bg += (view.sunc.rgb * (.03 + .06 * sh) + skyLut(vec3f(0., 1., 0.)) * .04) * vec3f(.25, .8, .42) * (.5 + 1.5 * veil) * select(1., .4, slab) * (1. + min(dist / 300., 1.5)) * (.55 + .6 * live);
-  bg += pu * vec3f(.6, 1., .75) * (.8 + 2. * veil) * select(1., .5, slab && size < 6.);
-  // internal planes on two lattices: some cells mirror another part of the world (horizon, zenith, ground), giving
-  // depth; a rare one flashes with the sun
-  {
-    let pm = o + dl * tex * .45; let Ls = clamp(size * .05, .35, 5.);
-    for (var k = 0; k < 2; k++) {
-      // long axial planes, lit, dark or clear, each fading across its width like a mirror turning away
-      let a1 = HEXN[k * 2]; let u = vec2f(dot(pm.xz, a1) + pm.y * .22, pm.y * .3 - dot(pm.xz, vec2f(-a1.y, a1.x)) * .4) / (Ls * (1. + f32(k) * .7)) + f32(k) * 7.3 + dot(dl.xz, a1) * 1.5;
-      let id = floor(u) + f32(k) * 17.; let hs = h22(id); let fu = fract(u); let kind = h21(id + 9.);
-      // each plane brightens and dims on its own slow clock
-      let ramp = mix(fu.x, 1. - fu.x, step(.5, hs.y)) * ss(0., .08, min(fu.y, 1. - fu.y)) * (.72 + .28 * sin(view.cam.w * (.5 + hs.x) + hs.y * 40.)); let on = select(1., 0., slab);
-      bg = mix(bg, bg * vec3f(.3, .36, .46), ss(.72, .8, kind) * ramp * .8 * on);
-      bg += (view.sunc.rgb * (.05 + .16 * sh) + skyLut(vec3f(view.sun.x, .3, view.sun.z)) * .12) * ss(.3, .22, kind) * ramp * (.5 + hs.x) * on;
-    }
-  }
-  bg += memit;
-  // sun-side facets bright, the others deep
-  let ft =.55 + .8 * sat(dot(N, normalize(vec3f(L.x, .25, L.z))) * .5 + .5) + select(0., .5 * (facet - .5), slab);
-  bg *= ft; col *= .7 + .5 * ft;
-  // spectral fringes at grazing angles; facet sparkle on small panels
-  col += (.5 + .5 * cos(6.283 * (dot(p, vec3f(.21, .13, .17)) + vec3f(0., .33, .67)))) * pow(1. - nv, 4.) * lum(textureSampleLevel(tEnv, sLin, R, 1.).rgb) * .22;
-  if (slab && size < 6.) { col += textureSampleLevel(tEnv, sLin, R, 0.).rgb * (.08 + .5 * facet * facet); }
-  // slightly rounded long edges catch the brightest sky
-  if (!slab) {
-    let ap = max(dot(o.xz, normalize(nl.xz + 1e-5)), .3); let an = atan2(o.z, o.x) / (PI / 3.); let ed = (.5 - abs(fract(an) - .5)) * (PI / 3.) * ap * 1.15;
-    col += (textureSampleLevel(tEnv, sLin, normalize(vec3f(view.sun.x, .25, view.sun.z) + N), 1.).rgb * .55 + view.sunc.rgb * .05 * sh) * sat((min(ed + fwp * .5, .07) - max(ed - fwp * .5, -.07)) / fwp);
-  }
-  // forward scattering when standing against the sun
-  bg += view.sunc.rgb * (.03 + .1 * veil) * pow(sat(dot(rd, L)), 5.) * (.4 + .6 * sh);
-  col += bg * (1. - F);
-  return FO(vec4f(aerial(col, view.cam.xyz, rd, dist), 1.));
+  bg+=skyLut(vec3f(0.,1.,0.))*vec3f(.04,.12,.065)*ss(.62,.78,veins);
+  let R=reflect(rd,N); let sh=shadow(p,N); let H=normalize(V+view.sun.xyz);
+  var col=textureSampleLevel(tEnv,sLin,R,.35).rgb*F;
+  col+=view.sunc.rgb*sh*min(ggxD(sat(dot(N,H)),.018),120.)*.12*sat(dot(N,view.sun.xyz))*F;
+  col+=bg*(1.-F);
+  return FO(vec4f(aerial(col,view.cam.xyz,rd,dist),1.));
 }
 // thin glass (domes): mirror at grazing angles, clear face-on
 @fragment fn fsGlass(i: VO) -> FO {

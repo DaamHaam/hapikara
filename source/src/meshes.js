@@ -58,7 +58,7 @@ function meshCityGround() {
   const mb = new MB(1 << 17), gar = ringPoly(RB.gar), out = ringPoly(RB.out);
   mb.mat = M.FLOOR; mb.poly(out.map((p) => [p[0], FLOOR_Y, p[1]]), [0, 1, 0], 0.8);
   for (const b of BLOCKS) {
-    const poly = clipPoly(rect(b[0], b[1], b[2], b[3]), gar); if (poly.length < 3 || polyArea(poly) < 40) continue;
+    const poly = clipPoly(rect(b[0], b[1], b[2], b[3]), gar); if (poly.length < 3 || polyArea(poly) < 1e-5) continue;
     const cx = (b[0]+b[2])/2, cz = (b[1]+b[3])/2;
     const height = p => cityH(mix(p[0], cx, 1e-5), mix(p[1], cz, 1e-5));
     const elevated = cityH(cx, cz) > LAND + .01;
@@ -87,11 +87,10 @@ function meshCityGround() {
 const T1 = { h: 108, y: 15 }, T2 = { h: 80, y: 20, pool: 71, wy: 19.7 }, PYR = { y0: 18.8, h0: 63, step: 7, rise: 13, n: 7 };
 const pyrH = (k) => PYR.h0 - PYR.step * k; // half size of step k
 const pyrY = (k) => PYR.y0 + PYR.rise * k; // foot of step k (top of the pyramid: pyrY(7))
-const PDN = { h: 11, H: 26 }; // pyramidion: half base, height
 const PYR_TOP = pyrY(PYR.n);
 // stairway along +x (rotate with yaw): foot at (xa, ya), top at (xb, yb), half width hw; ramp drawn with step lines
-function stair(mb, yaw, xa, ya, xb, yb, hw, cheek = true) {
-  const c = cos(yaw), s = sin(yaw); mb.fr = [0, 0, 0, c, s, 1];
+function stair(mb, yaw, xa, ya, xb, yb, hw, cheek = true, ox = 0, oz = 0) {
+  const c = cos(yaw), s = sin(yaw); mb.fr = [ox, 0, oz, c, s, 1];
   const dx = xb - xa, dy = yb - ya, l = hypot(dx, dy), nx = -dy / l, ny = dx / l;
   mb.mat = M.STEP; mb.eb = 255;
   mb.quad(mb.v(xa, ya, -hw, 0, 1, 0, 0.85), mb.v(xa, ya, hw, 0, 1, 0, 0.85), mb.v(xb, yb, hw, 0, 1, 0), mb.v(xb, yb, -hw, 0, 1, 0)); mb.eb = 0;
@@ -142,12 +141,19 @@ function meshPyramid() {
   const mb = new MB(1 << 15);
   for (let k = 0; k < PYR.n; k++) {
     const h = pyrH(k), y0 = pyrY(k), y1 = pyrY(k + 1);
-    mb.mat = M.MARBLE; mb.box(-h, y0 - (k ? 0.2 : 0.5), -h, h, y1, h, 0.08, false);
-    bandSq(mb, h, y1 - 1.9, y1 - 0.35, 0.05, k % 2 ? PC.TURQ : PC.LAPIS, true);
+    mb.mat = M.SANDST; mb.box(-h, y0 - (k ? 0.2 : 0.5), -h, h, y1, h, 0.08, false);
+    bandSq(mb, h, y1 - 3.2, y1 - .55, .08, [PC.LAPIS,PC.CARN,PC.MALA][k%3], true);
+    bandSq(mb,h,y0+.6,y0+1.05,.04,PC.GOLDP,false);
   }
   // the east stair: up through the corners of the steps
   const sl = PYR.rise / PYR.step, xa = pyrH(0) + (pyrY(1) - T2.y) / sl;
-  stair(mb, 0, xa, T2.y, pyrH(PYR.n - 1), PYR_TOP, 4.5);
+  for(let side=0;side<4;side++) stair(mb,side*PI/2,xa,T2.y,pyrH(PYR.n-1),PYR_TOP,3.4);
+  // Four small open crown kiosks frame, rather than conceal, the emerald.
+  for(const sx of [-1]) for(const sz of [-1,1]) {
+    const x=sx*16,z=sz*16;
+    for(const dx of [-1.7,1.7]) for(const dz of [-1.7,1.7]) {mb.fr=[x+dx,PYR_TOP+.1,z+dz,1,0,1];column(mb,0,0,4.8,.3,1,[PC.MALA,PC.CARN,PC.LAPIS]);mb.fr=null;}
+    mb.mat=M.SANDST;mb.box(x-2.4,PYR_TOP+4.9,z-2.4,x+2.4,PYR_TOP+5.5,z+2.4,.06);
+  }
   // gold socle under the pyramidion
   mb.mat = M.GOLD; mb.box(-PDN.h - 0.5, PYR_TOP - 0.1, -PDN.h - 0.5, PDN.h + 0.5, PYR_TOP + 0.6, PDN.h + 0.5, 0.05, false);
   bandSq(mb, PDN.h + 0.5, PYR_TOP + 0.6, PYR_TOP + 1.5, 0.02, PC.LAPIS, true);
@@ -207,11 +213,11 @@ function meshCascades() {
       prev = ring;
     }
   };
-  const fall = (ax, az, bx, bz, nx, nz, y1, y0, pool) => {
+  const fall = (ax, az, bx, bz, nx, nz, y1, y0, pool, scale = 16, kind = 3) => {
     const H = y1 - y0, big = min(1, H / 10), reach = 0.15 + 0.35 * big, mh = 0.5 + 2.9 * big;
     const sec = [[-0.24, y1 + 0.02], [-0.1, y1 + 0.03], [0, y1 - 0.02], [0.05, y1 - 0.15]];
     for (let j = 1; j <= 6; j++) { const t = j / 6; sec.push([0.05 + reach * sqrt(t), y1 - 0.15 - (H - 0.15) * t]); }
-    mb.ea = 3; sweep(sec.map((q) => [q[0], q[1], (q[1] - y0) / 16, (y1 + 0.03 - q[1]) / 16]), ax, az, bx, bz, nx, nz);
+    mb.ea = kind; sweep(sec.map((q) => [q[0], q[1], (q[1] - y0) / scale, (y1 + 0.03 - q[1]) / scale]), ax, az, bx, bz, nx, nz);
     mb.ea = 4; sweep([0, 0.3, 0.65, 1].map((t) => [-0.05 + (reach + pool) * t, y0 + 0.05, big, t]), ax, az, bx, bz, nx, nz);
     mb.ea = 5; for (const j of [0, 1]) sweep([0, 0.25, 0.6, 1].map((t) => [reach * 0.5 + j * 0.45 + (0.8 + j * 0.9) * big * t * (0.6 + 0.4 * t) + 0.25 * t, y0 + 0.03 + mh * (0.75 + 0.25 * j) * t, big, t]), ax, az, bx, bz, nx, nz);
   };
@@ -219,14 +225,19 @@ function meshCascades() {
   // over the east stair)
   for (let k = 0; k < PYR.n; k++) {
     const h = pyrH(k) + 0.02, y1 = pyrY(k + 1) + 0.06, y0 = k ? pyrY(k) + 0.06 : T2.wy, pool = k ? 2.2 : 4.5;
-    const n = max(1, round(2 * h / 13)), w = min(2 * h / n * 0.55, 8);
+    const n = max(1, round(2 * h / 17)), w = min(2 * h / n * 0.8, 13);
     for (const [nx, nz] of [[1, 0], [0, 1], [-1, 0], [0, -1]]) for (let i = 0; i < n; i++) {
       const c = -h + (i + 0.5 + (k % 2 ? 0.25 : -0.25) * (n > 1 ? 1 : 0)) * 2 * h / n, a = c - w / 2, b = c + w / 2;
-      if (nx > 0 && a < 6.5 && b > -6.5) continue;
+      if (a < 5 && b > -5) continue;
       const tx = -nz, tz = nx;
       fall(nx * h + tx * a, nz * h + tz * a, nx * h + tx * b, nz * h + tz * b, nx, nz, y1, y0, pool);
     }
   }
+  // High biefs overflow into the low network; foam lands on actual canal water.
+  for(const [x0,x1,z,y] of BIEFS) for(let x=x0+5;x<x1-3;x+=14) fall(x-1.6,z+.12,x+1.6,z+.12,0,1,y+.64,WATER,3);
+  // A single vertical drop stands in front of the cliff spur, with its toe inside the oasis.
+  const f=OASIS_FALL,z=OASIS[1];
+  fall(f.x,z-f.w/2,f.x,z+f.w/2,1,0,f.y+.15,2.6,7,192,6);
   mb.ea = mb.eb = mb.ec = 0;
   return mb.build();
 }

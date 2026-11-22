@@ -8,7 +8,7 @@
   const st = (a, n) => { const s = Array.from(a.subarray(0, n)).sort((x, y) => x - y); let sum = 0; for (const v of s) sum += v; return `avg ${(sum / n).toFixed(2)}  p99 ${s[min(n - 1, floor(n * 0.99))].toFixed(2)}  max ${s[n - 1].toFixed(2)} ms`; };
   const report = () => {
     const over = Array.from(logFrame.subarray(0, nFrame)).filter((v) => v > 16.7).length;
-    const s = `Fly-through ${W}x${H}, ${nFrame} frames in ${FLYT} s (${(1000 * nFrame / logFrame.subarray(0,nFrame).reduce((a,b)=>a+b,0)).toFixed(1)} fps)\nframe  ${st(logFrame, nFrame)}  ·  frames over 16.7 ms: ${over}${late}  ·  long main-thread tasks: ${longN} (max ${longMax.toFixed(0)} ms)\nGPU  ${nGpu ? st(logGpu, nGpu) : 'timestamp-query unavailable'}`;
+    const s = `Fly-through ${W}x${H}, ${nFrame} frames in ${FLYT} s (${(1000 * nFrame / logFrame.subarray(0,nFrame).reduce((a,b)=>a+b,0)).toFixed(1)} fps)\nframe  ${st(logFrame, nFrame)}  ·  frames over 16.7 ms: ${over}${late}  ·  long main-thread tasks: ${longN} (max ${longMax.toFixed(0)} ms)\nGPU  ${nGpu ? st(logGpu, nGpu) : benchTS ? 'timestamp-query unavailable' : 'readback disabled (?nots); see per-view timings'}`;
     info.textContent = s; if (finish) { finish(s); finish = null; }
   };
   // main-thread tasks over 50 ms during a benchmark: own stalls vs frames the browser delivered late
@@ -19,7 +19,7 @@
     if (flying) {
       const now = performance.now(), dtr = now - tPrev; tPrev = now;
       F[FLT] += F[DT]; flyAt(); F[VX] = F[VY] = F[VZ] = 0;
-      if (bench && F[FLT] > 0.5) { if (dtr > 33) late += ` ${dtr.toFixed(1)} ms at ${F[FLT].toFixed(1)} s;`; if (nFrame < LOGN) logFrame[nFrame++] = dtr; if (gpuN !== seenGpu && nGpu < LOGN) { seenGpu = gpuN; logGpu[nGpu++] = gpuMs[NP]; } }
+      if (bench && F[FLT] > 0.5) { if (dtr > 33) late += ` ${dtr.toFixed(1)} ms at ${F[FLT].toFixed(1)} s;`; if (nFrame < LOGN) logFrame[nFrame++] = dtr; if (benchTS && gpuN !== seenGpu && nGpu < LOGN) { seenGpu = gpuN; logGpu[nGpu++] = gpuMs[NP]; } }
       if (soak) { if (nSoak++ > 30 && now - soakT0 > 3000 && dtr > soakMs) { performance.mark('stall'); soakLog.push(`${dtr.toFixed(0)} ms at ${((now - soakT0) / 1000).toFixed(1)} s (path ${F[FLT].toFixed(1)} s, camera ${F[CX].toFixed(0)},${F[CY].toFixed(0)},${F[CZ].toFixed(0)})`); } if (F[FLT] >= FLYT) { F[FLT] = 0; F[RESET] = 1; } }
       else if (F[FLT] >= FLYT) { if (bench) report(); stop(); }
     }
@@ -145,14 +145,18 @@
     };
     try {
       const adapterInfo = adapter.info;
-      const report = {gpu: {vendor:adapterInfo.vendor, architecture:adapterInfo.architecture, device:adapterInfo.device, description:adapterInfo.description}, path:window.__path(), views:[]};
+      const report = {environment:{browser:navigator.userAgent,visibility:document.visibilityState,width:W,height:H,level:LVN[LV],timestamps:hasTS},gpu: {vendor:adapterInfo.vendor, architecture:adapterInfo.architecture, device:adapterInfo.device, description:adapterInfo.description}, path:window.__path(),planting:window.__planting, views:[]};
       for (let pose=0;pose<6;pose++) {
         const shots=await window.__shot({pose,frames:48,time:10});
         await send({name:`P${pose+1}.png`,image:shots[0]});
-        report.views.push({pose,stats:window.__stats()});
+        report.views.push({pose,stats:window.__stats(),count:await window.__count()});
       }
       const flicker=await window.__flicker({pose:4,time:10});
+      const palmCam=[169,21,39,154.5,25,21];
+      await send({name:'palms.png',image:(await window.__shot({cam:palmCam,time:10}))[0]});
+      const palmFlicker=await window.__flicker({cam:palmCam,time:10});report.palmFlicker=palmFlicker[0];await send({name:'palms-flicker.png',image:palmFlicker[1]});
       report.flicker=flicker[0]; await send({name:'flicker.png',image:flicker[1]});
+      await send({name:'oasis.png',image:(await window.__shot({cam:[OASIS[0]+300,110,40,OASIS[0]-55,100,0]}))[0]});
       for (const fly of [28,40,52]) {
         const shots=await window.__shot({fly,pair:true});
         for(let k=0;k<shots.length;k++) await send({name:`fly-${fly}-${k}.png`,image:shots[k]});

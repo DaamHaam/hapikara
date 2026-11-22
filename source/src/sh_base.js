@@ -247,11 +247,11 @@ fn carpet(c0: LA, p: vec2f, n: i32, sd: f32, ln: f32, wd: f32) -> LA {
       c = leaf(c, p, o, o + rot2(1.571 + (r.x - .5) * 1.4) * (.3 + .15 * r.y), .014, .7);
     }
   } else if (tile == 10) { // palm frond: a rachis with long narrow leaflets swept towards the tip
-    c = put(c, seg(p, vec2f(.5, 0.), vec2f(.5, 1.)) - .011, .45, 0., .5);
-    for (var i = 0; i < 21; i++) {
-      let y = .015 + f32(i) * .047; let r = h22(vec2f(f32(i), 13.)); let L = (.43 + .08 * r.x) * (1. - .5 * y * y);
-      c = leaf(c, p, vec2f(.5, y), vec2f(.5, y) + rot2(.55 + .25 * r.y) * L, .02, .65 + .35 * r.x);
-      c = leaf(c, p, vec2f(.5, y + .022), vec2f(.5, y + .022) + rot2(PI - .55 - .25 * r.x) * L, .02, .65 + .35 * r.y);
+    c = put(c, seg(p, vec2f(.5, 0.), vec2f(.5, 1.)) - .019, .45, 0., .5);
+    for (var i = 0; i < 13; i++) {
+      let y = .015 + f32(i) * .074; let r = h22(vec2f(f32(i), 13.)); let L = (.43 + .08 * r.x) * (1. - .5 * y * y);
+      c = leaf(c, p, vec2f(.5, y), vec2f(.5, y) + rot2(.55 + .25 * r.y) * L, .038, .65 + .35 * r.x);
+      c = leaf(c, p, vec2f(.5, y + .022), vec2f(.5, y + .022) + rot2(PI - .55 - .25 * r.x) * L, .038, .65 + .35 * r.y);
     }
   } else if (tile == 11) { // water lily: round notched pads, two flowers
     for (var i = 0; i < 6; i++) {
@@ -307,7 +307,7 @@ fn skyLut(d: vec3f) -> vec3f {
   var c = textureSampleLevel(tSky, sRep, uv, 0.).rgb * E0 * mix(1., 2.3, sat(d.y * 1.4) * (1. - ss(.5, .97, dot(d, view.sun.xyz))));
   // pearl just above the horizon, warming to cream and gold (and higher) towards the low sun
   let ts = ss(-.35, .95, dot(d.xz / max(length(d.xz), 1e-4), normalize(view.sun.xz)));
-  let l = lum(c); c = mix(c, vec3f(l) * mix(vec3f(1.03, 1., .99), vec3f(1.2, 1., .72), ts) * 1.12, mix(.8, .9, ts) * (1. - ss(0., mix(.24, .38, ts), abs(d.y))));
+  let l = lum(c); c = mix(c, vec3f(l) * mix(vec3f(1.03, 1., .99), vec3f(1.2, 1., .72), ts) * 1.12, mix(.25, .4, ts) * (1. - ss(0., mix(.12, .2, ts), abs(d.y))));
   return c;
 }
 // small cumulus on a flat layer 1.7 km up; lit sunward, grey-blue below
