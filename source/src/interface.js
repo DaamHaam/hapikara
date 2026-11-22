@@ -56,6 +56,11 @@ if (!AUTO) {
   };
   const stats=()=>{hud=!hud;tsOn=hud&&hasTS;info.textContent='';$('stats-toggle').setAttribute('aria-pressed',String(hud));};
   $('stats-toggle').onclick=stats;
+  // full screen (Chrome, Edge, Firefox; hidden where the page cannot go full screen, as in Safari on iPhone)
+  const fsb=$('fs-toggle'),fsOn=()=>!!document.fullscreenElement;
+  if(!document.fullscreenEnabled)fsb.hidden=true;
+  fsb.onclick=()=>{(fsOn()?document.exitFullscreen():document.documentElement.requestFullscreen({navigationUI:'hide'})).catch(()=>{});};
+  document.addEventListener('fullscreenchange',()=>{fsb.textContent=fsOn()?'Quitter le plein écran':'Plein écran';fsb.setAttribute('aria-pressed',String(fsOn()));});
   addEventListener('keydown',e=>{
     if(e.code==='Escape'&&!panel.hidden){e.preventDefault();show(false);return;}
     if(e.target instanceof HTMLInputElement||e.target instanceof HTMLTextAreaElement)return;
