@@ -13,8 +13,8 @@ for(let x=-440.3;x<440;x+=3.7) for(let z=-370.2;z<370;z+=4.1) {
  assert(n===(canalAt(x,z)?0:1),'land/water partition '+x+','+z);
  if(canalAt(x,z)) wet++; else dry++;
  if(max(abs(x),abs(z))>140 && quayStepY(x,z)<-1e8 && !BIEFS.some(b=>x>b[0]&&x<b[1]&&z>b[2]-7&&z<b[2])) {
-  surfaceAt(x,z,1e6);
-  assert(abs(COL[0]-(canalAt(x,z)?WATER+CLEAR_W:cityH(x,z)+CLEAR))<1e-6,'collision height');
+  surfaceAtPoint(x,z,1e6);
+  assert(abs(COL[0]-(canalAt(x,z)?FLOOR_Y+CLEAR:cityH(x,z)+CLEAR))<1e-6,'collision height');
  }
 }
 const mesh=meshCityGround();
@@ -41,13 +41,20 @@ const meshes=[mesh,meshPyramid(),meshAcropolis(),meshCascades(),meshSphinx(0),me
 for(let v=1;v<=20;v++)meshes.push(meshVillaE(v,0).mesh);
 for(let l=0;l<5;l++)meshes.push(meshPalm(11,l));
 for(const m of meshes){const f=new Float32Array(m.vb);for(let i=0;i<m.nv;i++)for(let j=0;j<3;j++)assert(Number.isFinite(f[i*5+j]),'non-finite vertex');for(const i of m.ib)assert(i<m.nv,'index outside mesh');}
-for(const [x,z,h]of [[-207,-191,22],[-200,36,16],[190,203,16],[345,130,WATER]]) {
- surfaceAt(x,z,1e6); assert(abs(COL[0]-(h+(h===WATER?CLEAR_W:CLEAR)))<1e-6,'landmark collision');
+for(const [x,z,h]of [[-207,-191,22],[-200,36,16],[190,203,16],[345,130,FLOOR_Y]]) {
+ surfaceAtPoint(x,z,1e6); assert(abs(COL[0]-(h+CLEAR))<1e-6,'landmark collision');
 }
-for(const [x,z,h] of [[-200,-145,22.64],[-220,115,16.64],[180,258,16.64]]) {surfaceAt(x,z,1e6);assert(abs(COL[0]-h-CLEAR_W)<1e-6,'bief water height');}
-for(const [x,z] of [[88,0],[-88,0],[0,88],[0,-88],[40,0],[0,-40]]){surfaceAt(x,z,1e6);assert(abs(COL[0]-acroStairY(x,z)-CLEAR)<1e-6,'acropolis stair ramp');}
+for(const [x,z,h] of [[-200,-145,22.64],[-220,115,16.64],[180,258,16.64]]) {surfaceAtPoint(x,z,1e6);assert(abs(COL[0]-h-CLEAR_W)<1e-6,'bief water height');}
+for(const [x,z] of [[88,0],[-88,0],[0,88],[0,-88],[40,0],[0,-40]]){surfaceAtPoint(x,z,1e6);assert(abs(COL[0]-acroStairY(x,z)-CLEAR)<1e-6,'acropolis stair ramp');}
 setHard({boxes:[],bridges:[119.6,-10,140.4,10,10.91,0,.6]});
-surfaceAt(130,0,20);assert(abs(COL[0]-11.81)<1e-6,'bridge deck hump');
-surfaceAt(130,0,8);assert(abs(COL[1]-9.71)<1e-6,'bridge underside');
+surfaceAtPoint(130,0,20);assert(abs(COL[0]-11.81)<1e-6,'bridge deck hump');
+surfaceAtPoint(130,0,8);assert(abs(COL[1]-9.71)<1e-6,'bridge underside');
+setHard({boxes:[],bridges:[]});
+const F=new Float64Array(16),CX=0,CY=1,CZ=2,VX=3,VY=4,VZ=5;
+F.set([155,5,200]);collide(130,5,200);
+assert(F[CX]<140.4&&F[CX]>139&&F[CY]===5,'swept submerged quay collision');
+F.set([130,0,200]);collide(130,5,200);assert(abs(F[CY]-FLOOR_Y-CLEAR)<1e-6,'solid canal bottom');
+F.set([130,9,200]);collide(130,5,200);assert(F[CY]===9,'water surface remains passable');
+assert(waterSurfaceAt(130,200)===WATER&&waterSurfaceAt(155,200)<-1e8,'submersion footprint');
 console.log('Plan OK:',BLOCKS.length,'convex cells,',dry,'land and',wet,'water samples;',checked,'rendered tops,',meshes.length,'finite meshes; terrace/bief/stair/bridge collisions agree.');
 `, {console});

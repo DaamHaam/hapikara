@@ -1,11 +1,12 @@
 {
   "name": "hapikara",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "A procedural Egyptian oasis city rendered with WebGPU, bundled into one HTML file",
   "type": "module",
   "scripts": {
     "check:plan": "node tools/check-plan.mjs",
+    "check:ambiance": "node tools/check-ambiance.mjs",
     "check:bundle": "node tools/check-bundle.mjs",
     "build": "node build.mjs",
     "build:readable": "node build.mjs --readable",

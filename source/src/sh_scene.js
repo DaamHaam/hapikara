@@ -1,6 +1,6 @@
 // shaders 2/4: instancing, GPU culling, materials (G-buffer) and shadow casters
 // material ids, shared by mesh generators and shaders
-const M = { MARBLE: 0, PAVE: 1, PLASTER: 2, GOLD: 3, QUAY: 4, FLOOR: 5, WINDOW: 6, BARK: 7, ALLOY: 8, TRIM: 9, TERRAIN: 10, CORE: 11, TERRACE: 12, GROUND: 13, STEP: 14, ROCK: 15, FALL: 16, SEA: 17, PAINT: 18, SANDST: 19, GRANITE: 20, PALM: 21, PALMBARK: 22, LEAF: 32 };
+const M = { MARBLE: 0, PAVE: 1, PLASTER: 2, GOLD: 3, QUAY: 4, FLOOR: 5, WINDOW: 6, BARK: 7, ALLOY: 8, TRIM: 9, TERRAIN: 10, CORE: 11, TERRACE: 12, GROUND: 13, STEP: 14, ROCK: 15, FALL: 16, SEA: 17, PAINT: 18, SANDST: 19, GRANITE: 20, PALM: 21, PALMBARK: 22, UWSTONE: 23, LEAF: 32 };
 // leaf atlas tiles (material = M.LEAF + tile): crowns, then vines (TRAIL fringe, VLEAF / VBLOSSOM carpets)
 const LT = { OLIVE: 0, BROAD: 1, PINE: 2, CYPRESS: 3, BLOSSOM: 4, HYDRANGEA: 5, TRAIL: 6, LAVENDER: 7, VLEAF: 8, VBLOSSOM: 9, PALM: 10, LILY: 11 };
 
@@ -104,7 +104,7 @@ fn transform(v: VI) -> VO {
     wp.y += sin(t * .7 + sd * 40.) * .22 * view.misc.w;
   }
   var o: VO;
-  o.clip = view.vp * vec4f(wp, 1.); o.wp = wp; o.n = n; o.uv = v.ext.yzw; o.ao = v.nrm.w;
+  o.clip = view.vp * vec4f(wp, 1.);if(mat==23u&&view.look5.x<.5){o.clip=vec4f(2.,2.,2.,1.);} o.wp = wp; o.n = n; o.uv = v.ext.yzw; o.ao = v.nrm.w;
   o.tint = unpack4x8unorm(it.tint); o.mi = vec2u(mat, e >> 24u); o.lp = v.pos; o.q = q; o.sc = vec4f(s, it.rad);
   // Low: LODs swap at mid-fade instead of dissolving; the hidden one collapses to a point here, so no fragment shader
   // needs a discard (phone GPUs only reject hidden fragments early for shaders that never discard)
@@ -316,7 +316,7 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
   // distance rule tuned for a 2:1 atlas
   let uvx = dpdx(i.uv.xy); let uvy = dpdy(i.uv.xy);
   let lux = uvx * .245; let luy = uvy * .245; let lq = vec2f(1., 2.); let lg = vec2f(1., 4. / 3.);
-  let px = i.clip.xy; let fb = i.mi.y; let nz = ign(px + view.jit.z * 5.588);
+  let px = i.clip.xy; let fb = i.mi.y; let nz = select(ign(px + view.jit.z * 5.588),h21(floor(i.wp.xz*12.)+floor(i.wp.y*12.)*vec2f(.31,.73)),mat==7u||mat==21u||mat==22u||mat>=32u);
   if ((fb & 127u) != 127u) { let f = f32(fb & 127u) / 127.; if ((fb & 128u) != 0u) { if (nz < 1. - f) { discard; } } else if (nz >= f) { discard; } }
   if (REFL && i.wp.y < view.jit.w) { discard; }
   var o: Mt; o.metal = 0.; o.inlay = 0.; o.trans = 0.; o.nb = vec3f(0.); o.rough = .5; o.alb = vec3f(.8);
@@ -352,7 +352,8 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
     let ridge=1.-ss(.015,.05+abs(uvx.x)+abs(uvy.x),abs(q.x-.5));
     o.alb=i.tint.rgb*i.tint.rgb*(.68+.3*q.y+.08*i.uv.z)*mix(vec3f(.9,1.,.72),vec3f(1.05,1.,.8),q.y)*(1.-.12*vein+.09*ridge);
     o.rough=.82;o.trans=.25;
-  } else if (mat == 0u || mat == 4u || mat == 9u) {
+  } else if(mat==23u){let A=tri(tNoiseA,p,dx,dy,w,2.);o.alb=vec3f(.29,.32,.19)*(.75+.45*A.r);o.rough=.88;}
+  else if (mat == 0u || mat == 4u || mat == 9u) {
     // marble: honed walls in courses, smooth trim, quay walls with a waterline
     let m = marble(p, dx, dy, w, vec3f(0.));
     o.alb = MARB * m.rgb; o.rough = select(.47, .3, mat == 9u) + .12 * (m.a - .5); o.nb = triN(p, dx, dy, w, 2.3, false) * .06;
@@ -504,7 +505,7 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
   let mat = i.mi.x; let tile = max(mat, 32u) - 32u; let luv = atlasUV(tile, i.uv.xy);
   let uvx = dpdx(i.uv.xy); let uvy = dpdy(i.uv.xy);
   let lux = uvx * .245; let luy = uvy * .245; let lq = vec2f(1., 2.); let lg = vec2f(1., 4. / 3.);
-  let px = i.clip.xy; let fb = i.mi.y; let nz = ign(px + view.jit.z * 5.588);
+  let px = i.clip.xy; let fb = i.mi.y; let nz = select(ign(px + view.jit.z * 5.588),h21(floor(i.wp.xz*12.)+floor(i.wp.y*12.)*vec2f(.31,.73)),mat==7u||mat==21u||mat==22u||mat>=32u);
   if ((fb & 127u) != 127u) { let f = f32(fb & 127u) / 127.; if ((fb & 128u) != 0u) { if (nz < 1. - f) { discard; } } else if (nz >= f) { discard; } }
   if (REFL && i.wp.y < view.jit.w) { discard; }
   if (mat >= 32u) {

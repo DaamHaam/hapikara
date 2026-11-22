@@ -81,7 +81,7 @@ const TANH = tan(30 * DEG), NEAR = 0.3, EXPO = 0.72;
 // sun at the ground: atmospheric transmittance x 1.35 (keeps sunlit paving warm rather than grey)
 const AT = atmo(), SUNC = AT.Ts.map((t) => t * E0 * 1.35);
 if (AUTO) console.log('sun at ground ' + SUNC.map((v) => v.toFixed(2)) + ' · psi ' + AT.PSI.map((v) => v.toFixed(4)));
-const syncLook = () => { for(const U of UB){U.set(LOOK_ACTIVE.subarray(0,20),O_LOOK); for(let c=0;c<3;c++)U[O_SUNC+c]=SUNC[c]*LOOK_ACTIVE[0]*(1+LOOK_ACTIVE[1]*[.14,0,-.16][c]);U[O_SUNC+3]=LOOK_ACTIVE[4];} };
+const syncLook = () => { for(const U of UB){U.set(LOOK_ACTIVE.subarray(0,20),O_LOOK);U.set(LOOK_ACTIVE.subarray(22,25),204);U[207]=-1e9; for(let c=0;c<3;c++)U[O_SUNC+c]=SUNC[c]*LOOK_ACTIVE[0]*(1+LOOK_ACTIVE[1]*[.14,0,-.16][c]);U[O_SUNC+3]=LOOK_ACTIVE[4];} };
 for (const U of UB) { U.set(SUN, O_SUN); U.set(SUNC, O_SUNC); U[O_SUNC + 3] = EXPO; U[O_MISC + 2] = 1; U[O_LODC + 3] = 1; }
 syncLook();
 // camera matrices and frustum planes for a view at (cx, cy, cz), yaw / pitch
@@ -122,11 +122,12 @@ function shadowMat(at, cx, cy, cz, R, d0, d1, size, cull) {
   }
 }
 
-// sky table and environment light (baked once)
+// Sky table and environment light; rebaked after sky/light adjustments.
 await say('Le ciel s’éclaire…', 0.1);
 const tSky = tex(256, 128, HDR, RT), tEnvRaw = tex(256, 256, HDR, RT, { layers: 6, mips: 9 }), tEnv = tex(256, 256, HDR, RT, { layers: 6, mips: 6 }), tIrr = tex(16, 16, HDR, RT, { layers: 6 });
 const cubeView = (t, o = {}) => t.createView({ dimension: 'cube', ...o });
-{
+let lookBaking=false,environmentTimer=0;
+async function bakeEnvironment() {
   const ms = mod(W_SKYLUT(AT), 'skylut');
   let e = device.createCommandEncoder();
   const flush = async (m) => { Q.submit([e.finish()]); await ck(m); e = device.createCommandEncoder(); };
@@ -144,6 +145,17 @@ const cubeView = (t, o = {}) => t.createView({ dimension: 'cube', ...o });
   for (let m = 0; m < 6; m++) { for (let f = 0; f < 6; f++) pass(tEnv, f, m, 2 + m, cubeView(tEnvRaw)); await flush('sky cube, roughness ' + m); }
   for (let f = 0; f < 6; f++) pass(tIrr, f, 0, 9, cubeView(tEnvRaw));
   Q.submit([e.finish()]); await ck('sky irradiance');
+}
+await bakeEnvironment();
+let environmentKey=[0,1,11,12].map(i=>LOOK_ACTIVE[i]).join(',');
+function scheduleEnvironment(){
+  const key=[0,1,11,12].map(i=>LOOK_ACTIVE[i]).join(',');clearTimeout(environmentTimer);if(key===environmentKey&&!lookBaking)return;
+  environmentTimer=setTimeout(async()=>{
+    if(lookBaking){scheduleEnvironment();return;}
+    lookBaking=true;environmentKey=key;
+    try{await bakeEnvironment();}catch(e){console.error('Environment update:',e);}
+    finally{lookBaking=false;F[RESET]=1;}
+  },350);
 }
 
 // the world: meshes, instances, levels of detail
@@ -280,7 +292,7 @@ const passShadow = depthPass(tSh[0]);
 
 // full-screen passes
 // passes a level leaves out are never compiled
-const lLight = layout('usscttt' + 'dttkk' + 'dddd' + 'tttt', SS.FRAGMENT), lAO = layout('udtt', SS.FRAGMENT), lPolish = layout('ustdttk', SS.FRAGMENT), pPolish = POLISH && fsPipe(mod(W_POLISH, 'polish'), lPolish, HDR, 'fs', ADD), lVol = layout('ucddd', SS.FRAGMENT), pVol = SHAFTS && fsPipe(mod(W_VOL, 'vol'), lVol, 'rg16float'), lTAA = layout('ustt' + 'd', SS.FRAGMENT), lPost = layout('ustt', SS.FRAGMENT);
+const lLight = layout('usscttt' + 'dttkk' + 'dddd' + 'tttt', SS.FRAGMENT), lAO = layout('udtt', SS.FRAGMENT), lPolish = layout('ustdttk', SS.FRAGMENT), pPolish = POLISH && fsPipe(mod(W_POLISH, 'polish'), lPolish, HDR, 'fs', ADD), lVol = layout('ucddd', SS.FRAGMENT), pVol = SHAFTS && fsPipe(mod(W_VOL, 'vol'), lVol, 'rg16float'), lTAA = layout('ustt' + 'd', SS.FRAGMENT), lPost = layout('usttd', SS.FRAGMENT);
 const pLight = fsPipe(mod(W_LIGHT, 'light'), lLight, HDR), pAO = SSAO && fsPipe(mod(W_AO, 'ao'), lAO, 'rg16float'), pTAA = fsPipe(mod(W_TAA, 'taa'), lTAA, HDR), pPost = fsPipe(mod(W_POST, 'post'), lPost, FMT);
 // history stretched into a new resolution
 const pFit = device.createRenderPipeline({ layout: plOf(lBlit), vertex: { module: mBlit, entryPoint: 'vsFit' }, fragment: { module: mBlit, entryPoint: 'fsFit', targets: [{ format: HDR }] } });
@@ -366,7 +378,7 @@ function resize() {
   for (let i = 0; i < NB; i++) { bloomPass.push({ colorAttachments: [colorAtt(bl[i].createView(), true)], timestampWrites: i === 0 ? tsB(9) : undefined }); for (const k of [0, 1]) bloomBG[k].push(blitBG(i ? bl[i - 1].createView() : hist[k].createView())); }
   for (let i = NB - 1; i > 0; i--) { bloomPass.push({ colorAttachments: [colorAtt(bl[i - 1].createView(), false)], timestampWrites: i === 1 ? tsE(9) : undefined }); for (const k of [0, 1]) bloomBG[k].push(blitBG(bl[i].createView())); }
   passPost = { colorAttachments: [{ view: null, loadOp: 'clear', storeOp: 'store', clearValue: [0, 0, 0, 1] }], timestampWrites: tsBE(10) };
-  bgPost = [0, 1].map((i) => group(lPost, [ubo[V_MAIN], sLin, hist[i], bl[0]]));
+  bgPost = [0, 1].map((i) => group(lPost, [ubo[V_MAIN], sLin, hist[i], bl[0],g[3]]));
   cpA = { texture: tA }; cpB = { texture: tB }; cpD = { texture: g[3] }; cpDc = { texture: tDc }; cpSize = [W, H];
   // start a new size from the old picture: with no history every resolution change would flash
   if (old) {
@@ -411,6 +423,7 @@ function render() {
   setCam(U, cx, cy, cz, F[YAW], F[PIT], W, H, 0, 0);
   for (let i = 0; i < 16; i++) { U[32 + i] = PVP[i]; PVP[i] = U[i]; }
   setCam(U, cx, cy, cz, F[YAW], F[PIT], W, H, JIT[j] * 2 / W, JIT[j + 1] * 2 / H);
+  U[207]=waterSurfaceAt(cx,cz);if(cy>=U[207])U[207]=-1e9;
   U[O_CAM + 3] = t; U[O_JIT + 2] = fr; U[O_JIT + 3] = -1e9;
   // heartbeat: x = seconds since the last pulse, y = slow crystal breathing, z = flare as each pulse leaves
   const tp = t % PULSE, tq = (tp < PULSE / 2 ? tp : tp - PULSE) / 0.7;
@@ -512,7 +525,7 @@ const render0 = render; // dev.js wraps `render`
 let kf = 0, kb = 0, kl = 0, kr = 0, ku = 0, kd = 0, ks = 0, mdx = 0, mdy = 0, lkx = 0, lky = 0, l2x = 0, l2y = 0, hN = 0, hMax = 0, menu = true;
 let solid = !QP.has('noclip'); // key C
 let tId = -1, tN = 0, tx = 0, ty = 0, tx0 = 0, ty0 = 0; // touch: steering finger id, fingers down, its position and where it went down
-// flying speed: wheel scales it ~15% a step (0.25-50 m/s, Shift x8 too); middle button resets to 12.5 m/s
+// Wheel scales speed (~15% a step); middle button restores 15 m/s, Shift uses 200 m/s.
 let spd = clamp(+QP.get('spd') || 1, 0.02, 4);
 addEventListener('wheel', (e) => { if (!menu) spd = clamp(spd * exp(-(e.deltaMode ? e.deltaY * 33 : e.deltaY) * 0.0014), 0.02, 4); }, { passive: true });
 addEventListener('mousedown', (e) => { if (!menu && e.button === 1) { e.preventDefault(); spd = 1; } });
@@ -542,6 +555,7 @@ function tune() {
 function frame(now) {
   requestAnimationFrame(frame);
   if (dead || document.hidden) return;
+  if(lookBaking){F[LAST]=now;return;}
   const dtr = now - F[LAST];
   if (FPS && dtr < 1000 / FPS - 1) return;
   F[LAST] = now;
@@ -560,11 +574,12 @@ function frame(now) {
   const dyw = l2x * kq, dpt = l2y * kq; l2x -= dyw; l2y -= dpt;
   const yaw = F[YAW] + dyw; let pitch = F[PIT] - dpt; pitch = pitch < -1.55 ? -1.55 : pitch > 1.55 ? 1.55 : pitch;
   // one finger flies forward, a second flies fast
-  const sp = (ks || tN > 1 ? 100 : 12.5) * spd, k = 1 - exp(-dt * 5), mf = kf - kb + (tN > 0 ? 1 : 0), mr = kr - kl, mu = ku - kd, cp = cos(pitch), sy = sin(yaw), cw = cos(yaw);
+  const submerged=waterSurfaceAt(F[CX],F[CZ])>F[CY];
+  const sp = (ks || tN > 1 ? 200 : 15) * spd * (submerged?.3:1), k = 1 - exp(-dt * 5), mf = kf - kb + (tN > 0 ? 1 : 0), mr = kr - kl, mu = ku - kd, cp = cos(pitch), sy = sin(yaw), cw = cos(yaw);
   const vx = F[VX] + ((sy * cp * mf + cw * mr) * sp - F[VX]) * k, vy = F[VY] + ((sin(pitch) * mf + mu) * sp - F[VY]) * k, vz = F[VZ] + ((-cw * cp * mf + sy * mr) * sp - F[VZ]) * k;
   let x = F[CX] + vx * dt, y = F[CY] + vy * dt, z = F[CZ] + vz * dt;
   const rad = sqrt(x * x + z * z); if (rad > 6000) { x *= 6000 / rad; z *= 6000 / rad; }
-  y = y < 0.6 ? 0.6 : y > 2500 ? 2500 : y;
+  y = y < -60 ? -60 : y > 2500 ? 2500 : y;
   const px = F[CX], py = F[CY], pz = F[CZ];
   F[YAW] = yaw; F[PIT] = pitch; F[VX] = vx; F[VY] = vy; F[VZ] = vz; F[CX] = x; F[CY] = y; F[CZ] = z;
   // collision (collide.js); key C disables it
@@ -573,37 +588,35 @@ function frame(now) {
   render();
   if (hud) {
     hN++; if (dtr > hMax) hMax = dtr; F[HUDT] += dtr / 1000;
-    if (F[HUDT] > 0.5) { let s = `${(hN / F[HUDT]).toFixed(0)} fps · worst frame ${hMax.toFixed(1)} ms · GPU ${(gpuMs[NP] * SLOW).toFixed(2)} ms · ${W}x${H}${W < DW ? ` (${(100 * W / DW).toFixed(0)}% of ${DW}x${DH})` : ''} · ${LVN[LV]}\n`; for (let i = 0; i < NP; i++) s += `${PASSES[i]} ${gpuMs[i].toFixed(2)}  `; info.textContent = s + `\n${x.toFixed(0)}, ${y.toFixed(0)}, ${z.toFixed(0)} · yaw ${(((yaw / DEG) % 360 + 360) % 360).toFixed(0)}° pitch ${(pitch / DEG).toFixed(0)}° · speed ${(12.5 * spd).toFixed(spd < 0.8 ? 2 : 1)} m/s${solid ? '' : ' · collision off (C)'}`; F[HUDT] = 0; hN = 0; hMax = 0; }
+    if (F[HUDT] > 0.5) { let s = `${(hN / F[HUDT]).toFixed(0)} fps · worst frame ${hMax.toFixed(1)} ms · GPU ${(gpuMs[NP] * SLOW).toFixed(2)} ms · ${W}x${H}${W < DW ? ` (${(100 * W / DW).toFixed(0)}% of ${DW}x${DH})` : ''} · ${LVN[LV]}\n`; for (let i = 0; i < NP; i++) s += `${PASSES[i]} ${gpuMs[i].toFixed(2)}  `; info.textContent = s + `\n${x.toFixed(0)}, ${y.toFixed(0)}, ${z.toFixed(0)} · yaw ${(((yaw / DEG) % 360 + 360) % 360).toFixed(0)}° pitch ${(pitch / DEG).toFixed(0)}° · speed ${((ks?200:15) * spd * (submerged?.3:1)).toFixed(spd < 0.8 ? 2 : 1)} m/s${solid ? '' : ' · collision off (C)'}`; F[HUDT] = 0; hN = 0; hMax = 0; }
   }
 }
 
 // input and menu
 const key = (e, v) => {
   switch (e.code) {
-    case 'KeyW': kf = v; break; case 'KeyS': kb = v; break; case 'KeyA': kl = v; break; case 'KeyD': kr = v; break;
+    case 'KeyW': case 'ArrowUp': kf = v; break; case 'KeyS': case 'ArrowDown': kb = v; break; case 'KeyA': case 'ArrowLeft': kl = v; break; case 'KeyD': case 'ArrowRight': kr = v; break;
     case 'KeyE': ku = v; break; case 'KeyQ': kd = v; break; case 'ShiftLeft': case 'ShiftRight': ks = v; break;
     default: if (v && !e.repeat) {
-      if (e.code === 'KeyH') { hud = !hud; tsOn = hud && hasTS; info.textContent = ''; }
+      if (e.code === 'KeyI' && !mob) { hud = !hud; tsOn = hud && hasTS; info.textContent = ''; }
       else if (e.code === 'KeyC') solid = !solid;
       else if (e.code >= 'Digit1' && e.code <= 'Digit6') { lookAt(...POSES[e.code.charCodeAt(5) - 49]); F[VX] = F[VY] = F[VZ] = 0; }
     }
   }
 };
-addEventListener('keydown', (e) => { if (!(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement) && (!menu || e.code === 'KeyH')) key(e, 1); });
+addEventListener('keydown', (e) => { if (!(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement) && (!menu || e.code === 'KeyI')) {if(e.code.startsWith('Arrow'))e.preventDefault();key(e, 1);} });
 addEventListener('keyup', (e) => key(e, 0));
 const release = () => { kf = kb = kl = kr = ku = kd = ks = 0; tId = -1; tN = 0; };
 addEventListener('blur', release);
 const capture = () => { if (mob) return; const p = canvas.requestPointerLock({ unadjustedMovement: true }); if (p && p.catch) p.catch(() => canvas.requestPointerLock()).catch(() => 0); };
 addEventListener('mousemove', (e) => { if (document.pointerLockElement === canvas) { mdx += e.movementX; mdy += e.movementY; } });
-// touch: hold to fly forward, slide to steer, second finger fast. Portrait phones show the page rotated
-// (template.html), so the touch axes turn too.
-const rot = matchMedia('(orientation:portrait) and (pointer:coarse)');
+// Touch follows the screen axes in both orientations; a second finger accelerates.
 const touch = (e) => {
   e.preventDefault(); if (menu) return; tN = e.touches.length;
   let f = null, first = false; for (let i = 0; i < tN; i++) if (e.touches[i].identifier === tId) f = e.touches[i];
   if (!f) { tId = -1; if (tN) { f = e.touches[0]; tId = f.identifier; first = true; } }
   if (f) {
-    const x = rot.matches ? f.clientY : f.clientX, y = rot.matches ? -f.clientX : f.clientY, s = 1100 / min(innerWidth, innerHeight);
+    const x = f.clientX, y = f.clientY, s = 1100 / min(innerWidth, innerHeight);
     if (first) { tx0 = x; ty0 = y; } else { mdx += (x - tx) * s; mdy += (y - ty) * s; } // the view follows the finger at once
     tx = x; ty = y;
   }
@@ -614,7 +627,7 @@ for (const n of ['touchstart', 'touchmove', 'touchend', 'touchcancel']) canvas.a
 const ui = (m) => { if (dead) return; menu = m; body.className = m ? 'm' : document.pointerLockElement ? 'g p' : 'g'; if (m) release(); };
 $('d').onclick = () => {
   ui(false); $('d').textContent = 'Reprendre la visite';
-  // phones: full screen and landscape; if refused the style sheet still rotates the page
+  // Phones may enter landscape; if unavailable, portrait controls remain aligned with the screen.
   if (mob) document.documentElement.requestFullscreen?.()?.then(() => screen.orientation.lock('landscape')).catch(() => 0); else capture();
 };
 $('o').onclick = () => ui(true);
@@ -624,7 +637,7 @@ document.addEventListener('pointerlockchange', () => { if (!mob) ui(!document.po
 $('q').querySelectorAll('button').forEach((b, i) => { if (i === 2 - LV) b.className = 'on'; else b.onclick = () => { try { localStorage.atlantis = 2 - i; } catch {} location.href = location.href.replace(/[?&]lv=\d/, ''); }; });
 
 // draw the first frames and wait for the GPU (pipelines compile on first use) before revealing
-lookAt(...POSES[4]); // the scene opens on viewpoint 5: the inner island, domes and crystal against the sun
+lookAt(...POSES[2]); // canal-level welcome: jade water and reflections fill the free right-hand side
 await say('La lumière entre dans la cité…', 1);
 render(); await Q.onSubmittedWorkDone();
 setTimeout(() => { keep('atlantisLoad', ''); keep('atlantisLost', ''); }, 15e3); // the load counts as survived after 15 s

@@ -151,6 +151,7 @@
         await send({name:`P${pose+1}.png`,image:shots[0]});
         report.views.push({pose,stats:window.__stats(),count:await window.__count()});
       }
+      if(!QP.has('smoke')){
       const flicker=await window.__flicker({pose:4,time:10});
       const palmCam=[169,21,39,154.5,25,21];
       await send({name:'palms.png',image:(await window.__shot({cam:palmCam,time:10}))[0]});
@@ -164,7 +165,9 @@
         const shots=await window.__shot({fly,pair:true});
         for(let k=0;k<shots.length;k++) await send({name:`fly-${fly}-${k}.png`,image:shots[k]});
       }
+      }
       if(QP.has('looks'))for(const [name,preset]of Object.entries(LOOK_PRESETS)){LOOK_ACTIVE.set(LOOK);for(let i=0;i<20;i++)if(preset[LOOK_FIELDS[i][0]]!==undefined)LOOK_ACTIVE[i]=preset[LOOK_FIELDS[i][0]];syncLook();F[RESET]=1;await send({name:'look-'+name+'.png',image:(await window.__shot({pose:2,time:10}))[0]});}LOOK_ACTIVE.set(LOOK);syncLook();F[RESET]=1;
+      for(let level=0;level<4;level++){LOOK_ACTIVE[22]=level;syncLook();F[RESET]=1;await send({name:'underwater-'+level+'.png',image:(await window.__shot({cam:[130,4.8,180,130,4.6,155],time:10}))[0]});report.views.push({underwater:level,stats:window.__stats()});}LOOK_ACTIVE.set(LOOK);syncLook();F[RESET]=1;
       if(QP.has('bench')) report.benchmark=await window.__bench();
       if(GPU_ERRORS.length)throw Error(GPU_ERRORS.join('\n'));
       await send({name:'report.json',report});

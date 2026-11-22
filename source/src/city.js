@@ -210,6 +210,20 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
   for(const [x0,z0,s]of [[-226,-218,.75],[-226,86,.9],[-65,-213,.7],[225,230,.8]])
     for(const [dx,dz,sc]of [[0,0,.7],[13,2,1.1],[-2,13,.85],[12,15,1.3]])
       if(edgeDist(x0+dx,z0+dz)>4&&free(x0+dx,z0+dz,3))tree('palm',x0+dx,cityH(x0+dx,z0+dz),z0+dz,s*sc,.5);
+  let esplanadeFountains=0;
+  // A small fountain at a free edge of each civic terrace, never in the processional axis.
+  for(const [cx,cz]of [[-200,-191],[-200,36],[0,-191],[195,203]]){
+    let placed=false;for(const dx of [-34,34,-18,18]){if(placed)break;for(const dz of [-32,32,-16,16]){
+      const x=cx+dx,z=cz+dz,y=cityH(x,z);
+      if(inCity(x,z)&&edgeDist(x,z)>7&&free(x,z,7)&&abs(cityH(x+4,z)-y)<.1&&abs(cityH(x-4,z)-y)<.1&&abs(cityH(x,z+4)-y)<.1&&abs(cityH(x,z-4)-y)<.1){basin(x,z,y);paint(x,z,5,0,240,1);esplanadeFountains++;placed=true;break;}
+    }}
+  }
+  // Optional still-life on canal floors: stones and a small amphora, hidden in the simple underwater mode.
+  const finds=new MB(1024);finds.mat=M.UWSTONE;
+  for(const [x,z,r]of [[-1,.4,.55],[.7,-.8,.4],[1.1,.6,.3]])finds.lathe([[r*.7,0],[r,.12],[r*.75,r*.65],[0,r*.8]],{seg:8,cx:x,cz:z});
+  finds.lathe([[.17,0],[.24,.1],[.35,.4],[.25,.65],[.12,.78],[.14,.9]],{seg:12,cx:0,cz:0});
+  const tFinds=type([finds.build()],K.SOLID,1e9,1e9,240);
+  for(const [x,z]of [[130,168],[266,320],[-130,210],[336,130],[320,196],[-310,240]])if(canalAt(x,z))put(tFinds,x,FLOOR_Y,z,1,qYaw(rng()*TAU));
   // garden planting: palms, sycamores, flowering trees, shrubs; paths
   for (const poly of garden) {
     let bx0 = 1e9, bz0 = 1e9, bx1 = -1e9, bz1 = -1e9; for (const p of poly) { bx0 = min(bx0, p[0]); bz0 = min(bz0, p[1]); bx1 = max(bx1, p[0]); bz1 = max(bz1, p[1]); }
@@ -271,5 +285,5 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
   for(const [x,z,a,s]of [[321,195,0,.5],[235,-310,PI/2,.45],[-130,215,0,.45]])put(tBoat,x,WATER+.02,z,s,qYaw(a));
   for (let i = 0; i < 16; i++) { const z = rr(-1800, 1800), x = nileX(z) + rr(70, NILE_W - 70); put(tBoat, x, 0.05, z, 1, qYaw((rng() < 0.5 ? 1 : -1) * PI / 2 + rr(-0.35, 0.35))); }
   for (let i = 0; i < 6; i++) { const t = rr(0, TAU), r = (RB.gar(t) + RB.out(t)) / 2, x = r * cos(t), z = r * sin(t); if (onBridge(x, z, 12)) continue; put(tBoat, x, WATER + 0.02, z, 0.8, qYaw(-t + PI / 2 * (rng() < 0.5 ? 1 : -1))); }
-  if (AUTO) {window.__planting={trees:nTree,palms:nPalm,palmsInCity:nCityPalm};console.log(`${nTree} trees, ${nCityPalm} city palms, ${hard.boxes.length / 5} solid boxes`);}
+  if (AUTO) {window.__planting={trees:nTree,palms:nPalm,palmsInCity:nCityPalm,esplanadeFountains};console.log(`${nTree} trees, ${nCityPalm} city palms, ${hard.boxes.length / 5} solid boxes`);}
 }

@@ -12,17 +12,19 @@ Pierre dorée, pierres précieuses et eau vert-jade qui ruisselle de partout, de
 
 ![La cité entre le Nil et le désert](.github/screenshots/aerial.jpg)
 
-## Atelier d'ambiance et plan de la cité
+## Accueil et atelier d’ambiance — v0.3.0
 
-L'accueil montre le **plan de la cité**, généré à partir du vrai tracé des canaux et des terrasses : choisissez un lieu pour y commencer la visite. Le bouton **Ambiance** (touche `L`) ouvre un atelier de réglages de la lumière : soleil, ombres, couleurs, brume, ciel, eau et cristal. Il propose trois ambiances de départ, une comparaison avec l'ouverture, une sauvegarde sur l'appareil et **« Copier mes réglages »** pour transmettre les valeurs retenues. Le bouton **i/s** (touche `H`) affiche les images par seconde.
+L’accueil laisse voir l’eau et ses reflets : titre, entrée et trois qualités, sans image intégrée ni plan. **Sanctuaire voilé** est l’ambiance par défaut. Sur ordinateur, **`L`** ouvre les réglages de lumière et d’eau ; **`I`** affiche les statistiques. Aucun bouton d’outils n’encombre le téléphone. Les essais reviennent aux valeurs par défaut à chaque ouverture ; copier/importer permet de conserver volontairement des valeurs. Appliquer la position du soleil recharge la scène ; les changements de ciel et de lumière recalculent aussi l’environnement des reflets.
 
-Les palmes sont désormais des feuilles pleines et dentelées, sans découpe transparente : elles ne clignotent plus. Des colonnes de hiéroglyphes sont gravées sur les pylônes et dorées sur les obélisques.
+Les canaux, le Nil et l’oasis peuvent être explorés sous l’eau, à vitesse réduite. Le panneau `L` propose quatre niveaux : simple (teinte et visibilité), fonds (pierres et amphores), caustiques, rayons. Ces effets sont des approximations légères ; les vasques et bassins hauts restent peu profonds. Quelques fontaines supplémentaires ponctuent les esplanades.
+
+Les palmes pleines et dentelées évitent la découpe transparente. Les transitions de détail des végétaux utilisent maintenant un motif fixe dans le monde. **Le scintillement proche reste présent** : le contrôle A/B n’a pas établi de gain sur cette vue. Des hiéroglyphes décorent les pylônes et obélisques.
 
 ## Essayer
 
-En ligne : **https://daamhaam.github.io/hapikara/** — ou ouvrir `index.html` dans Chrome ou Edge (WebGPU). Entrée pour entrer, souris pour regarder, `W` `A` `S` `D` pour voler, `Q` / `E` pour descendre et monter, `Maj` pour accélérer, `1` à `6` pour les points de vue, `Échap` pour le menu (niveau de détail). Sur écran tactile : un doigt pour avancer et tourner.
+En ligne : **https://daamhaam.github.io/hapikara/** — ou ouvrir `index.html` dans Chrome ou Edge (WebGPU). Entrée pour entrer, souris pour regarder, les flèches (haut/bas : avancer/reculer, gauche/droite : déplacement latéral) ou `W` `A` `S` `D` pour voler, `Q` / `E` pour descendre et monter, `Maj` maintenue pour accélérer (15 m/s normalement, 200 m/s accéléré, avant réglage par molette), `1` à `6` pour les points de vue, `Échap` pour le menu (niveau de détail). Sur écran tactile : un doigt pour avancer et tourner, deux doigts pour accélérer. Les commandes suivent les axes de l’écran en portrait et paysage.
 
-> 🚧 Itération 2 — v0.2.0 : canaux segmentés, lagunes et îlot, quartiers en terrasses, temples et villas variés, palmiers beaucoup moins nombreux en ville. Environ 60 i/s sont mesurées sur le Mac M1 ; les pics isolés et la cible photoréaliste restent à améliorer.
+> Les mesures ci-dessous concernent la livraison historique v0.2.0. Les captures et contrôles de v0.3.0 sont conservés dans [iteration4](.github/screenshots/iteration4/). La VR reste une étape séparée.
 
 ## Itération 2 — livraison du 22 novembre 2026
 
@@ -68,7 +70,7 @@ npm install
 npm run build
 ```
 
-Contrôles CPU et livrable : `cd source && npm run check:plan && npm run check:bundle`. Le fichier minifié autonome pèse **94 482 octets** (80 628 octets gzip). Pour reproduire les captures et le benchmark, lancer `python3 source/tools/qa-server.py` à la racine, puis ouvrir dans Chrome `http://localhost:8137/dev.html?auto&lv=1&w=1440&h=900&qa=release-medium&bench&nots` après `npm run build:dev`. Les captures de développement et les outils de mesure ne sont pas inclus dans `index.html`.
+Contrôles CPU et livrable : `cd source && npm run check:plan && npm run check:ambiance && npm run check:bundle`. Le fichier minifié autonome reste proche de **101 ko** (86 ko gzip), sans ressource externe. Pour reproduire les captures et le benchmark, lancer `python3 source/tools/qa-server.py` à la racine, puis ouvrir dans Chrome `http://localhost:8137/dev.html?auto&lv=1&w=1440&h=900&qa=release-medium&bench&nots` après `npm run build:dev`. Les captures de développement et les outils de mesure ne sont pas inclus dans `index.html`.
 
 ## Licence
 

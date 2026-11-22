@@ -224,13 +224,14 @@ fn shafts(fc: vec2f, z: f32, rd: vec3f) -> vec3f {
   var sun = view.sunc.rgb * sh;
   // under water: moving caustics from the surface, dimmed with depth
   let r = length(wp.xz); let wl = select(0., ${WATER}, pow(pow(abs(wp.x) / 470., 5.) + pow(abs(wp.z) / 400., 5.), .2) < 1.); let dep = wl - wp.y;
-  var cz = 0.; let pu = pulseAt(r);
+  var cz = 0.;
   if (dep > -2.6 && (r < 432. || wp.y < 2.2)) {
     // two caustic layers at unrelated scales and angles, warped so they never repeat; mip by pixel size against sizzle
     let q0 = wp.xz + L.xz * dep * 1.1; let wv = textureSampleLevel(tNoiseA, sRep, q0 / 83., 0.).rg - .5; let q = q0 + wv * 7.;
     let cl = max(log2(max(dist * view.up.w * view.res.w * 150., 1.)) - ${Math.log2(512 / WAVEPX)}., 0.); // minus a smaller wave tile's missing levels
     let c1 = textureSampleLevel(tWater, sRep, q / 9.7, cl).b; let c2 = textureSampleLevel(tWater, sRep, vec2f(q.x * .6 + q.y * .8, q.y * .6 - q.x * .8) / 5.3 + .37, cl + .9).b;
-    cz = (c1 * .6 + c2 * .5) * (.8 + .9 * wv.x) + .35 * lum(pu) * 6.;
+    cz = (c1 * .6 + c2 * .5) * (.8 + .9 * wv.x);
+    if(view.look5.w>view.cam.y&&view.look5.x<1.5){cz*=.2;}
     // refracted sun is steeper than the maps know: ease shadows
     if (dep > 0.) { sun = view.sunc.rgb * mix(sh, 1., .7) * (.3 + 1.5 * cz) * exp(-dep * vec3f(.14, .035, .03)); }
   }
@@ -260,6 +261,18 @@ fn shafts(fc: vec2f, z: f32, rd: vec3f) -> vec3f {
   // a recessed pane still mirrors what's in front: the reveal dims it only a little
   if (glass) { env = surround(R, env, wp); so = mix(so, 1., .6); }
   col += env * envBRDF(f0, rough, nv) * so;
+  if(view.look5.w>view.cam.y&&view.look5.x>2.5){
+    let wl=view.look5.w;let sy=sqrt(1.-(1.-L.y*L.y)/1.777);
+    let sunUnder=vec3f(L.x/1.333,sy,L.z/1.333);
+    var reach=min(dist,35.);if(rd.y>.001){reach=min(reach,(wl-view.cam.y)/rd.y);}
+    var beams=0.;for(var j=0;j<${QL(8,5,3)};j++){
+      let sp=view.cam.xyz+rd*reach*(f32(j)+.5)/${QL(8,5,3)}.;
+      let q=(sp.xz+sunUnder.xz/max(sunUnder.y,.1)*(wl-sp.y))/9.7;
+      let ca=textureSampleLevel(tWater,sRep,q,2.).b;
+      beams+=pow(sat(ca*.65),3.)*shadow(sp,vec3f(0.,1.,0.));
+    }
+    col+=view.sunc.rgb*vec3f(.12,.3,.2)*beams*reach/${QL(8,5,3)}.*.12*view.look5.z;
+  }
   return vec4f(aerial(col, view.cam.xyz, rd, dist) + shafts(fc.xy, z, rd), 1.);
 }
 `;
@@ -315,6 +328,7 @@ const W_POST = W_COMMON + W_FS + /*wgsl*/`
 @group(0) @binding(1) var sLin: sampler;
 @group(0) @binding(2) var tC: texture_2d<f32>;
 @group(0) @binding(3) var tB: texture_2d<f32>;
+@group(0) @binding(4) var tD: texture_depth_2d;
 // AgX: rolls bright colours off to white instead of clipping hue
 fn agxCurve(x: vec3f) -> vec3f { let x2 = x * x; let x4 = x2 * x2; return 15.5 * x4 * x2 - 40.14 * x4 * x + 31.96 * x4 - 6.868 * x2 * x + .4298 * x2 + .1191 * x - .00232; }
 fn agx(c: vec3f) -> vec3f {
@@ -335,6 +349,15 @@ fn agx(c: vec3f) -> vec3f {
   c = max(c + (c * k - nb * kn) * view.look4.y / k, vec3f(0.));
   let bl = textureSampleLevel(tB, sLin, uv, 0.).rgb;
   c = mix(c, bl, view.look4.z);
+  if(view.look5.w>view.cam.y){
+    let ndc=uv*vec2f(2.,-2.)+vec2f(-1.,1.)-view.jit.xy;
+    let ray=view.fwd.xyz+view.right.xyz*ndc.x*view.right.w+view.up.xyz*ndc.y*view.up.w;
+    let rd=normalize(ray);let dp=textureLoad(tD,px,0);
+    var d=min(view.fwd.w/max(dp,1e-6)*length(ray),120.);
+    if(rd.y>.001){d=min(d,(view.look5.w-view.cam.y)/rd.y);}
+    let tr=exp(-d*view.look5.y*vec3f(2.4,.65,1.15));
+    c=c*tr+vec3f(.04,.24,.17)*(1.-tr)*(.5+view.sunc.g*.15);
+  }
   // exposure, soft vignette, white balance for the warm low sun
   let q = uv - .5; c *= (1. - dot(q, q) * .3) * view.sunc.w * vec3f(1.02, 1., .99);
   c = agx(c);

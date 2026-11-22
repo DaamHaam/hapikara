@@ -84,7 +84,6 @@ const W_FX2 = /*wgsl*/`
   let dx = dpdx(p.xz); let dy = dpdy(p.xz); let fw = max(length(dx), length(dy));
   let toC = view.cam.xyz - p; let dist = length(toC); let V = toC / dist; let rd = -V;
   let nz = ign(fc + view.jit.z * 5.588); let r = length(p.xz); let L = view.sun.xyz;
-  let pl = lum(pulseAt(r));
   // surface slope from the wave texture at two or three scales
   var sl = vec2f(0.); var rough2 = .0006;
   if (kind == 2u) {
@@ -111,12 +110,19 @@ const W_FX2 = /*wgsl*/`
     let b = r1 * textureSampleGrad(tWater, sRep, (q * r1) / 5.9 + .31, (dx * r1) / 5.9, (dy * r1) / 5.9).rg;
     let c = r2 * textureSampleGrad(tWater, sRep, (q * r2) / 3.1 + .7, (dx * r2) / 3.1, (dy * r2) / 3.1).rg;
     sl = (a * .5 + b * .34 + c * .2) * k * (.6 + .9 * n2);
-    // the pulse sends a soft ring across the water
-    let rw = 22. + 60. * view.pulse.x; sl += normalize(p.xz) * sin((r - rw) * .9) * exp(-sq((r - rw) / 9.)) * .05 * exp(-r / 300.);
+    // Natural wave layers only; no propagating artificial pulse.
     rough2 = .0004 + (.006 * sat(fw / .9) + .004 * sat(fw / 2.5)) * k * k;
   }
   let N = normalize(vec3f(-sl.x, 1., -sl.y)); let nv = max(dot(N, V), 1e-3);
   let F = .02 + .98 * pow(1. - nv, 5.);
+  if(view.cam.y<p.y-.015){
+    let belowN=-N;let transmitted=refract(rd,belowN,1.333);let tir=dot(transmitted,transmitted)<.01;
+    let refl=textureSampleLevel(tEnv,sLin,reflect(rd,belowN),1.).rgb*vec3f(.35,.7,.5);
+    let uv=clamp(suv+sl*.018*view.look3.y,vec2f(.001),vec2f(.999));
+    let above=textureSampleLevel(tScene,sLin,uv,0.).rgb;
+    let fres=select(.02+.98*pow(1.-abs(dot(N,V)),5.),1.,tir);
+    return FO(vec4f(mix(above,refl,fres),1.));
+  }
   // under the surface: the scene behind, bent and coloured by the water depth
   let zs = viewZ(suv); let zw = 1. / i.clip.w; let thick0 = max(zs - zw, 0.); // fragment w is 1 / view depth
   var uv2 = suv + N.xz * vec2f(1., -1.) * (.035 * view.look3.y) * sat(thick0 * .6) / (1. + dist * .02);
@@ -150,24 +156,12 @@ const W_FX2 = /*wgsl*/`
   let sh = shw;
   let H = normalize(V + L); let a = max(rough2 * 2., .0008);
   col += view.sunc.rgb * sh * min(ggxD(sat(dot(N, H)), sqrt(a)) * ggxV(sat(dot(N, L)), nv, sqrt(a)), select(90., 30., kind == 2u)) * sat(dot(N, L)) * (.02 + .98 * pow(1. - sat(dot(V, H)), 5.));
-  if (false) {
-    // light-liquid: three layers of violet and rose filaments drifting round the ring at their own speeds, stirred by a
-    // swirl, with brightness waves and breathing. Whole-number texture turns around the ring avoid a seam where the angle wraps.
-    let nt = select(select(select(82., 56., r < 80.), 46., r < 65.), 25., r < 50.); let an = atan2(p.z, p.x) / (2. * PI); let rv = r / 8.;
-    let fdx = vec2f(fw / 30., 0.); let fdy = vec2f(0., fw / 30.); let tm = view.cam.w; let fl = tm * .03;
-    let sw = textureSampleGrad(tNoiseA, sRep, vec2f(an * round(nt * .07), rv * .11) + vec2f(fl * .5, tm * .011), fdx, fdy).rg - .5;
-    let f1 = textureSampleGrad(tNoiseA, sRep, vec2f(an * round(nt * .13), rv * .27) + vec2f(fl, tm * .004) + sw * .14 + sl * .05, fdx, fdy).b;
-    let f2 = textureSampleGrad(tNoiseA, sRep, vec2f(an * round(nt * .21), rv * .43) + vec2f(fl * 1.7, .3 - tm * .009) - sw * .11 - sl * .04, fdx, fdy).b;
-    let f3 = textureSampleGrad(tNoiseA, sRep, vec2f(an * round(nt * .47), rv * .93) + vec2f(fl * 2.8, tm * .017) + sw * .2, fdx * 2., fdy * 2.).b;
-    let wave = .72 + .28 * sin(r * .22 - tm * 1.5 + sw.x * 5.);
-    let glow = (f1 * .9 + f2 * .7 + f3 * .4) * wave * (.4 + 1.6 * exp(-r / 45.) + .35 * view.pulse.y + .8 * view.pulse.z) * (1. + 4. * pl) + pl * 1.2;
-    col += mix(vec3f(.5, .28, 1.), vec3f(1., .4, .62), sat(f2 * 1.4)) * glow * .6 * (1. - F);
-  } else if (kind == 2u) {
+  if (kind == 2u) {
     // thin foam at the shore
     let f = textureSampleGrad(tNoiseA, sRep, p.xz / 5. + vec2f(view.cam.w * .02), dx / 5., dy / 5.);
     let edge = ss(.55, .0, depth + (f.r - .5) * .5 + .12 * sin(view.cam.w * .7 + f.a * 6.)) * ss(.25, .6, f.g + f.a * .5);
     col = mix(col, amb * .55 + view.sunc.rgb * sh * .22, edge * .8);
-  } else { col += vec3f(.5, .95, .75) * pl * .2; }
+  }
   return FO(vec4f(aerial(col, view.cam.xyz, rd, dist), 1.));
 }
 // podium falls: sheet, foam, mist (uv.x = 3, 4, 5; see meshCascades)

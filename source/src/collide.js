@@ -1,5 +1,5 @@
 // collision: what the camera cannot fly into
-// solid: land, water, city ground and quays, terraces, pyramid and pyramidion, bridge decks (passable under their
+// solid: land, canal bottoms, city ground and quays, terraces, pyramid and pyramidion, bridge decks (passable under their
 // openings), the Nile quays, and the buildings city.js lists as boxes. Trees, shrubs, papyrus and boats are not.
 // surfaceAt(x, z, y): the floor and ceiling (under a bridge) the camera must keep between. Runs every frame; no allocation.
 const CLEAR = 0.9, CLEAR_W = 0.55; // clearance above solid ground, and above water
@@ -40,16 +40,16 @@ function acroStairY(x,z) {
   if(r>=xb&&r<=xa&&v<3.4)return mix(PYR_TOP,T2.y,(r-xb)/(xa-xb));
   return -1e9;
 }
-function surfaceAt(x, z, y0) {
+function surfaceAtPoint(x, z, y0) {
   COL[1] = 1e9; COL[2] = 0;
   for (let i = 0; i < HR.length; i += 7) if (x > HR[i] && x < HR[i + 2] && z > HR[i + 1] && z < HR[i + 3]) {
     const u = HR[i + 5] ? (z - HR[i + 1]) / (HR[i + 3] - HR[i + 1]) : (x - HR[i]) / (HR[i + 2] - HR[i]);
-    deck(HR[i+4] + HR[i+6] * (sin(PI*u)-1), WATER, y0); return;
+    deck(HR[i+4] + HR[i+6] * (sin(PI*u)-1), FLOOR_Y+CLEAR-CLEAR_W, y0); return;
   }
   if (inCity(x, z)) {
     const qs=quayStepY(x,z); if(qs>-1e8){COL[0]=qs+CLEAR;return;}
     for(let i=0;i<BIEFS.length;i++){const b=BIEFS[i];if(x>b[0]&&x<b[1]&&z>b[2]-7&&z<b[2]){COL[0]=max(b[3]+.64+CLEAR_W,builtY(x,z)+CLEAR);return;}}
-    if (canalAt(x, z)) { COL[0] = WATER + CLEAR_W; COL[2] = 1; return; }
+    if (canalAt(x, z)) { COL[0] = max(FLOOR_Y,builtY(x,z)) + CLEAR; return; }
     let f = cityH(x, z); const m = max(abs(x), abs(z));
     const ramp=acroStairY(x,z);
     if(ramp>-1e8) {COL[0]=max(ramp,builtY(x,z))+CLEAR;return;}
@@ -62,13 +62,28 @@ function surfaceAt(x, z, y0) {
   if (abs(z) < QZ && x >= QX0 && x <= quayX(z) + 0.5) { h = quayY(x, z); nat = 0; }
   const b = builtY(x, z); if (b > h) { h = b; nat = 0; }
   let w = 0; if (oasisD(x,z) < 58) w = 2.6;
-  if (h < w) { COL[0] = w + CLEAR_W; COL[2] = 1; } else { COL[0] = h + CLEAR; COL[2] = nat; }
+  COL[0] = h + CLEAR; COL[2] = h < w ? 0 : nat;
+}
+// Water access is limited to real wet footprints; shallow temple bowls remain above-water.
+function waterSurfaceAt(x,z){
+  if(inCity(x,z))return canalAt(x,z)?WATER:-1e9;
+  if(oasisD(x,z)<58&&landY&&landY(x,z)<2.6)return 2.6;
+  return landY&&landY(x,z)<0?0:-1e9;
+}
+// A camera has volume: keep its near plane away from quay/building faces.
+function surfaceAt(x,z,y0){
+  surfaceAtPoint(x,z,y0);let f=COL[0],ceiling=COL[1],nat=COL[2];
+  for(let k=0;k<4;k++){
+    surfaceAtPoint(x+(k===0?.7:k===1?-.7:0),z+(k===2?.7:k===3?-.7:0),y0);
+    if(COL[0]>f){f=COL[0];nat=COL[2];}ceiling=min(ceiling,COL[1]);
+  }
+  COL[0]=f;COL[1]=ceiling;COL[2]=nat;
 }
 // move the camera from (px, py, pz) towards F[CX..CZ] (velocity F[VX..VZ]), correcting both in place. Natural ground
-// lifts it; anything built higher than a stair step is a wall it slides along per axis. Long steps go in <= 2 m pieces.
+// lifts it; anything built higher than a stair step is a wall it slides along per axis. Long steps go in <= .7 m pieces.
 function collide(px, py, pz) {
   if (!landY) return;
-  const tx = F[CX], ty = F[CY], tz = F[CZ], n = min(16, ceil(hypot(tx - px, tz - pz) / 2));
+  const tx = F[CX], ty = F[CY], tz = F[CZ], n = min(128, ceil(hypot(tx - px, tz - pz) / .7));
   if (n < 2) { collide1(px, py, pz); return; }
   let cx = px, cy = py, cz = pz, dx = (tx - px) / n, dz = (tz - pz) / n; const dy = (ty - py) / n;
   for (let i = 0; i < n; i++) {

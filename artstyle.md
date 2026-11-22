@@ -113,7 +113,7 @@ Le Nil coule du **sud vers le nord**, à l'**est** de la cité. Le désert et le
 
 **Règles du plan**
 - **Un axe majeur** est-ouest (Nil → pyramide → désert), plus un axe secondaire nord-sud. Les canaux secondaires sont des segments de longueurs inégales : coudes, redans, grands îlots sans traversée et lagunes, jamais un quadrillage continu.
-- **Végétation par zones** : très peu de palmiers dans la cité, surtout des sycomores, tamaris, arbres fleuris et massifs bas. Esplanades sacrées dégagées. Palmeraies espacées hors les murs, rives du Nil et oasis.
+- **Végétation par zones** : palmiers de différentes hauteurs par petits groupes, sycomores, tamaris, arbres fleuris et massifs bas. Petits jardins clos avec fontaine parmi les maisons ; quelques fontaines et plantations au bord des esplanades, en gardant les axes sacrés dégagés. Palmeraies espacées hors les murs, rives du Nil et oasis.
 - **Relief par quartiers** : quais urbains à 10 m, quartiers sacrés à 16 et 22 m, acropole à 15 puis 20 m. De larges escaliers rejoignent les esplanades ; trois ensembles de temples et des groupes d’obélisques dégagent la silhouette. Les terrasses ne portent pas de palmeraie.
 - **L'eau descend du centre vers le Nil** : la majorité du réseau reste à 6,5 m ; des biefs sacrés surélevés débordent vers les canaux, puis le Nil à 0 m.
 - **Hiérarchie des hauteurs.** Le pyramidion (environ 110 m) domine, les obélisques montent à 45–55 m, les pylônes à 30 m, tout le reste sous 20 m. La pyramide est visible de presque partout.
