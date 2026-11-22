@@ -1,0 +1,34 @@
+{
+  "date": "2026-11-22",
+  "reviewer": "Sous-agent critique visuel indépendant, sans accès au code",
+  "sources": ["artstyle.md", "concept-art/*.png", "captures P1 à P6", "paires consécutives fly-28/40/52", "palms", "oasis"],
+  "milestones": ["plan2", "architecture", "water-light", "validated-medium", "release-high/oasis"],
+  "verdict": "Cité reconnaissable, cible de photoréalisme non atteinte. Aspect maquette : limite critique connue.",
+  "confirmed_progress": [
+    "Axe processionnel, canaux, pyramide et situation entre fleuve et désert lisibles",
+    "P1 retrouve une bande de Nil au premier plan",
+    "P6 réunit colonnes proches, felouque, soleil et chemin de reflets",
+    "Palette moins jaune, diversité des villas, fleurs et arbres renforcée",
+    "P3 possède reflets, caustiques, colonne proche et arrivée d'eau",
+    "Émeraude dégagée et sans halo rose"
+  ],
+  "remaining": [
+    {"severity": "critique", "issue": "Architecture et paysage schématiques : murs lisses, volumes simples, pelouses et espacements réguliers ; cible AAA non atteinte."},
+    {"severity": "majeur", "issue": "Palmes en larges rubans crantés, tronc peu caractérisé, couronnes sombres ; arbres secondaires arrondis."},
+    {"severity": "majeur", "issue": "Émeraude en grands aplats avec bandes sombres ; profondeur de gemme et information transmise insuffisantes."},
+    {"severity": "majeur", "issue": "Chutes proches de voiles blancs ou de stries ; chemin hydraulique du sommet au Nil insuffisamment lisible."},
+    {"severity": "modéré", "issue": "P2 garde beaucoup de ciel ; P5 reste un lotissement de villas isolées ; longues berges nues dans P3."},
+    {"severity": "modéré", "issue": "Motifs trop plats, comportements lumineux de pierre, or et lapis trop proches ; socles blancs des villas semblables à des découpes."}
+  ],
+  "oasis_addendum": {
+    "image": "release-high/oasis.png",
+    "corrected": ["Ligne dans le ciel disparue", "Palmiers suspendus disparus", "Cascade identifiable sur toute la hauteur et raccordée au bassin"],
+    "remaining": "Bande rectangulaire uniforme, départ horizontal artificiel, peu d'écume/brume ; falaise régulièrement striée et bassin en anneaux. Le verdict de réalisme demeure."
+  },
+  "section_14": {
+    "yes": ["Organisation de la cité", "Vocabulaire égyptien général"],
+    "partial": ["Ancrage", "Eau", "Lumière", "Palette", "Fraîcheur"],
+    "no": ["AAA", "Matérialité", "Végétation botanique", "Cristal réaliste", "Ambiance des références"]
+  },
+  "temporal": "Aucun saut géométrique ou d'exposition évident dans les trois paires. Elles ne suffisent pas à certifier l'absence de scintillement ou de popping."
+}
