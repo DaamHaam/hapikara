@@ -34,13 +34,13 @@ function sampleGamepad(dt,pads){
       return;
     }
     padArmed=false;padPrevious=0;padNav=0;
-    if(padHint){padHint.hidden=false;padHint.textContent='Manette : A / ✕ valider · croix directionnelle : menus · Start / Options : accueil. En visite : sticks déplacer / regarder · gâchettes descendre / monter · B / ○ accélérer.';}
+    if(padHint){padHint.hidden=false;padHint.textContent='Manette : A / ✕ valider · croix directionnelle : menus · Start / Options : accueil. En visite : sticks déplacer / regarder · gâchette droite accélérer.';}
   }
   let mask=0;for(let i=0;i<min(17,p.buttons.length);i++)if(padButton(p,i)>.5||p.buttons[i]?.pressed)mask|=1<<i;
   padStick(p,0,1); // right / forward (negated below)
   const right=PAD[1],forward=-PAD[2];
   padStick(p,2,3);
-  const up=clamp((padButton(p,7)-.08)/.92,0,1)-clamp((padButton(p,6)-.08)/.92,0,1);
+  const up=0; // triggers no longer climb: right trigger boosts, so sticks stay free while running
   const quiet=!mask&&!right&&!forward&&!PAD[3]&&!PAD[4]&&!up;
   if(!padArmed){PAD.fill(0);padPrevious=mask;if(quiet)padArmed=true;return;}
   const pressed=mask&~padPrevious;padPrevious=mask;
@@ -63,7 +63,7 @@ function sampleGamepad(dt,pads){
   if(pressed&1)activateMechanism(); // same action / skip as the contextual button
   if(menu||mechanismPhase){PAD.fill(0);return;}
   if(right||forward||up||PAD[3]||PAD[4])padOwned=true;
-  PAD[0]=forward;PAD[1]=right;PAD[2]=up;PAD[5]=mask&2?1:0;
+  PAD[0]=forward;PAD[1]=right;PAD[2]=up;PAD[5]=mask&(1<<7)?1:0;
   // Angular velocity, independent of refresh rate; positive stick Y looks down.
   lkx+=PAD[3]*1.8*dt;lky+=PAD[4]*1.4*dt;
 }

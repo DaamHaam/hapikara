@@ -192,3 +192,7 @@ Retours de Damien après la v0.9.0. Exécution commencée par Codex, terminée p
 
 Rien de noté pour l’instant.
 
+**Correctif immédiat demandé par Damien (v0.10.0, poussé) :** accélération à la manette sur la gâchette droite au lieu de B, pour accélérer tout en maniant les deux sticks. Les gâchettes ne font plus monter ni descendre ; B n’a plus de rôle en visite.
+
+- Test : accélérer avec la gâchette droite en manœuvrant les deux sticks ; vérifier que B et la gâchette gauche n’ont plus d’effet en visite.
+
