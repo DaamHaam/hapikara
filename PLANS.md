@@ -3,7 +3,7 @@
 ## État
 
 - Version livrée : v0.7.0 — Plan 2 codé et contrôlé automatiquement, **à tester par Damien**. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
-- Plan 2 partiellement testé : mécanisme fonctionnel confirmé par Damien ; autres essais en attente. Plan 3 en préparation (visibilité du levier, interaction, lumière et clins d’œil). Tests antérieurs non confirmés conservés. VR toujours reportée, emplacement conservé.
+- Plan 2 partiellement testé : mécanisme fonctionnel confirmé par Damien ; autres essais en attente. Plan 3 en préparation (visibilité du levier, interaction et clins d’œil). Tests antérieurs non confirmés conservés. VR toujours reportée, emplacement conservé.
 - La revue du code depuis `revue-ok` reste à faire avant la prochaine clôture ; la génération de cette référence ne constitue pas une revue.
 - Retours après v0.6.0 : poissons bien visibles, y compris depuis l’extérieur de l’eau ; passage intérieur approuvé en l’état, sans nouvelle refonte. Blocage sur les deux montants extérieurs de l’entrée : priorité n°1 du Plan 2. Ces retours ont été intégrés au Plan 2 lancé ensuite par Damien.
 
@@ -115,14 +115,17 @@ Sélection retenue : E1, E3, E4, E6, E8. Les barques sont précisées au point 7
 
 WebXR / HTC Vive : déplacement selon casque ou manette, montée/descente, niveaux de qualité et essais matériels. Projet Sous-Marin à tester séparément. Non lancé ; les tests casque devront être identifiés comme bloquants avant de construire sur leur résultat.
 
-## Plan 3 — En préparation : levier plus visible, lumière et petits clins d’œil
+## Plan 3 — En préparation : levier plus visible et petits clins d’œil
 
 Trouver d’autres petites découvertes peu coûteuses, personnelles ou oniriques, dans l’esprit du mécanisme inspiré de Zelda et des lettres DAM laissées par un visiteur temporel. Réflexion seulement ; aucun ajout de ce type au périmètre du Plan 2 sans demande. La VR reste à son emplacement précédent, reportée ; aucun déplacement décidé par l’agent.
 
 1. **Levier visible depuis la traversée du Nil.** Le placer sur la petite esplanade de la rive opposée, plus grand et clairement identifiable ; scarabée davantage mis en évidence pour rappeler celui de la porte immergée. Étudier un dégagement central, ou décaler le petit temple si nécessaire, en conservant un passage libre et des collisions cohérentes. Emplacement exact à confronter au décor lors de l’implémentation ; ne pas cacher le levier derrière le temple.
 2. **Touche Espace.** Permettre l’activation contextuelle du levier avec Espace en plus du clic/toucher, sans activation à distance ni répétition par maintien de la touche.
 3. **Ouverture de la porte audible.** Le claquement du loquet est entendu ; rendre distinct et plus perceptible le grondement sourd de pierre pendant l’ouverture. Une couche de frottement existe déjà mais ne ressort pas suffisamment dans l’essai de Damien. Respecter le mode muet et conserver la musique.
-4. **Ouverture lumineuse de la crypte — étude, sans refonte.** À 12°, son arrivée au milieu du mur paraît étrange. Étudier une ouverture plus haute ou proche d’un angle, en privilégiant un ajustement local du conduit et de son point visé ; ne pas déplacer la pièce ni changer le soleil global par défaut. Conserver une cohérence visuelle entre ciel, conduit et faisceau. La compatibilité exacte avec un rayon solaire direct à 12° reste à vérifier géométriquement ; à défaut, proposer une approximation assumée avant modification.
-5. **Sortie extérieure du conduit — défaut mineur.** Son bord semble dépasser le relief de la pyramide. Vérifier une terminaison affleurante, triangle par triangle, plutôt qu’une longueur commune aux quatre coins. Amélioration secondaire, signalée comme acceptable en l’état par Damien ; ne pas altérer la silhouette générale.
+4. **Sortie extérieure du conduit — défaut mineur.** Son bord semble dépasser le relief de la pyramide. Vérifier une terminaison affleurante, triangle par triangle, plutôt qu’une longueur commune aux quatre coins. Amélioration secondaire, signalée comme acceptable en l’état par Damien ; ne pas altérer la silhouette générale.
+
+5. **Signature plus découvrable — piste à préparer.** Damien ne retrouve pas la plaque malgré les indications ; fournir trois captures réelles (proche, mi-distance, lointaine). Envisager plusieurs petites gravures DAM dans des lieux de passage, toujours discrètes ; nombre et emplacements non arrêtés. Aucun ajout exécuté.
+
+**Décision lumière :** Damien abandonne l’ajustement local de l’ouverture intérieure ; conserver la pièce, le soleil et le conduit lumineux actuels. Le petit dépassement extérieur reste uniquement le défaut mineur secondaire déjà accepté en l’état.
 
 Repère de la signature actuelle (information à Damien, pas de déplacement demandé) : `[-119.03, 8.3, 210]`, sur la paroi est du canal nord-sud situé à l’ouest de la pyramide, au sud de celle-ci ; gravure à 1,8 m au-dessus de l’eau, à regarder depuis le canal en direction de la pyramide. Petit scarabée incrusté sur la même paroi à z=196, soit 14 m plus au nord.
