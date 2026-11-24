@@ -94,7 +94,7 @@ Un rendu moins riche en micro-détail que les références est acceptable. Un re
 - ruines, usure, sable envahissant la ville, palette sépia ou poussiéreuse, brume permanente
 - la cliché « temple de Louxor » à l'identique : tout est réinventé
 
-**Découvertes validées :** quelques vestiges discrets hors de la cité, coffres et sarcophages vides dans les hauts-fonds, mosaïques vert et or sous les canaux. Un passage entièrement immergé sous l’acropole conduit à une galerie puis à la chambre secrète de la pyramide. Grès chaud, malachite, or patiné, pénombre et braseros ; une étroite ouverture laisse un rayon solaire atteindre le sarcophage. Aucun mort ni personnage, aucune porte ou lumière magique.
+**Découvertes validées :** quelques vestiges discrets hors de la cité, coffres et sarcophages vides dans les hauts-fonds, mosaïques vert et or sous les canaux. Un passage entièrement immergé sous l’acropole conduit à une galerie puis à la chambre secrète de la pyramide. Grès chaud, malachite, or patiné, pénombre et braseros muraux ; un conduit discret laisse le soleil atteindre le sarcophage. Dans la chambre, exception validée aux figures : sarcophage fermé anthropomorphe, masque funéraire sculpté, coiffe vert/or et bras croisés. Coffres, coupes, vases canopes, bijoux et pièces composent un trésor autour du socle ; panneaux de pseudo-hiéroglyphes sur les murs. Référence artistique validée : `concept-art/source/crypte-reference-v1.png`. Aucun corps exposé ni personnage vivant, aucune porte ou lumière magique.
 
 ## 5. Plan du monde
 

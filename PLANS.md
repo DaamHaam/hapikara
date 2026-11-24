@@ -2,13 +2,13 @@
 
 ## État
 
-- Version publiée : v0.5.0. Tests utilisateur partiels : entrée immergée trouvée et trésor du Nil observé sur iPhone ; défauts ci-dessous signalés. Ces retours ne valent pas validation générale.
-- Plan 1 en préparation, non autorisé à coder. Référence visuelle proposée, non validée.
+- Version livrée : v0.6.0 — Plan 1 codé et contrôlé automatiquement, **à tester par Damien**. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
+- Plan 1 à tester ; Plan 2 (VR) en préparation pour plus tard, non lancé. Référence visuelle v1 validée comme direction artistique.
 - La revue du code depuis `revue-ok` reste à faire avant la prochaine clôture ; la génération de cette référence ne constitue pas une revue.
 
 ## Plan 1 — Fiabiliser le passage et enrichir la découverte
 
-1. **D’abord valider la référence visuelle** : `concept-art/source/crypte-reference-v1.png`. Prompt exact dans `crypte-reference-v1-prompt.txt`, intention et limites dans `crypte-reference-v1.md`. Référence artistique uniquement, aucune image à intégrer au moteur.
+1. **Référence visuelle validée** : `concept-art/source/crypte-reference-v1.png`. Prompt exact dans `crypte-reference-v1-prompt.txt`, intention et limites dans `crypte-reference-v1.md`. Référence artistique uniquement, aucune image à intégrer au moteur.
 2. Comprendre et reproduire la traversée de la paroi gauche après la sortie de l’eau dans la galerie, qui remonte la caméra sur la pyramide. Corriger les limites physiques ; tester les deux côtés, angles, plafond et déplacements en diagonale.
 3. Fixer les torches contre les murs, avec supports et passage dégagé.
 4. Étudier puis créer un conduit solaire traversant **uniquement la pyramide**, sans remanier la cité. Fragment du vrai extérieur visible, petite ouverture infranchissable, orientation selon hauteur ET azimut du soleil. Étudier un rendu extérieur limité à l’ouverture. Conserver un faisceau léger pour la lisibilité si nécessaire. La faisabilité et le coût restent à préciser avant exécution.
@@ -17,7 +17,17 @@
 
 **Ordre demandé :** référence visuelle avant le code ; après validation et ordre explicite, réaliser les changements de code en une seule passe.
 
-**À décider :** validation/corrections de l’image ; solution du conduit et coût de la vue extérieure ; densité des poissons après diagnostic mobile. Aucune garantie de reproduction pixel à pixel du concept.
+**Livré :** limites physiques de l’intérieur, torches sur supports muraux, conduit réellement découpé dans les triangles de la pyramide et ses films d’eau, ciel procédural visible au bout, faisceau analytique renforcé ; sarcophage anthropomorphe et trésors inspirés de l’image, panneaux de hiéroglyphes ; dix bancs plus proches des quais, plus clairs et moins profonds. Le ciel est rendu depuis l’intérieur, sans redessiner la cité extérieure. Aucune image de référence intégrée au moteur.
+
+**Contrôles :** CPU plan/maillages/collisions, géométrie du conduit et enveloppe des poissons ; réglages et bundle. Le test de la paroi gauche échoue avec l’ancien code (x=70, côté gauche) et passe avec le nouveau. Tests géométriques supplémentaires à 70° et avec azimuts 90°/180°. Captures WebGPU des trois qualités ; mesures et limites dans `.github/screenshots/iteration7/README.md`. Pas de test sur iPhone physique dans cette session.
+
+### Tests utilisateur du Plan 1 — à valider
+
+- Longer les deux parois de la galerie après la sortie de l’eau, puis le virage, en diagonale et en accélérant : rester dans le passage, sans remontée sur la pyramide ; revenir dans le canal.
+- Vérifier que les torches sont contre les murs, sans gêner le passage.
+- Depuis la chambre, repérer le conduit et la lumière ; depuis l’extérieur, juger l’ouverture discrète et vérifier qu’on ne la traverse pas.
+- Juger le sarcophage, les trésors et les hiéroglyphes par rapport à la direction artistique validée.
+- Sur iPhone, plonger devant les quais du Nil : repérer plusieurs bancs et vérifier la fluidité ; sur ordinateur, tester aussi la densité des poissons dans `L`.
 
 ## Tests utilisateur encore à valider — version v0.5.0
 
@@ -25,7 +35,7 @@
 - Fluidité des nouveautés sur ordinateur et iPhone, en qualité choisie.
 - Réglages `L` : grain 1,25, relief renforcé absent, densité de poissons fonctionnelle sur ordinateur.
 
-Le passage, les torches, le rayon et les poissons ont reçu des retours de défauts/améliorations : travaux consignés au Plan 1. Les futurs tests de ce plan seront ajoutés après implémentation.
+Les tests v0.5.0 ci-dessus restent en attente faute de validation explicite ; ils peuvent être réalisés avec v0.6.0. Avant le prochain plan, proposer à Damien de retirer ceux que son usage a déjà confirmés, sans les retirer d’office.
 
 ## Plan 2 — Pour plus tard : réalité virtuelle
 

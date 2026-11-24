@@ -104,6 +104,26 @@ function collide(px, py, pz) {
 }
 function collide1(px, py, pz) {
   let x = F[CX], y = F[CY], z = F[CZ];
+  // Interior walls are explicit limits, not an exterior height step. In particular,
+  // the sacred pool outside used to lift the camera through the gallery's left wall.
+  if(cryptMoving&&cryptZone(px,py,pz,true)>=0){
+    if(!cryptCameraFits(x,z)){
+      if(cryptCameraFits(x,pz)){z=pz;F[VZ]=0;}
+      else if(cryptCameraFits(px,z)){x=px;F[VX]=0;}
+      else{x=px;z=pz;F[VX]=F[VZ]=0;}
+    }
+    if(x<120.75){
+      let lo=-1e9,hi=1e9;
+      for(let k=0;k<5;k++){
+        const xx=x+(k===1?.65:k===2?-.65:0),zz=z+(k===3?.65:k===4?-.65:0),i=cryptZone(xx,0,zz,true);
+        lo=max(lo,i<0?3.2:cryptFloor(i,xx));hi=min(hi,i<0?6.3:cryptCeil(i,xx));
+      }
+      for(let i=0;i<CRYPT_SOLIDS.length;i++){const b=CRYPT_SOLIDS[i];if(x>b[0]-.65&&x<b[2]+.65&&z>b[1]-.65&&z<b[3]+.65)lo=max(lo,b[4]);}
+      F[CX]=x;F[CZ]=z;F[CY]=clamp(y,lo+CLEAR,hi-CLEAR);
+      if(F[CY]!==y)F[VY]=0;return;
+    }
+    cryptMoving=false;
+  }
   const lift = 0.5 + 1.5 * hypot(x - px, z - pz);
   surfaceAt(x, z, py);
   if (COL[2] < 0.5 && COL[0] - y > lift) {

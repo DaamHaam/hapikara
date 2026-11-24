@@ -180,7 +180,7 @@ function meshPyramid() {
   // gold socle under the pyramidion
   mb.mat = M.GOLD; mb.box(-PDN.h - 0.5, PYR_TOP - 0.1, -PDN.h - 0.5, PDN.h + 0.5, PYR_TOP + 0.6, PDN.h + 0.5, 0.05, false);
   bandSq(mb, PDN.h + 0.5, PYR_TOP + 0.6, PYR_TOP + 1.5, 0.02, PC.MALA, true);
-  return mb.build();
+  return cutCryptShaft(mb.build());
 }
 // pyramidion: a square gem on the gold socle (K.CRYSTAL), and its gold lattice
 function meshPyramidion() { const mb = new MB(256); mb.lathe([[PDN.h * SQRT2, 0], [PDN.h * SQRT2 * 0.98, 0.5], [0, PDN.H]], { seg: 4, flat: true, a0: PI / 4, a1: PI / 4 + TAU }); return mb.build(); }
@@ -205,7 +205,7 @@ function meshCityWater() {
   // the pool round the pyramid, the films on its treads and round the pyramidion
   waterSq(mb, PYR.h0 - 0.2, T2.pool, T2.wy, 1);
   for (let k = 1; k <= PYR.n; k++) waterSq(mb, k < PYR.n ? pyrH(k) - 0.3 : PDN.h + 0.55, pyrH(k - 1) - 0.25, pyrY(k) + 0.06, 1);
-  return mb.build();
+  return cutCryptShaft(mb.build());
 }
 // open water out to the horizon (the Nile where the land dips below 0): rings that follow the camera (the vertex shader
 // adds its position and the swell), each SEA_GROW wider so cells stay near-square. Low: SEAK = 2.

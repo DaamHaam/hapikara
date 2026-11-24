@@ -1,0 +1,194 @@
+{
+  "environment": {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+    "visibility": "visible",
+    "width": 1440,
+    "height": 900,
+    "level": "Medium",
+    "timestamps": true
+  },
+  "gpu": {
+    "vendor": "apple",
+    "architecture": "metal-3",
+    "device": "",
+    "description": ""
+  },
+  "path": "path: peak speed 67.5 m/s, peak yaw rate 39.7 deg/s, lowest 1.2 m above ground or water (at 39.1 s)",
+  "planting": {
+    "trees": 5934,
+    "palms": 5492,
+    "palmsInCity": 434,
+    "esplanadeFountains": 4
+  },
+  "views": [
+    {
+      "pose": 0,
+      "stats": "waves 0.98  cull 0.26  shadow 0.46  mirror 0.39  gbuffer 7.86  ao 7.08  light 8.85  transp 10.94  taa 1.31  bloom 1.57  post 1.70  | total 14.55 ms",
+      "count": "main: 1.06 M tris · solid 471 inst 0.74 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 3219 inst 0.18 M\n   top: 1x126912(w0)  938x90(l3)  900x90(l3)  68x734(s1)  1x44368(s0)  2x10610(s2)  1x16736(s0)  1x16736(s0)  2x7934(s2)\nmirror: 0.67 M tris · solid 260 inst 0.47 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 861 inst 0.06 M\n   top: 1x126912(w0)  1x44368(s0)  2x10610(s2)  196x90(l3)  186x90(l3)  2x7934(s2)  1x15072(s0)  3x4586(s2)  17x734(s1)\nshadow: 0.00 M tris · solid 2 inst 0.00 M · leaf 26 inst 0.00 M\n   top: 14x90(l3)  12x90(l3)  1x480(s0)  1x10(s0)"
+    },
+    {
+      "pose": 1,
+      "stats": "waves 0.98  cull 0.39  shadow 0.66  mirror 2.42  gbuffer 4.92  ao 3.41  light 5.05  transp 6.62  taa 0.85  bloom 1.11  post 1.18  | total 12.45 ms",
+      "count": "main: 1.10 M tris · solid 591 inst 0.71 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 8 inst 0.01 M · leaf 2608 inst 0.25 M\n   top: 1x126912(w0)  1x44368(s0)  14x2691(s0)  41x734(s1)  29x968(l1)  2x13298(s1)  26x968(l1)  268x90(l3)  250x90(l3)\nmirror: 0.69 M tris · solid 290 inst 0.48 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 973 inst 0.07 M\n   top: 1x126912(w0)  1x44368(s0)  44x734(s1)  2x10610(s2)  202x90(l3)  197x90(l3)  2x7934(s2)  1x15072(s0)  3x4586(s2)\nshadow: 0.21 M tris · solid 126 inst 0.10 M · leaf 308 inst 0.11 M\n   top: 14x2691(s0)  27x968(l1)  21x968(l1)  1x15072(s0)  7x1904(l0)  1x9830(s0)  24x376(l2)  19x376(l2)  3x1904(l0)"
+    },
+    {
+      "pose": 2,
+      "stats": "waves 0.98  cull 0.33  shadow 0.59  mirror 2.23  gbuffer 4.33  ao 3.41  light 4.92  transp 7.14  taa 1.44  bloom 1.70  post 1.84  | total 12.78 ms",
+      "count": "main: 0.93 M tris · solid 511 inst 0.62 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 8 inst 0.01 M · leaf 2172 inst 0.18 M\n   top: 1x126912(w0)  1x44368(s0)  2x13298(s1)  234x90(l3)  2x9950(s1)  215x90(l3)  17x968(l1)  17x968(l1)  1x15072(s0)\nmirror: 0.67 M tris · solid 260 inst 0.47 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 861 inst 0.06 M\n   top: 1x126912(w0)  1x44368(s0)  2x10610(s2)  196x90(l3)  186x90(l3)  2x7934(s2)  1x15072(s0)  3x4586(s2)  17x734(s1)\nshadow: 0.18 M tris · solid 138 inst 0.09 M · leaf 295 inst 0.09 M\n   top: 17x968(l1)  8x1904(l0)  1x15072(s0)  13x968(l1)  17x734(s1)  1x9830(s0)  4x1904(l0)  6x1140(s0)  1x5706(s1)"
+    },
+    {
+      "pose": 3,
+      "stats": "waves 0.98  cull 0.33  shadow 0.39  mirror 1.44  gbuffer 3.54  ao 2.88  light 4.59  transp 6.36  taa 1.18  bloom 1.51  post 1.57  | total 10.81 ms",
+      "count": "main: 0.68 M tris · solid 280 inst 0.47 M · crystal 1 inst 0.00 M · water 4 inst 0.13 M · cascade 3 inst 0.01 M · leaf 1237 inst 0.07 M\n   top: 1x126912(w0)  1x44368(s0)  294x90(l3)  263x90(l3)  1x17434(s0)  1x15072(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nmirror: 0.50 M tris · solid 120 inst 0.33 M · crystal 0 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 399 inst 0.03 M\n   top: 1x126912(w0)  1x44368(s0)  1x15072(s0)  164x90(l3)  137x90(l3)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.09 M tris · solid 20 inst 0.08 M · leaf 160 inst 0.01 M\n   top: 1x44368(s0)  1x15072(s0)  1x9830(s0)  45x90(l3)  1x3180(s0)  32x90(l3)  1x2256(s0)  3x284(s2)  2x284(s2)"
+    },
+    {
+      "pose": 4,
+      "stats": "waves 0.98  cull 0.33  shadow 0.66  mirror 2.29  gbuffer 4.52  ao 3.34  light 4.98  transp 6.55  taa 0.92  bloom 1.11  post 1.18  | total 11.93 ms",
+      "count": "main: 0.92 M tris · solid 496 inst 0.60 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 7 inst 0.01 M · leaf 2243 inst 0.18 M\n   top: 1x126912(w0)  1x44368(s0)  258x90(l3)  228x90(l3)  2x9950(s1)  3x5124(l0)  1x15072(s0)  1x13298(s1)  13x968(l1)\nmirror: 0.62 M tris · solid 215 inst 0.42 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 2 inst 0.01 M · leaf 810 inst 0.05 M\n   top: 1x126912(w0)  1x44368(s0)  2x7934(s2)  1x15072(s0)  156x90(l3)  153x90(l3)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.23 M tris · solid 180 inst 0.13 M · leaf 342 inst 0.11 M\n   top: 1x44368(s0)  8x1904(l0)  1x15072(s0)  1x13298(s1)  8x1542(l1)  12x968(l1)  2x5124(l0)  1x9830(s0)  6x1542(l1)"
+    },
+    {
+      "pose": 5,
+      "stats": "waves 0.98  cull 0.33  shadow 0.39  mirror 2.29  gbuffer 4.00  ao 3.08  light 4.65  transp 7.14  taa 1.51  bloom 1.70  post 1.77  | total 11.86 ms",
+      "count": "main: 1.00 M tris · solid 433 inst 0.71 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 2588 inst 0.16 M\n   top: 1x126912(w0)  822x90(l3)  753x90(l3)  68x734(s1)  1x44368(s0)  2x10610(s2)  1x16736(s0)  1x16736(s0)  1x16736(s0)\nmirror: 0.65 M tris · solid 146 inst 0.47 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 544 inst 0.04 M\n   top: 1x126912(w0)  1x44368(s0)  249x90(l3)  2x10610(s2)  221x90(l3)  1x16736(s0)  2x7934(s2)  1x15072(s0)  3x4586(s2)\nshadow: 0.06 M tris · solid 4 inst 0.00 M · leaf 74 inst 0.06 M\n   top: 9x1904(l0)  13x968(l1)  12x968(l1)  5x1904(l0)  1x2394(s0)  6x376(l2)  16x90(l3)  10x90(l3)  1x480(s0)"
+    },
+    {
+      "underwater": 0,
+      "stats": "waves 0.98  cull 0.39  shadow 0.79  mirror 2.36  gbuffer 4.52  ao 3.80  light 5.37  transp 7.08  taa 1.11  bloom 1.38  post 1.57  | total 12.65 ms"
+    },
+    {
+      "underwater": 1,
+      "stats": "waves 1.05  cull 0.39  shadow 0.85  mirror 2.29  gbuffer 4.59  ao 3.80  light 5.37  transp 7.14  taa 1.18  bloom 1.31  post 1.51  | total 12.78 ms"
+    },
+    {
+      "underwater": 2,
+      "stats": "waves 0.98  cull 0.33  shadow 0.79  mirror 2.29  gbuffer 4.52  ao 3.87  light 5.37  transp 7.14  taa 0.98  bloom 1.25  post 1.38  | total 12.58 ms"
+    },
+    {
+      "underwater": 3,
+      "stats": "waves 0.98  cull 0.33  shadow 0.79  mirror 2.42  gbuffer 4.59  ao 3.80  light 7.14  transp 8.91  taa 1.05  bloom 1.31  post 1.44  | total 14.55 ms"
+    }
+  ],
+  "aquatics": {
+    "schools": [
+      [
+        653.4038873109029,
+        -1.7,
+        -280
+      ],
+      [
+        665.1658976520762,
+        -2.4,
+        -218
+      ],
+      [
+        681.6583206776158,
+        -3.0999999999999996,
+        -156
+      ],
+      [
+        660.7538867432842,
+        -1.7,
+        -94
+      ],
+      [
+        674.4192276172288,
+        -2.4,
+        -32
+      ],
+      [
+        686.7155028352771,
+        -3.0999999999999996,
+        30
+      ],
+      [
+        664.7922809130262,
+        -1.7,
+        92
+      ],
+      [
+        671.8751333082976,
+        -2.396561484187668,
+        154
+      ],
+      [
+        681.2478522122127,
+        -3.0999999999999996,
+        216
+      ],
+      [
+        654.2305904869114,
+        -1.7,
+        278
+      ]
+    ],
+    "fish": 240,
+    "treasures": 4,
+    "mosaics": 4
+  },
+  "secretViews": [
+    {
+      "name": "entrance",
+      "stats": "waves 0.98  cull 0.39  shadow 0.52  mirror 1.77  gbuffer 3.60  ao 3.41  light 7.14  transp 8.78  taa 1.11  bloom 1.25  post 1.51  | total 13.57 ms",
+      "count": "main: 0.75 M tris · solid 443 inst 0.54 M · crystal 0 inst 0.00 M · water 4 inst 0.13 M · cascade 7 inst 0.01 M · leaf 1528 inst 0.07 M\n   top: 1x126912(w0)  1x44368(s0)  2x9950(s1)  1x17434(s0)  1x15998(s0)  168x90(l3)  1x15072(s0)  149x90(l3)  1x11584(s0)\nmirror: 0.54 M tris · solid 186 inst 0.38 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 485 inst 0.03 M\n   top: 1x126912(w0)  1x44368(s0)  2x7934(s2)  1x15072(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.20 M tris · solid 156 inst 0.14 M · leaf 242 inst 0.06 M\n   top: 1x44368(s0)  7x2691(s0)  1x15072(s0)  1x13298(s1)  1x9950(s1)  1x9830(s0)  5x1904(l0)  2x4722(l0)  9x968(l1)"
+    },
+    {
+      "name": "gallery",
+      "stats": "waves 0.98  cull 0.07  shadow 0.85  mirror 0.85  gbuffer 2.03  ao 3.21  light 3.87  transp 5.31  taa 1.18  bloom 1.38  post 1.44  | total 7.27 ms",
+      "count": "main: 0.02 M tris · solid 4 inst 0.02 M · crystal 0 inst 0.00 M · water 1 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: 1x17434(s0)  3x64(s0)  1x2(w0)\nmirror: 0.54 M tris · solid 186 inst 0.38 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 485 inst 0.03 M\n   top: 1x126912(w0)  1x44368(s0)  2x7934(s2)  1x15072(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.20 M tris · solid 156 inst 0.14 M · leaf 242 inst 0.06 M\n   top: 1x44368(s0)  7x2691(s0)  1x15072(s0)  1x13298(s1)  1x9950(s1)  1x9830(s0)  5x1904(l0)  2x4722(l0)  9x968(l1)"
+    },
+    {
+      "name": "crypt",
+      "stats": "waves 0.98  cull 0.07  shadow 0.85  mirror 0.85  gbuffer 2.03  ao 2.88  light 3.47  transp 4.52  taa 0.85  bloom 1.05  post 1.18  | total 6.55 ms",
+      "count": "main: 0.02 M tris · solid 3 inst 0.02 M · crystal 0 inst 0.00 M · water 1 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: 1x17434(s0)  2x64(s0)  1x2(w0)\nmirror: 0.54 M tris · solid 186 inst 0.38 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 485 inst 0.03 M\n   top: 1x126912(w0)  1x44368(s0)  2x7934(s2)  1x15072(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.20 M tris · solid 156 inst 0.14 M · leaf 242 inst 0.06 M\n   top: 1x44368(s0)  7x2691(s0)  1x15072(s0)  1x13298(s1)  1x9950(s1)  1x9830(s0)  5x1904(l0)  2x4722(l0)  9x968(l1)"
+    },
+    {
+      "name": "sarcophagus",
+      "stats": "waves 0.92  cull 0.07  shadow 0.85  mirror 0.85  gbuffer 2.10  ao 2.95  light 3.54  transp 4.59  taa 0.79  bloom 1.11  post 1.25  | total 6.55 ms",
+      "count": "main: 0.02 M tris · solid 2 inst 0.02 M · crystal 0 inst 0.00 M · water 1 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: 1x17434(s0)  1x64(s0)  1x2(w0)\nmirror: 0.54 M tris · solid 186 inst 0.38 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 485 inst 0.03 M\n   top: 1x126912(w0)  1x44368(s0)  2x7934(s2)  1x15072(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.20 M tris · solid 156 inst 0.14 M · leaf 242 inst 0.06 M\n   top: 1x44368(s0)  7x2691(s0)  1x15072(s0)  1x13298(s1)  1x9950(s1)  1x9830(s0)  5x1904(l0)  2x4722(l0)  9x968(l1)"
+    },
+    {
+      "name": "mask",
+      "stats": "waves 0.98  cull 0.72  shadow 0.85  mirror 0.92  gbuffer 1.64  ao 2.75  light 3.34  transp 4.26  taa 0.79  bloom 1.05  post 1.18  | total 6.82 ms",
+      "count": "main: 0.02 M tris · solid 1 inst 0.02 M · crystal 0 inst 0.00 M · water 1 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: 1x17434(s0)  1x2(w0)\nmirror: 0.54 M tris · solid 186 inst 0.38 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 485 inst 0.03 M\n   top: 1x126912(w0)  1x44368(s0)  2x7934(s2)  1x15072(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.20 M tris · solid 156 inst 0.14 M · leaf 242 inst 0.06 M\n   top: 1x44368(s0)  7x2691(s0)  1x15072(s0)  1x13298(s1)  1x9950(s1)  1x9830(s0)  5x1904(l0)  2x4722(l0)  9x968(l1)"
+    },
+    {
+      "name": "aperture",
+      "stats": "waves 1.05  cull 0.79  shadow 0.92  mirror 0.92  gbuffer 1.51  ao 2.82  light 3.47  transp 4.26  taa 0.79  bloom 1.05  post 1.11  | total 6.68 ms",
+      "count": "main: 0.02 M tris · solid 1 inst 0.02 M · crystal 0 inst 0.00 M · water 1 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: 1x17434(s0)  1x2(w0)\nmirror: 0.54 M tris · solid 186 inst 0.38 M · crystal 1 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 485 inst 0.03 M\n   top: 1x126912(w0)  1x44368(s0)  2x7934(s2)  1x15072(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.20 M tris · solid 156 inst 0.14 M · leaf 242 inst 0.06 M\n   top: 1x44368(s0)  7x2691(s0)  1x15072(s0)  1x13298(s1)  1x9950(s1)  1x9830(s0)  5x1904(l0)  2x4722(l0)  9x968(l1)"
+    },
+    {
+      "name": "pyramid-opening",
+      "stats": "waves 1.05  cull 0.39  shadow 0.39  mirror 2.23  gbuffer 3.93  ao 3.21  light 4.59  transp 6.95  taa 1.77  bloom 1.97  post 2.03  | total 12.26 ms",
+      "count": "main: 0.96 M tris · solid 509 inst 0.57 M · crystal 0 inst 0.00 M · water 4 inst 0.13 M · cascade 8 inst 0.01 M · leaf 3311 inst 0.26 M\n   top: 1x126912(w0)  1146x90(l3)  1132x90(l3)  68x734(s1)  1x44368(s0)  2x13298(s1)  1x17434(s0)  1x15072(s0)  31x376(l2)\nmirror: 0.61 M tris · solid 207 inst 0.42 M · crystal 0 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 773 inst 0.05 M\n   top: 1x126912(w0)  66x734(s1)  1x44368(s0)  279x90(l3)  271x90(l3)  2x10610(s2)  1x15072(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.13 M tris · solid 26 inst 0.12 M · leaf 108 inst 0.02 M\n   top: 1x44368(s0)  2x9950(s1)  1x15998(s0)  1x15072(s0)  1x9830(s0)  5x968(l1)  2x1904(l0)  1x3180(s0)  6x376(l2)"
+    },
+    {
+      "name": "fish",
+      "stats": "waves 0.98  cull 0.26  shadow 0.52  mirror 0.26  gbuffer 3.60  ao 3.74  light 6.95  transp 8.65  taa 1.05  bloom 1.31  post 1.57  | total 12.19 ms",
+      "count": "main: 0.71 M tris · solid 162 inst 0.40 M · crystal 0 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 1420 inst 0.16 M\n   top: 1x126912(w0)  672x90(l3)  652x90(l3)  1x16736(s0)  1x15072(s0)  37x376(l2)  14x968(l1)  1x11584(s0)  1x11584(s0)\nmirror: 0.61 M tris · solid 207 inst 0.42 M · crystal 0 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 773 inst 0.05 M\n   top: 1x126912(w0)  66x734(s1)  1x44368(s0)  279x90(l3)  271x90(l3)  2x10610(s2)  1x15072(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.07 M tris · solid 21 inst 0.04 M · leaf 110 inst 0.03 M\n   top: 1x15072(s0)  28x376(l2)  1x9830(s0)  19x376(l2)  6x734(s1)  1x3180(s0)  3x968(l1)  3x968(l1)  1x2626(s1)"
+    },
+    {
+      "name": "treasure",
+      "stats": "waves 0.98  cull 0.26  shadow 0.52  mirror 0.20  gbuffer 3.80  ao 4.13  light 7.27  transp 8.91  taa 0.92  bloom 1.25  post 1.44  | total 12.45 ms",
+      "count": "main: 0.70 M tris · solid 109 inst 0.37 M · crystal 0 inst 0.00 M · water 2 inst 0.13 M · cascade 1 inst 0.01 M · leaf 1239 inst 0.19 M\n   top: 1x126912(w0)  566x90(l3)  527x90(l3)  32x968(l1)  22x968(l1)  37x376(l2)  7x1904(l0)  32x376(l2)  1x11584(s0)\nmirror: 0.61 M tris · solid 207 inst 0.42 M · crystal 0 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 773 inst 0.05 M\n   top: 1x126912(w0)  66x734(s1)  1x44368(s0)  279x90(l3)  271x90(l3)  2x10610(s2)  1x15072(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.10 M tris · solid 50 inst 0.05 M · leaf 117 inst 0.05 M\n   top: 1x15072(s0)  14x968(l1)  16x734(s1)  1x9830(s0)  5x1904(l0)  20x376(l2)  7x968(l1)  17x376(l2)  1x3180(s0)"
+    },
+    {
+      "name": "mosaic",
+      "stats": "waves 0.98  cull 0.33  shadow 0.52  mirror 2.03  gbuffer 3.08  ao 2.75  light 6.42  transp 7.73  taa 0.92  bloom 1.18  post 1.38  | total 13.04 ms",
+      "count": "main: 0.87 M tris · solid 355 inst 0.52 M · crystal 0 inst 0.00 M · water 4 inst 0.13 M · cascade 3 inst 0.01 M · leaf 2082 inst 0.21 M\n   top: 1x126912(w0)  624x90(l3)  612x90(l3)  1x44368(s0)  1x21362(s0)  1x17434(s0)  6x2691(s0)  1x15072(s0)  12x968(l1)\nmirror: 0.57 M tris · solid 189 inst 0.37 M · crystal 0 inst 0.00 M · water 3 inst 0.13 M · cascade 2 inst 0.01 M · leaf 830 inst 0.06 M\n   top: 1x126912(w0)  1x44368(s0)  277x90(l3)  272x90(l3)  1x15072(s0)  1x13298(s1)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.21 M tris · solid 139 inst 0.14 M · leaf 253 inst 0.06 M\n   top: 1x44368(s0)  6x2691(s0)  1x15072(s0)  3x4722(l0)  1x13298(s1)  6x1904(l0)  1x9950(s1)  1x9830(s0)  9x968(l1)"
+    }
+  ],
+  "fishCost": [
+    {
+      "density": 0,
+      "gpuMean": 11.931648000000003,
+      "gpuPeak": 17.170432,
+      "count": "main: 0.70 M tris · solid 67 inst 0.40 M · crystal 0 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 1420 inst 0.16 M\n   top: 1x126912(w0)  672x90(l3)  652x90(l3)  1x16736(s0)  1x15072(s0)  37x376(l2)  14x968(l1)  1x11584(s0)  1x11584(s0)\nmirror: 0.57 M tris · solid 189 inst 0.37 M · crystal 0 inst 0.00 M · water 3 inst 0.13 M · cascade 2 inst 0.01 M · leaf 830 inst 0.06 M\n   top: 1x126912(w0)  1x44368(s0)  277x90(l3)  272x90(l3)  1x15072(s0)  1x13298(s1)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.07 M tris · solid 21 inst 0.04 M · leaf 110 inst 0.03 M\n   top: 1x15072(s0)  28x376(l2)  1x9830(s0)  19x376(l2)  6x734(s1)  1x3180(s0)  3x968(l1)  3x968(l1)  1x2626(s1)"
+    },
+    {
+      "density": 1,
+      "gpuMean": 11.880448000000003,
+      "gpuPeak": 17.69472,
+      "count": "main: 0.71 M tris · solid 162 inst 0.40 M · crystal 0 inst 0.00 M · water 3 inst 0.13 M · cascade 1 inst 0.01 M · leaf 1420 inst 0.16 M\n   top: 1x126912(w0)  672x90(l3)  652x90(l3)  1x16736(s0)  1x15072(s0)  37x376(l2)  14x968(l1)  1x11584(s0)  1x11584(s0)\nmirror: 0.57 M tris · solid 189 inst 0.37 M · crystal 0 inst 0.00 M · water 3 inst 0.13 M · cascade 2 inst 0.01 M · leaf 830 inst 0.06 M\n   top: 1x126912(w0)  1x44368(s0)  277x90(l3)  272x90(l3)  1x15072(s0)  1x13298(s1)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.07 M tris · solid 21 inst 0.04 M · leaf 110 inst 0.03 M\n   top: 1x15072(s0)  28x376(l2)  1x9830(s0)  19x376(l2)  6x734(s1)  1x3180(s0)  3x968(l1)  3x968(l1)  1x2626(s1)"
+    }
+  ]
+}

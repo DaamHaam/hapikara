@@ -1,6 +1,6 @@
 // shaders 2/4: instancing, GPU culling, materials (G-buffer) and shadow casters
 // material ids, shared by mesh generators and shaders
-const M = { MARBLE: 0, PAVE: 1, PLASTER: 2, GOLD: 3, QUAY: 4, FLOOR: 5, WINDOW: 6, BARK: 7, ALLOY: 8, TRIM: 9, TERRAIN: 10, CORE: 11, TERRACE: 12, GROUND: 13, STEP: 14, ROCK: 15, FALL: 16, SEA: 17, PAINT: 18, SANDST: 19, GRANITE: 20, PALM: 21, PALMBARK: 22, UWSTONE: 23, FLAME:24, FISH:25, MOSAIC:26, LEAF: 32 };
+const M = { MARBLE: 0, PAVE: 1, PLASTER: 2, GOLD: 3, QUAY: 4, FLOOR: 5, WINDOW: 6, BARK: 7, ALLOY: 8, TRIM: 9, TERRAIN: 10, CORE: 11, TERRACE: 12, GROUND: 13, STEP: 14, ROCK: 15, FALL: 16, SEA: 17, PAINT: 18, SANDST: 19, GRANITE: 20, PALM: 21, PALMBARK: 22, UWSTONE: 23, FLAME:24, FISH:25, MOSAIC:26, HIERO:27, EYE:28, LEAF: 32 };
 // leaf atlas tiles (material = M.LEAF + tile): crowns, then vines (TRAIL fringe, VLEAF / VBLOSSOM carpets)
 const LT = { OLIVE: 0, BROAD: 1, PINE: 2, CYPRESS: 3, BLOSSOM: 4, HYDRANGEA: 5, TRAIL: 6, LAVENDER: 7, VLEAF: 8, VBLOSSOM: 9, PALM: 10, LILY: 11 };
 
@@ -89,7 +89,7 @@ fn transform(v: VI) -> VO {
   var q = it.q; var org = it.p.xyz;
   if(mat==25u){
     let sd=f32(it.tint>>24u)/255.;let t=view.cam.w;let a=t*.22+floor(it.p.z/80.)*.9;
-    org+=vec3f(7.*sin(a),.25*sin(t*.8+sd*6.),5.*cos(a));
+    org+=vec3f(3.5*sin(a),.15*sin(t*.8+sd*6.),2.5*cos(a));
     let yaw=atan2(5.*sin(a),7.*cos(a));q=vec4f(0.,sin(yaw*.5),0.,cos(yaw*.5));
     lp.z+=sin(t*7.+sd*6.-v.pos.x*4.)*(.05+.16*sat(-v.pos.x))*it.p.w;
   }
@@ -358,15 +358,22 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
   } else if(mat==24u){o.alb=vec3f(1.,.35,.035);o.rough=1.;glass=1.;}
   else if(mat==25u){
     let stripe=.85+.15*sin(i.lp.x*14.+i.uv.x*255.);
-    o.alb=i.tint.rgb*i.tint.rgb*stripe*mix(vec3f(.7,.8,.65),vec3f(1.2,1.15,1.),sat(N.y*.5+.5));
+    o.alb=i.tint.rgb*i.tint.rgb*stripe*mix(vec3f(.8,.88,.8),vec3f(1.25,1.2,1.1),sat(N.y*.5+.5));
     if(i.uv.y>.5){o.alb=vec3f(.006);}
-    o.metal=.18;o.rough=.32;
+    o.metal=.25;o.rough=.42;
   }else if(mat==26u){
     let q=i.lp.xz;let r=length(q);let a=atan2(q.y,q.x);
     let lotus=abs(r-(1.55+.35*cos(a*8.)));let ring=abs(r-2.55);
     let motif=1.-ss(.04,.08+fw,min(lotus,ring));
     let tiles=min(fract(q.x*5.),fract(q.y*5.));let grout=ss(.02,.07,tiles);
     o.alb=mix(vec3f(.025,.19,.13),vec3f(.7,.46,.12),motif)*(.72+.28*grout);o.rough=.55;
+  }else if(mat==28u){o.alb=vec3f(.003,.006,.005);o.rough=.4;}
+  else if(mat==27u){
+    let u=select(p.z,p.x,abs(N.z)>.5)/1.45;let v=p.y/1.65;
+    let q=vec2f(fract(u)-.5,fract(v)-.5);let k=u32(h21(vec2f(floor(u),floor(v)))*6.);
+    let d=glyphD(q,k);let aa=max(fw,.008);let mark=1.-ss(-aa,aa,d);
+    o.alb=mix(vec3f(.53,.4,.24),vec3f(.34,.22,.075),mark);
+    o.alb*=1.-.4*(1.-ss(.005,.04,abs(d)));o.metal=.12+.45*mark;o.rough=.68-.28*mark;
   }else if (mat == 21u) {
     // Broad continuous leaf; veins are shading only, derivative filtered, never holes.
     let q=i.uv.xy; let v=q.y*10.+abs(q.x-.5)*3.; let fwv=max((abs(uvx.y)+abs(uvy.y))*10.+(abs(uvx.x)+abs(uvy.x))*3.,.02);

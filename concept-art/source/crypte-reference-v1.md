@@ -1,6 +1,6 @@
 # Chambre secrète — proposition visuelle v1
 
-Statut : référence proposée, à valider par Damien avant toute implémentation. Générée avec l’outil intégré imagegen. Image : `crypte-reference-v1.png`. Aucun changement du code de l’expérience.
+Statut : référence validée par Damien comme direction artistique du Plan 1, implémenté en v0.6.0. Générée avec l’outil intégré imagegen. Image : `crypte-reference-v1.png`, non intégrée au moteur ; les objets sont recréés par géométrie procédurale.
 
 Direction : sarcophage fermé anthropomorphe vert et or, trésor composé autour d’un socle de granit, panneaux de hiéroglyphes, appliques murales et allée centrale dégagée. Le conduit solaire doit traverser seulement la maçonnerie de la pyramide et laisser voir un fragment du ciel extérieur. L’image exprime l’intention ; elle ne valide ni la géométrie réelle du conduit, ni son coût de rendu.
 

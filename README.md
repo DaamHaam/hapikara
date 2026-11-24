@@ -12,7 +12,17 @@ Pierre dorée, pierres précieuses et eau vert-jade qui ruisselle de partout, de
 
 ![La cité entre le Nil et le désert](.github/screenshots/aerial.jpg)
 
-## Passage secret et vie sous-marine — v0.5.0
+## Chambre funéraire et poissons visibles — v0.6.0
+
+Le passage possède des limites physiques indépendantes du sol extérieur : longer ses parois ne doit plus remonter la caméra sur la pyramide. Les braseros sont fixés aux murs. La chambre suit la référence artistique validée : sarcophage fermé anthropomorphe, masque et coiffe vert/or, bras croisés sculptés, coffres, pièces, coupes, vases canopes et panneaux de pseudo-hiéroglyphes.
+
+Un véritable conduit de section 1,4 × 0,96 m est soustrait des triangles de la pyramide à la construction, orienté vers le soleil. La petite ouverture extérieure reste discrète et infranchissable. Depuis la chambre, on voit le ciel procédural au bout de ce conduit ; la cité entière n’est pas redessinée. Le faisceau dans la poussière est un renfort analytique, pas une simulation complète de transport lumineux. Le reste de la cité conserve sa géométrie.
+
+Dix bancs plus proches des quais et moins profonds remplacent les quatre bancs éloignés : 320/240/160 poissons selon la qualité, plus grands et plus clairs. Le curseur `L` permet toujours de les réduire ou de les masquer.
+
+[Captures et vérifications du Plan 1](.github/screenshots/iteration7/README.md). Les contrôles automatisés ne remplacent pas les essais utilisateur sur téléphone : voir `PLANS.md`.
+
+## Passage secret et vie sous-marine — v0.5.0 (historique)
 
 Un passage sous l’eau, dans le canal à l’est de l’acropole, mène à une galerie ascendante puis à la chambre de la pyramide : sarcophage vide, braseros et rayon solaire passant par une ouverture trop petite pour la caméra. Plan des murs et collisions sont communs ; la sortie impose de replonger. À l’intérieur, la cité extérieure et son miroir ne sont plus dessinés.
 
@@ -90,7 +100,7 @@ npm install
 npm run build
 ```
 
-Contrôles CPU et livrable : `cd source && npm run check:plan && npm run check:ambiance && npm run check:bundle`. Le fichier minifié autonome fait environ **109 ko** (92 ko gzip), sans ressource externe de scène. Pour reproduire les nouvelles captures, lancer `python3 source/tools/qa-server.py` à la racine, puis ouvrir `http://localhost:8137/dev.html?auto&lv=1&w=1440&h=900&qa=secrets-medium&smoke&secrets` après `npm run build:dev` (`lv=0/1/2` : High/Medium/Low). Ajouter `bench` pour le parcours chronométré. Les captures de développement et les outils de mesure ne sont pas inclus dans `index.html`.
+Contrôles CPU et livrable : `cd source && npm run check:plan && npm run check:ambiance && npm run check:bundle`. Le fichier minifié autonome fait environ **112 ko** (95 ko gzip), sans ressource externe de scène. Pour reproduire les nouvelles captures, lancer `python3 source/tools/qa-server.py` à la racine, puis ouvrir `http://localhost:8137/dev.html?auto&lv=1&w=1440&h=900&qa=secrets-medium&smoke&secrets` après `npm run build:dev` (`lv=0/1/2` : High/Medium/Low). Ajouter `bench` pour le parcours chronométré. Les captures de développement et les outils de mesure ne sont pas inclus dans `index.html`.
 
 ## Licence
 

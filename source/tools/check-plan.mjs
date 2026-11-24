@@ -78,5 +78,45 @@ assert(F[CZ]<12,'sun aperture cannot be traversed');
 F.set([54,11.7,0]);for(let z=.25;z<=36;z+=.25)go(54,F[CY],z);
 for(let x=54.25;x<=130;x+=.25)go(x,F[CY],36);
 assert(F[CX]>129&&F[CY]<5.5,'crypt exit stays submerged');
+// Both walls of the ascending gallery, then the bend: pool terrain must never lift us out.
+for(const x of [60,70,78,90])for(const side of [-1,1]){
+ const y=cryptFloor(1,x)+1.25;F.set([x,y,36]);
+ for(let j=0;j<80;j++)go(F[CX],y,F[CZ]+side*.24);
+ assert(F[CZ]>=32.7&&F[CZ]<=39.3&&abs(F[CY]-y)<.01,'gallery side wall escape '+x+','+side);
+}
+for(const side of [-1,1]){
+ F.set([54,12.2,25]);for(let j=0;j<80;j++)go(F[CX]+side*.24,12.2,F[CZ]);
+ assert(F[CX]>=50.7&&F[CX]<=57.3&&abs(F[CY]-12.2)<.01,'bend side wall escape');
+}
+F.set([70,9.4,36]);go(40,40,60);assert(cryptInside(F[CX],F[CY],F[CZ]),'fast diagonal stays inside');
+// Actual pyramid triangles must leave a clear sun line, not just a painted aperture.
+function rayHits(mesh,origin,dir){
+ const vdot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+ const f=new Float32Array(mesh.vb);let hits=0;
+ for(let k=0;k<mesh.ib.length;k+=3){
+  const a=mesh.ib[k]*5,b=mesh.ib[k+1]*5,c=mesh.ib[k+2]*5;
+  const e=[f[b]-f[a],f[b+1]-f[a+1],f[b+2]-f[a+2]],v=[f[c]-f[a],f[c+1]-f[a+1],f[c+2]-f[a+2]],h=vcross(dir,v),det=vdot(e,h);
+  if(abs(det)<1e-8)continue;const q=origin.map((n,j)=>n-f[a+j]),u=vdot(q,h)/det;if(u<0||u>1)continue;
+  const r=vcross(q,e),w=vdot(dir,r)/det,t=vdot(v,r)/det;if(w>=0&&u+w<=1&&t>6&&t<220)hits++;
+ }return hits;
+}
+assert(rayHits(meshPyramid(),CRYPT_TARGET,SUN)===0,'pyramid solar shaft obstructed');
+assert(rayHits(meshPyramid(),CRYPT_TARGET.map((v,i)=>v+CRYPT_U[i]*2),SUN)>0,'shaft cut too wide');
+assert(rayHits(meshCrypt(),CRYPT_TARGET,SUN)===0,'crypt solar shaft obstructed');
+assert(rayHits(meshCrypt(),CRYPT_TARGET.map((v,i)=>v+CRYPT_U[i]*3),SUN)>0,'crypt aperture cut too wide');
+// Shoal travel envelopes must stay below the surface and above the riverbed.
+let checkLevel=0;const QL=(h,m,l)=>[h,m,l][checkLevel],AUTO=false,K={SOLID:0},NO_SHADOW=4,NO_BAKE=8,NO_MIRROR=2,FISH_SCHOOL=256,Q0=[0,0,0,1],rgb=()=>0;
+for(checkLevel=0;checkLevel<3;checkLevel++){
+ let types=0,fishN=0;
+ populateAquatics({gH:terrainH,type:()=>types++,put:(ty,x,y,z,s)=>{
+  if(ty>=3)return;fishN++;
+  assert(y+.15+s*.5<-.1,'fish breaches surface');
+  for(let j=0;j<24;j++){
+   const a=j*TAU/24,xx=x+3.5*sin(a),zz=z+2.5*cos(a);
+   for(const [dx,dz]of [[2.3,0],[-2.3,0],[0,2.3],[0,-2.3]])assert(y-.15-s*.5>terrainH(xx+dx,zz+dz),'fish penetrates bed');
+  }
+ }});
+ assert(fishN===[320,240,160][checkLevel],'shoal count by quality');
+}
 console.log('Plan OK:',BLOCKS.length,'convex cells,',dry,'land and',wet,'water samples;',checked,'rendered tops,',meshes.length,'finite meshes; terrace/bief/stair/bridge collisions agree.');
 `, {console});

@@ -11,7 +11,7 @@ function meshFish(species,lod=0){
   fin([[-long*.85,0,0],[-long*1.5,tall*1.2,0],[-long*1.4,-tall*1.2,0]],[0,0,1]);
   fin([[-.3,tall*.75,0],[.15,tall*1.65,0],[.5,tall*.6,0]],[0,0,1]);
   m.eb=255;for(const sd of [-1,1]){const ps=[];for(let j=0;j<8;j++){const a=j*TAU/8;ps.push([long*.65+cos(a)*.045,tall*.32+sin(a)*.045,sd*wide*.8]);}m.poly(ps,[0,0,sd]);}m.eb=0;
-  const mesh=m.build();mesh.rad+=40;return mesh;
+  const mesh=m.build();mesh.rad+=12;return mesh;
 }
 function sarcophagus(m,x,y,z,s=1){
   m.fr=[x,y,z,1,0,s];
@@ -35,17 +35,23 @@ function meshTreasure(kind){
 function meshMosaic(){const m=new MB(4);m.mat=M.MOSAIC;m.poly([[-3,0,-3],[3,0,-3],[3,0,3],[-3,0,3]],[0,1,0]);return m.build();}
 function populateAquatics({type,put,gH}){
   const rng=RNG(713541),fish=[0,1,2].map(k=>type([meshFish(k,0),meshFish(k,1)],K.SOLID,45,1e9,200,0,NO_SHADOW|NO_BAKE|NO_MIRROR|FISH_SCHOOL));
-  const counts=QL(60,40,20),sites=[];
-  for(let k=0;k<4;k++){
-    const z=-190+k*125,x=nileX(z)+65+k*12,y=min(-1.6,max(gH(x,z)+2,-4.3));sites.push([x,y,z]);
+  const counts=QL(32,24,16),sites=[];
+  for(let k=0;k<10;k++){
+    const z=-280+k*62;let x=nileX(z)+[28,40,52][k%3],bed=-1e9;
+    // Reserve the whole shoal's footprint, including shader motion, on the wet shelf.
+    for(let attempt=0;attempt<15;attempt++){
+      bed=-1e9;for(let a=-10;a<=10;a+=5)for(let b=-10;b<=10;b+=5)bed=max(bed,gH(x+a,z+b));
+      if(bed<-2.9)break;x+=3;
+    }
+    const y=max(bed+1.2,-1.7-(k%3)*.7);sites.push([x,y,z]);
     for(let j=0;j<counts;j++){
-      const px=x+(rng()-.5)*13,pz=z+(rng()-.5)*13,py=min(-.8,max(gH(px,pz)+1.1,y+(rng()-.5)*1.5));
-      put(fish[(k+j)%3],px,py,pz,.3+rng()*.4,Q0,rgb(.48+rng()*.3,.59+rng()*.25,.38+rng()*.35,rng()));
+      const px=x+(rng()-.5)*9,pz=z+(rng()-.5)*9,py=y+(rng()-.5)*.7;
+      put(fish[(k+j)%3],px,py,pz,.55+rng()*.5,Q0,rgb(.76+rng()*.2,.79+rng()*.18,.59+rng()*.3,rng()));
     }
   }
   const treasure=[0,1].map(k=>type([meshTreasure(k)],K.SOLID,1e9,1e9,180));
   for(const [z,off,k]of [[-160,22,0],[-20,30,1],[135,26,0],[275,35,1]]){const x=nileX(z)+off;put(treasure[k],x,gH(x,z)+.12,z,1,qYaw(z*.13));}
   const mosaic=type([meshMosaic()],K.SOLID,1e9,1e9,150);
   for(const [x,z]of [[130,36],[130,90],[-130,-200],[266,200]])if(canalAt(x,z))put(mosaic,x,FLOOR_Y+.035,z);
-  if(AUTO)window.__aquatics={schools:sites,fish:4*counts,treasures:4,mosaics:4};
+  if(AUTO)window.__aquatics={schools:sites,fish:10*counts,treasures:4,mosaics:4};
 }

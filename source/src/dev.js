@@ -186,14 +186,15 @@
       }
       if(QP.has('secrets')){
         report.aquatics=window.__aquatics;report.secretViews=[];
-        const sx=nileX(-65)+77;
-        for(const [name,cam]of [['entrance',[128,4.8,36,110,4.8,36]],['gallery',[89,6.5,36,65,10.5,36]],['crypt',[43,15,5,-6,12.5,0]],['sarcophagus',[4,15,6,-6,12.3,0]],['fish',[sx,-2.8,-45,sx,-3,-65]],['treasure',[nileX(-160)+23,-1.5,-150,nileX(-160)+22,-3,-160]],['mosaic',[130,5.2,40,130,3.1,36]]]){
+        const shoal=window.__aquatics.schools[4],sx=shoal[0],sy=shoal[1],sz=shoal[2];
+        const port=cryptShaftPoint(CRYPT_RAY.length-4,0,0),exit=cryptShaftExit().p;
+        for(const [name,cam]of [['entrance',[128,4.8,36,110,4.8,36]],['gallery',[85,7.5,36,65,10.5,36]],['crypt',[26,15,6,-14,13.5,-5]],['sarcophagus',[-4,17,5,-14,13.5,-5]],['mask',[-14,18,-12,-14,14,-7.7]],['aperture',[port[0],port[1],port[2],exit[0],exit[1],exit[2]]],['pyramid-opening',[exit[0]+SUN[0]*9,exit[1]+SUN[1]*9,exit[2]+SUN[2]*9,exit[0],exit[1],exit[2]]],['fish',[sx,sy+1,sz+14,sx,sy,sz]],['treasure',[nileX(-160)+23,-1.5,-150,nileX(-160)+22,-3,-160]],['mosaic',[130,5.2,40,130,3.1,36]]]){
           await send({name:name+'.png',image:(await window.__shot({cam,time:10}))[0]});report.secretViews.push({name,stats:window.__stats(),count:await window.__count()});
         }
         report.fishCost=[];
         for(const density of [0,1]){
           LOOK_ACTIVE[26]=density;syncLook();F[RESET]=1;
-          await send({name:'fish-density-'+density+'.png',image:(await window.__shot({cam:[sx,-2.8,-45,sx,-3,-65],time:10}))[0]});
+          await send({name:'fish-density-'+density+'.png',image:(await window.__shot({cam:[sx,sy+1,sz+14,sx,sy,sz],time:10}))[0]});
           let sum=0,peak=0;for(let j=0;j<32;j++){draw();await Q.onSubmittedWorkDone();sum+=gpuMs[NP];peak=max(peak,gpuMs[NP]);}
           report.fishCost.push({density,gpuMean:sum/32,gpuPeak:peak,count:await window.__count()});
         }
