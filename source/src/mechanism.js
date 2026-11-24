@@ -1,13 +1,14 @@
 // One mechanism, reset on every load. State is shared by rendering and collision.
 const MECHANISM_SITE=new Float64Array([EAST_QUAY[0]-7,3.7,EAST_QUAY[1]-11]);
+const MECHANISM_VIEW=[133,10.8,40,119,5.8,36]; // above water, aimed through the surface at the doorway
 let GATE_OPEN=0,leverTurn=0,mechanismPhase=0,mechanismTime=0,mechanismFade=0;
 const mechanismSaved=new Float64Array(5);
-let mechanismButton=null,mechanismPrompt=false,mechanismSoundStop=null;
+let mechanismButton=null,mechanismLabel=null,mechanismPrompt=false,mechanismSoundStop=null;
 const easeMechanism=t=>{t=clamp(t,0,1);return t*t*(3-2*t);};
 function mechanismAvailable(){
   if(menu||mechanismPhase||GATE_OPEN>=1)return false;
   const dx=MECHANISM_SITE[0]-F[CX],dy=MECHANISM_SITE[1]+2.7-F[CY],dz=MECHANISM_SITE[2]-F[CZ],d=hypot(dx,dy,dz);
-  return d<9&&d>.1&&(dx*sin(F[YAW])*cos(F[PIT])+dy*sin(F[PIT])-dz*cos(F[YAW])*cos(F[PIT]))/d>.4;
+  return d<20&&d>.1&&(dx*sin(F[YAW])*cos(F[PIT])+dy*sin(F[PIT])-dz*cos(F[YAW])*cos(F[PIT]))/d>.4;
 }
 function updateMechanismPrompt(){
   if(!mechanismButton)return;
@@ -19,7 +20,7 @@ function activateMechanism(){
   if(!mechanismAvailable())return false;
   mechanismSaved.set(F.subarray(0,5));mechanismPhase=1;mechanismTime=0;
   release();F[VX]=F[VY]=F[VZ]=0;mdx=mdy=lkx=lky=l2x=l2y=0;
-  if(mechanismButton)mechanismButton.textContent='Passer';
+  if(mechanismLabel)mechanismLabel.textContent='Passer';
   playMechanismSound();updateMechanismPrompt();return true;
 }
 function finishMechanism(){
@@ -27,13 +28,13 @@ function finishMechanism(){
   GATE_OPEN=leverTurn=1;mechanismPhase=0;mechanismTime=mechanismFade=0;
   F.set(mechanismSaved,0);F[VX]=F[VY]=F[VZ]=0;F[RESET]=1;
   release();mdx=mdy=lkx=lky=l2x=l2y=0;
-  if(mechanismButton)mechanismButton.textContent='Actionner';updateMechanismPrompt();
+  if(mechanismLabel)mechanismLabel.textContent='Actionner';updateMechanismPrompt();
 }
 function stepMechanism(dt){
   if(menu)return;mechanismTime+=dt;
   if(mechanismPhase===1){
     leverTurn=easeMechanism(mechanismTime/.8);mechanismFade=easeMechanism((mechanismTime-.8)/.4);
-    if(mechanismTime>=1.2){mechanismPhase=2;mechanismTime=0;F[CX]=132;F[CY]=5;F[CZ]=36;F[YAW]=-PI/2;F[PIT]=-.01;F[RESET]=1;}
+    if(mechanismTime>=1.2){mechanismPhase=2;mechanismTime=0;const v=MECHANISM_VIEW;F[CX]=v[0];F[CY]=v[1];F[CZ]=v[2];F[YAW]=atan2(v[3]-v[0],v[2]-v[5]);F[PIT]=atan2(v[4]-v[1],hypot(v[3]-v[0],v[5]-v[2]));F[RESET]=1;}
   }else if(mechanismPhase===2){
     GATE_OPEN=easeMechanism((mechanismTime-.5)/2.6);
     mechanismFade=mechanismTime<.4?1-easeMechanism(mechanismTime/.4):easeMechanism((mechanismTime-3.7)/.4);
@@ -78,7 +79,7 @@ function mechanismKey(e){
   if(mechanismAvailable()){e.preventDefault();activateMechanism();}
 }
 function initMechanism(){
-  mechanismButton=$('action');mechanismButton.onclick=e=>{e.stopPropagation();activateMechanism();};
+  mechanismButton=$('action');mechanismLabel=$('action-label');mechanismButton.onclick=e=>{e.stopPropagation();activateMechanism();};
   addEventListener('keydown',mechanismKey);
 }
 function meshScarab(){

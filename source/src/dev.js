@@ -235,6 +235,15 @@
         }
         for(const [name,cam]of views)await send({name:name+'.png',image:(await window.__shot({cam,time:10}))[0]});
       }
+      if(QP.has('plan5')){
+        const p=MECHANISM_SITE;GATE_OPEN=leverTurn=mechanismPhase=0;menu=false;
+        await send({name:'lever-distance.png',image:(await window.__shot({cam:[p[0]-18,p[1]+3.3,p[2]+1,p[0],p[1]+3.1,p[2]],time:10}))[0]});
+        if(!mechanismAvailable())throw Error('Lever unavailable at 18m');
+        const saved=Array.from(F.slice(0,5));activateMechanism();
+        for(let i=0;i<390;i++){stepMechanism(1/60);F[TIME]+=1/60;draw();if(i%8===7)await Q.onSubmittedWorkDone();if(i===170||i===265)await send({name:i===170?'door-surface-opening.png':'door-surface-open.png',image:grab()});}
+        if(mechanismPhase||GATE_OPEN!==1||!saved.every((v,i)=>F[i]===v))throw Error('Plan 5 exact return failed');
+        report.plan5={range:20,openingView:MECHANISM_VIEW,returnedExactly:true};
+      }
       if(QP.has('bench')) report.benchmark=await window.__bench();
       if(GPU_ERRORS.length)throw Error(GPU_ERRORS.join('\n'));
       await send({name:'report.json',report});
@@ -243,4 +252,4 @@
   },0);
 }
 
-if(QP.has('lever')){const p=MECHANISM_SITE;lookAt(p[0]-6,p[1]+2.5,p[2]+1,p[0],p[1]+2.8,p[2]);ui(false);}
+if(QP.has('lever')){const p=MECHANISM_SITE;lookAt(p[0]-17,p[1]+3.3,p[2]+1,p[0],p[1]+3.1,p[2]);ui(false);}

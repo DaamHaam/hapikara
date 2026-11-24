@@ -2,8 +2,8 @@
 
 ## État
 
-- Version livrée : v0.9.0 — Plan 4 (manette) codé et contrôlé, **à tester avec une manette physique par Damien**. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
-- Plan 4 à tester ; Plan 5 en préparation : version discrète, bouton plein écran, portée du levier et cadrage de son ouverture. Plan 3 à tester. Plan 2 partiellement testé : mécanisme fonctionnel confirmé par Damien ; autres essais en attente. Tests antérieurs non confirmés conservés. VR toujours reportée, emplacement conservé.
+- Version livrée : v0.10.0 — Plan 5 (version, plein écran, levier) codé et contrôlé, **à tester par Damien**. Plan 4 (manette) toujours à tester avec une manette physique. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
+- Plans 5 et 4 à tester ; Plan 6 en préparation (vide pour l’instant). Plan 3 à tester. Plan 2 partiellement testé : mécanisme fonctionnel confirmé par Damien ; autres essais en attente. Tests antérieurs non confirmés conservés. VR toujours reportée, emplacement conservé.
 - La revue du code depuis `revue-ok` reste à faire avant la prochaine clôture ; la génération de cette référence ne constitue pas une revue.
 - Retours après v0.6.0 : poissons bien visibles, y compris depuis l’extérieur de l’eau ; passage intérieur approuvé en l’état, sans nouvelle refonte. Blocage sur les deux montants extérieurs de l’entrée : priorité n°1 du Plan 2. Ces retours ont été intégrés au Plan 2 lancé ensuite par Damien.
 
@@ -164,9 +164,9 @@ Les anciens essais non confirmés restent en attente ; ils pourront être retir�
 - Débrancher/rebrancher et changer de fenêtre : aucun mouvement bloqué ni activation involontaire au retour. Clavier, souris et tactile restent fonctionnels.
 - Vérifier musique et sons avec la manette ; si le navigateur bloque le son au premier lancement, vérifier qu’un clic ou une touche le déverrouille.
 
-## Plan 5 — En préparation : repères de version et confort du mécanisme
+## Plan 5 — Livré v0.10.0 : repères de version et confort du mécanisme
 
-Retours de Damien après la v0.9.0. **Pour la prochaine session, sans exécution autorisée à ce stade.** Les essais utilisateur antérieurs restent en attente ; ce retour ne valide pas à lui seul l’ensemble du support manette.
+Retours de Damien après la v0.9.0. Exécution commencée par Codex, terminée par Claude.
 
 1. **Version discrète dans un coin.** Afficher un petit numéro de version lisible, peu contrasté mais identifiable, placé dans une zone sûre sans chevaucher les boutons ni les marges mobiles. Le renseigner automatiquement à la construction depuis `source/package.json` pour qu’il corresponde au HTML chargé. Proposition : coin inférieur gauche, y compris pendant la visite.
 2. **Actionner le levier de plus loin.** Damien doit actuellement s’approcher jusqu’à ce que la poignée dépasse l’écran. Augmenter la distance d’interaction (actuellement 9 m), avec une cible initiale de 18–20 m à ajuster visuellement pour garder le levier entier dans le cadre. Examiner aussi la tolérance de visée ; garder une activation volontaire et tournée vers le mécanisme. Même portée pour clic, toucher, Espace et A/Croix. Vérifier que le bouton apparaît à une distance confortable, y compris sur téléphone et télévision.
@@ -176,5 +176,19 @@ Retours de Damien après la v0.9.0. **Pour la prochaine session, sans exécution
 
 5. **Bouton « Actionner » plus soigné.** Damien le trouve trop petit et peu stylisé par rapport à l’accueil et au décor. Le rendre plus généreux et lisible, avec une composition inspirée du bouton principal de l’accueil : or doux, fond profond jade/pétrole, bordure fine et relief léger. Une petite évocation du scarabée peut renforcer le lien au mécanisme sans surcharger. Conserver une apparence discrète hors proximité (bouton toujours contextuel), un contraste lisible sur l’eau et le sable et une taille confortable à la souris, au toucher et depuis une télévision. Harmoniser aussi l’état « Passer » de la séquence. Valider visuellement sur ordinateur et mobile, sans annoncer L/I ni ajouter de menu. Préparation uniquement.
 
-Ne pas lancer sans ordre explicite. Aucun changement du jeu dans cette préparation.
+**Livré :** numéro `v0.10.0` en bas à gauche, injecté à la construction depuis `source/package.json` et vérifié par `check:bundle`. Portée du levier portée à 20 m, même visée exigée, pour clic, toucher, Espace et A/Croix. Vue de la porte depuis la surface, en surplomb, avec scarabée et ouverture lisibles ; retour exact conservé. Bouton plein écran en haut à droite (`fullscreen.js`), synchronisé sur l’état réel, message en cas de refus, masqué si l’API manque, jamais verrouillé pendant la demande. Bouton « Actionner »/« Passer » agrandi, jade et or doux, petit scarabée, version mobile.
+
+**Contrôles :** check:plan, check:mechanism (dont portée 18/23 m et caméra au-dessus de l’eau), check:ambiance, check:gamepad, check:fullscreen, build et check:bundle. Captures WebGPU du levier à 18 m et de l’ouverture vue de la surface, séquence au clic sans erreur, version en largeur mobile. Plein écran réel non vérifiable dans le navigateur intégré. Rapport : `.github/screenshots/iteration11/`. Revue globale depuis `revue-ok` toujours à faire avant clôture.
+
+### Tests utilisateur du Plan 5 — à valider
+
+- Lire la version en bas à gauche, à l’accueil et pendant la visite, sur ordinateur et téléphone ; elle ne doit gêner aucun bouton.
+- Dans Chrome/Safari sur ordinateur : entrer et sortir du plein écran par le bouton, puis sortir avec Échap ; l’icône suit l’état et l’image se redimensionne.
+- Faire apparaître « Actionner » de plus loin, levier entier dans le cadre ; vérifier aussi au téléphone, avec Espace et A/Croix.
+- Juger le nouveau bouton « Actionner »/« Passer » sur sable, eau et téléphone.
+- Pendant la séquence, voir le scarabée et la porte s’ouvrir à travers la surface ; retour au bon endroit.
+
+## Plan 6 — En préparation
+
+Rien de noté pour l’instant.
 

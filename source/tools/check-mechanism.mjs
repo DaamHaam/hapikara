@@ -11,8 +11,9 @@ F.set([MECHANISM_SITE[0]-5,1,MECHANISM_SITE[2],PI/2,.12]);
 const saved=Array.from(F.slice(0,5));
 assert(mechanismAvailable()&&activateMechanism(),'nearby facing interaction');
 assert(mechanismPhase===1,'lever phase');
+assert(MECHANISM_VIEW[1]>WATER+2,'opening camera stays above water');
 menu=true;stepMechanism(2);assert(mechanismTime===0,'menu pauses sequence');menu=false;
-let sawDoor=false;for(let i=0;i<800;i++){stepMechanism(.01);if(mechanismPhase===2)sawDoor=true;}
+let sawDoor=false;for(let i=0;i<800;i++){stepMechanism(.01);if(mechanismPhase===2){sawDoor=true;assert(F[CY]>WATER&&F[PIT]<0,'door seen from surface looking down');}}
 assert(sawDoor&&mechanismPhase===0&&GATE_OPEN===1&&leverTurn===1,'complete sequence opens once');
 assert(saved.every((v,i)=>F[i]===v)&&mechanismFade===0,'exact position and orientation restored');
 assert(!activateMechanism(),'no repeated activation');
@@ -26,6 +27,8 @@ menu=true;press();assert(mechanismPhase===0,'Space ignored in menu');menu=false;
 F[CX]-=30;press();assert(mechanismPhase===0,'no distant Space activation');F[CX]+=30;
 assert(press().defaultPrevented&&mechanismPhase===1,'Space activates nearby lever and prevents scrolling');
 press();assert(mechanismPhase===1,'Space does not skip or reactivate the running sequence');finishMechanism();
+GATE_OPEN=0;F.set([MECHANISM_SITE[0]-18,MECHANISM_SITE[1]+2.7,MECHANISM_SITE[2],PI/2,0]);
+assert(mechanismAvailable(),'lever usable at 18 metres');F[CX]-=3;assert(!mechanismAvailable(),'outside 20 metre range');F[CX]+=3;F[YAW]=-PI/2;assert(!mechanismAvailable(),'must still face lever');
 assert(MECHANISM_SITE[0]>EAST_QUAY[0]-17&&MECHANISM_SITE[0]<EAST_QUAY[0]+20&&MECHANISM_SITE[2]>-246&&MECHANISM_SITE[2]<-194,'lever stands on landing with clearance');
 
 `;

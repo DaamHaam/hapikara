@@ -1,5 +1,6 @@
 initMechanism();
 initGamepad();
+initFullscreen();
 // Lighting workshop. All DOM work happens on interaction, never inside render().
 if (!AUTO && !mob) {
   const panel=$('look-panel'),status=$('look-status'),data=$('look-data');
