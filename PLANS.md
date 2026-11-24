@@ -5,6 +5,7 @@
 - Version livrée : v0.6.0 — Plan 1 codé et contrôlé automatiquement, **à tester par Damien**. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
 - Plan 1 à tester ; Plan 2 (VR) en préparation pour plus tard, non lancé. Référence visuelle v1 validée comme direction artistique.
 - La revue du code depuis `revue-ok` reste à faire avant la prochaine clôture ; la génération de cette référence ne constitue pas une revue.
+- Retours après v0.6.0 : poissons bien visibles, y compris depuis l’extérieur de l’eau ; passage intérieur approuvé en l’état, sans nouvelle refonte. Blocage distinct au montant droit extérieur de l’entrée, consigné au Plan 2. Aucun nouveau code autorisé pour ces retours.
 
 ## Plan 1 — Fiabiliser le passage et enrichir la découverte
 
@@ -23,11 +24,10 @@
 
 ### Tests utilisateur du Plan 1 — à valider
 
-- Longer les deux parois de la galerie après la sortie de l’eau, puis le virage, en diagonale et en accélérant : rester dans le passage, sans remontée sur la pyramide ; revenir dans le canal.
 - Vérifier que les torches sont contre les murs, sans gêner le passage.
 - Depuis la chambre, repérer le conduit et la lumière ; depuis l’extérieur, juger l’ouverture discrète et vérifier qu’on ne la traverse pas.
 - Juger le sarcophage, les trésors et les hiéroglyphes par rapport à la direction artistique validée.
-- Sur iPhone, plonger devant les quais du Nil : repérer plusieurs bancs et vérifier la fluidité ; sur ordinateur, tester aussi la densité des poissons dans `L`.
+- Sur iPhone, vérifier la fluidité ; sur ordinateur, tester aussi la densité des poissons dans `L`. Repérage des bancs validé par Damien, depuis l’eau et depuis l’extérieur.
 
 ## Tests utilisateur encore à valider — version v0.5.0
 
@@ -37,6 +37,14 @@
 
 Les tests v0.5.0 ci-dessus restent en attente faute de validation explicite ; ils peuvent être réalisés avec v0.6.0. Avant le prochain plan, proposer à Damien de retirer ceux que son usage a déjà confirmés, sans les retirer d’office.
 
-## Plan 2 — Pour plus tard : réalité virtuelle
+## Plan 2 — En préparation, non lancé
+
+### Retours v0.6.0 pour la prochaine session
+
+1. **Poissons :** conserver leur bonne visibilité ; ajouter des bancs de petits poissons en complément des plus grands, et réduire la taille maximale actuelle. Proposition à valider : plusieurs classes de taille cohérentes par banc ; plafonner les plus grands à environ 75–80 % de la taille actuelle et privilégier la réutilisation des maillages. Aucun nombre ou facteur encore validé.
+2. **Blocage au montant droit extérieur de l’entrée immergée :** Damien reste coincé en touchant le montant droit en entrant ; regard libre, mouvements horizontaux bloqués, mouvement vertical encore possible, redémarrage nécessaire. Reproduction CPU sans modification du code : position (119.9, 4.8, 32.2), avance/recul/latéral de 0.1 m refusés, montée de 0.1 m acceptée. La caméra partiellement engagée dans le bord échoue à `cryptCameraFits` pour chaque petit pas. Prévoir une récupération/glissade permettant de se dégager, et des tests de raccord extérieur/intérieur sur les deux montants et dans les deux sens. Corriger ce défaut avant d’ajouter une porte à cette entrée. **Conserver le passage intérieur en l’état.**
+3. **Idée à définir, non encore validée pour implémentation : mécanisme à distance et porte coulissante.** Entrée immergée initialement fermée par une dalle discrète ; gros levier ancien sur la rive opposée du Nil, activable volontairement en s’approchant puis par clic/toucher. Le levier bascule avec un son procédural, une courte séquence montre la porte qui s’ouvre, puis restaure exactement position et orientation de la visite. Proposition : fondu vers une vue de la porte plutôt qu’un long survol ; ouverture maintenue pendant la visite, sans minuterie ; remise à zéro à la prochaine ouverture. Prévoir absence de double activation, commandes adaptées au tactile, son respectant le réglage muet, séquence écourtable et collisions cohérentes avec l’ouverture. Coût de rendu attendu faible ; effort principal dans les interactions, transitions caméra et tests. **À décider :** apparence/emplacement du levier, persistance entre visites, durée et déclenchement de la séquence. Aucun code à ce stade.
+
+### Réalité virtuelle — toujours pour plus tard, emplacement conservé
 
 WebXR / HTC Vive : déplacement selon casque ou manette, montée/descente, niveaux de qualité et essais matériels. Projet Sous-Marin à tester séparément. Non lancé ; les tests casque devront être identifiés comme bloquants avant de construire sur leur résultat.
