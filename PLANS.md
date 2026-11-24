@@ -3,7 +3,7 @@
 ## État
 
 - Version livrée : v0.9.0 — Plan 4 (manette) codé et contrôlé, **à tester avec une manette physique par Damien**. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
-- Plan 4 à tester ; Plan 5 en préparation, sans périmètre défini. Plan 3 à tester. Plan 2 partiellement testé : mécanisme fonctionnel confirmé par Damien ; autres essais en attente. Tests antérieurs non confirmés conservés. VR toujours reportée, emplacement conservé.
+- Plan 4 à tester ; Plan 5 en préparation : version discrète, portée du levier et cadrage de son ouverture. Plan 3 à tester. Plan 2 partiellement testé : mécanisme fonctionnel confirmé par Damien ; autres essais en attente. Tests antérieurs non confirmés conservés. VR toujours reportée, emplacement conservé.
 - La revue du code depuis `revue-ok` reste à faire avant la prochaine clôture ; la génération de cette référence ne constitue pas une revue.
 - Retours après v0.6.0 : poissons bien visibles, y compris depuis l’extérieur de l’eau ; passage intérieur approuvé en l’état, sans nouvelle refonte. Blocage sur les deux montants extérieurs de l’entrée : priorité n°1 du Plan 2. Ces retours ont été intégrés au Plan 2 lancé ensuite par Damien.
 
@@ -164,6 +164,13 @@ Les anciens essais non confirmés restent en attente ; ils pourront être retir�
 - Débrancher/rebrancher et changer de fenêtre : aucun mouvement bloqué ni activation involontaire au retour. Clavier, souris et tactile restent fonctionnels.
 - Vérifier musique et sons avec la manette ; si le navigateur bloque le son au premier lancement, vérifier qu’un clic ou une touche le déverrouille.
 
-## Plan 5 — En préparation
+## Plan 5 — En préparation : repères de version et confort du mécanisme
 
-Aucun nouveau périmètre arrêté. Ne pas lancer sans ordre explicite.
+Retours de Damien après la v0.9.0. **Pour la prochaine session, sans exécution autorisée à ce stade.** Les essais utilisateur antérieurs restent en attente ; ce retour ne valide pas à lui seul l’ensemble du support manette.
+
+1. **Version discrète dans un coin.** Afficher un petit numéro de version lisible, peu contrasté mais identifiable, placé dans une zone sûre sans chevaucher les boutons ni les marges mobiles. Le renseigner automatiquement à la construction depuis `source/package.json` pour qu’il corresponde au HTML chargé. Proposition : coin inférieur gauche, y compris pendant la visite.
+2. **Actionner le levier de plus loin.** Damien doit actuellement s’approcher jusqu’à ce que la poignée dépasse l’écran. Augmenter la distance d’interaction (actuellement 9 m), avec une cible initiale de 18–20 m à ajuster visuellement pour garder le levier entier dans le cadre. Examiner aussi la tolérance de visée ; garder une activation volontaire et tournée vers le mécanisme. Même portée pour clic, toucher, Espace et A/Croix. Vérifier que le bouton apparaît à une distance confortable, y compris sur téléphone et télévision.
+3. **Séquence de porte depuis la surface — direction proposée par Damien.** Replacer la caméra au-dessus de l’eau, légèrement en surplomb et si utile en biais, pour voir le scarabée et situer l’entrée tout en regardant la porte s’ouvrir à travers la surface verte. Référence : photo jointe au retour de Damien (grand scarabée sur le mur, ouverture turquoise visible sous la surface au premier plan). Choisir le cadrage d’après le rendu réel : limiter les reflets masquant la porte, conserver une ouverture bien lisible et le retour exact à la position/orientation du visiteur. Conserver fondu, grondement, possibilité de passer et ouverture sans minuterie.
+
+Ne pas lancer sans ordre explicite. Aucun changement du jeu dans cette préparation.
+
