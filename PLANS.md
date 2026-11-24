@@ -3,7 +3,7 @@
 ## État
 
 - Version livrée : v0.6.0 — Plan 1 codé et contrôlé automatiquement, **à tester par Damien**. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
-- Plan 1 à tester ; Plan 2 (VR) en préparation pour plus tard, non lancé. Référence visuelle v1 validée comme direction artistique.
+- Plan 1 à tester ; Plan 2 en préparation, non lancé : poissons, raccord de l’entrée et mécanisme unique validés dans leur principe. VR toujours reportée, emplacement conservé. Référence visuelle v1 validée comme direction artistique.
 - La revue du code depuis `revue-ok` reste à faire avant la prochaine clôture ; la génération de cette référence ne constitue pas une revue.
 - Retours après v0.6.0 : poissons bien visibles, y compris depuis l’extérieur de l’eau ; passage intérieur approuvé en l’état, sans nouvelle refonte. Blocage distinct au montant droit extérieur de l’entrée, consigné au Plan 2. Aucun nouveau code autorisé pour ces retours.
 
@@ -41,9 +41,51 @@ Les tests v0.5.0 ci-dessus restent en attente faute de validation explicite ; il
 
 ### Retours v0.6.0 pour la prochaine session
 
-1. **Poissons :** conserver leur bonne visibilité ; ajouter des bancs de petits poissons en complément des plus grands, et réduire la taille maximale actuelle. Proposition à valider : plusieurs classes de taille cohérentes par banc ; plafonner les plus grands à environ 75–80 % de la taille actuelle et privilégier la réutilisation des maillages. Aucun nombre ou facteur encore validé.
+1. **Poissons — validé pour le prochain plan, pas encore lancé :** conserver leur bonne visibilité ; ajouter des bancs de petits poissons en complément des plus grands, et réduire la taille maximale actuelle. Plusieurs classes cohérentes par banc, plus grands plafonnés autour de 75–80 % de la taille actuelle, maillages réutilisés. Ces réglages seront à juger visuellement après implémentation.
 2. **Blocage au montant droit extérieur de l’entrée immergée :** Damien reste coincé en touchant le montant droit en entrant ; regard libre, mouvements horizontaux bloqués, mouvement vertical encore possible, redémarrage nécessaire. Reproduction CPU sans modification du code : position (119.9, 4.8, 32.2), avance/recul/latéral de 0.1 m refusés, montée de 0.1 m acceptée. La caméra partiellement engagée dans le bord échoue à `cryptCameraFits` pour chaque petit pas. Prévoir une récupération/glissade permettant de se dégager, et des tests de raccord extérieur/intérieur sur les deux montants et dans les deux sens. Corriger ce défaut avant d’ajouter une porte à cette entrée. **Conserver le passage intérieur en l’état.**
-3. **Idée à définir, non encore validée pour implémentation : mécanisme à distance et porte coulissante.** Entrée immergée initialement fermée par une dalle discrète ; gros levier ancien sur la rive opposée du Nil, activable volontairement en s’approchant puis par clic/toucher. Le levier bascule avec un son procédural, une courte séquence montre la porte qui s’ouvre, puis restaure exactement position et orientation de la visite. Proposition : fondu vers une vue de la porte plutôt qu’un long survol ; ouverture maintenue pendant la visite, sans minuterie ; remise à zéro à la prochaine ouverture. Prévoir absence de double activation, commandes adaptées au tactile, son respectant le réglage muet, séquence écourtable et collisions cohérentes avec l’ouverture. Coût de rendu attendu faible ; effort principal dans les interactions, transitions caméra et tests. **À décider :** apparence/emplacement du levier, persistance entre visites, durée et déclenchement de la séquence. Aucun code à ce stade.
+3. **Mécanisme unique et porte coulissante — principe validé, exécution non lancée.** Entrée immergée initialement fermée par une dalle discrète ; gros levier ancien sur la rive opposée du Nil, activable volontairement en s’approchant avec un bouton « Actionner » par clic/toucher. Le mécanisme bascule avec un claquement sourd. Fondu vers une courte vue de la porte qui s’ouvre, puis retour à la position et l’orientation exactes du joueur. Porte maintenue ouverte toute la visite, **sans minuterie**. Un seul mécanisme pour l’instant. Prévoir absence de double activation, tactile, son respectant le réglage muet, séquence écourtable et collisions cohérentes. Coût de rendu attendu faible ; effort principal dans les interactions, transitions et tests. **À préciser :** apparence/emplacement exact, durée et conservation éventuelle de l’état après relance (proposition : réinitialisation à chaque visite, pas explicitement tranchée). Aucun code à ce stade.
+4. **Musique :** validée par Damien ; conserver la musique procédurale actuelle sans la modifier. Le claquement/frottement du mécanisme est un effet distinct.
+5. **Accueil :** retirer seulement la mention « L ambiance » des indications affichées. Le raccourci `L` et l’atelier restent actifs pour les essais personnels de Damien, sans nouvel accès visible. Noté pour le prochain plan, non exécuté.
+
+### Réservoir d’idées demandé — propositions non retenues automatiquement
+
+Pistes à discuter et sélectionner ; ne pas implémenter ces trente idées par défaut. Privilégier décors statiques, maillages réutilisés, proximité et état simple. Aucun mécanisme supplémentaire dans le périmètre validé.
+
+**G — Gamification douce**
+1. G1 : carnet des lieux découverts, consultable à la demande.
+2. G2 : petites amulettes repérées automatiquement à proximité.
+3. G3 : piste de symboles menant au mécanisme déjà prévu.
+4. G4 : belvédères à découvrir, chacun offrant un cadrage remarquable.
+5. G5 : mode photo masquant l’interface et conservant une capture.
+6. G6 : quartiers nommés à la première entrée, indication brève.
+7. G7 : objectifs facultatifs de promenade, sans chronomètre.
+8. G8 : reconnaissance des silhouettes de poissons dans un petit carnet.
+9. G9 : repères favoris personnels pour retrouver les lieux aimés.
+10. G10 : distinctions discrètes d’exploration, sans score permanent.
+
+**M — Mystère**
+1. M1 : symbole commun sur la dalle immergée et le levier distant.
+2. M2 : mosaïque interrompue suggérant un chemin sous l’eau.
+3. M3 : fausse porte funéraire sculptée, purement décorative.
+4. M4 : socle vide dans un ensemble symétrique, suggérant une absence.
+5. M5 : même scarabée gravé dans plusieurs lieux éloignés.
+6. M6 : ombre dessinant un ankh avec le soleil à 12°.
+7. M7 : détail sculpté visible seulement dans un alignement de colonnes.
+8. M8 : amphore scellée entrouverte laissant voir quelques bijoux.
+9. M9 : traces statiques sur une rive conduisant à une halte abandonnée.
+10. M10 : rares sons localisés près d’un lieu caché, sans changer la musique.
+
+**E — Esthétique et surprises du décor**
+1. E1 : bouquets de lotus irréguliers dans quelques recoins.
+2. E2 : petits îlots de papyrus de hauteurs variées, silhouettes stables.
+3. E3 : motifs de faïence distincts sur quelques façades.
+4. E4 : voiles d’ombrage fixes, vert, lin et or sourd.
+5. E5 : fleurs retombant de certaines terrasses.
+6. E6 : coins de marché statiques, paniers, jarres et étoffes.
+7. E7 : deux ou trois variantes de barques amarrées.
+8. E8 : incrustations de malachite et de cuivre patiné près de l’eau.
+9. E9 : minuscules jardins intérieurs révélés par un passage étroit.
+10. E10 : patines et traces d’eau discrètes à la base des pierres, sans rétablir le relief renforcé.
 
 ### Réalité virtuelle — toujours pour plus tard, emplacement conservé
 
