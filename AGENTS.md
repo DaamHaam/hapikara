@@ -6,6 +6,7 @@ Source unique des règles pour Codex et Claude Code (`CLAUDE.md` contient seulem
 
 - **Branche de travail** : on développe directement sur `main` ; ne pas créer de branche `dev`.
 - **Publication** : GitHub Pages depuis la racine de `main` (`index.html`) : https://daamhaam.github.io/hapikara/ — chaque push sur `main` republie.
+- **Clarifications** : regrouper les questions nécessaires en un seul envoi pour permettre une réponse d’ensemble. Ne pas créer une succession d’attentes et de questions isolées ; recueillir librement les idées, les organiser dans les plans et trancher les choix courants avec des hypothèses explicites.
 - **Tags de version** : `vX.Y.Z` posés automatiquement par `.github/workflows/agents.yml` depuis `source/package.json`.
 - **Particularités** :
   - Mac M1 8 Go : une seule fenêtre de navigateur de test à la fois, la fermer et arrêter le serveur après usage ; limiter les i/s en développement.
