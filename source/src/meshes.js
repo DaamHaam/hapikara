@@ -70,7 +70,12 @@ function meshCityGround() {
       const mx=(a[0]+q[0])/2+nx*.1, mz=(a[1]+q[1])/2+nz*.1, ya=height(a), yb=height(q);
       if (!canalAt(mx,mz) && cityH(mx,mz) >= (ya+yb)/2-.1) continue;
       mb.mat=M.QUAY;
-      mb.quad(mb.v(a[0],FLOOR_Y,a[1],nx,0,nz,.55),mb.v(q[0],FLOOR_Y,q[1],nx,0,nz,.55),mb.v(q[0],yb,q[1],nx,0,nz),mb.v(a[0],ya,a[1],nx,0,nz));
+      if(abs(a[0]-119)<.01&&abs(q[0]-119)<.01&&max(a[1],q[1])>32&&min(a[1],q[1])<40){
+        const lo=min(a[1],q[1]),hi=max(a[1],q[1]);
+        const panel=(za,zb,y0,y1)=>{if(zb<=za)return;mb.poly([[119,y0,za],[119,y0,zb],[119,y1,zb],[119,y1,za]],[nx,0,nz]);};
+        panel(lo,min(32,hi),FLOOR_Y,ya);panel(max(40,lo),hi,FLOOR_Y,ya);
+        panel(max(lo,32),min(hi,40),FLOOR_Y,3.2);panel(max(lo,32),min(hi,40),6.3,ya);
+      }else mb.quad(mb.v(a[0],FLOOR_Y,a[1],nx,0,nz,.55),mb.v(q[0],FLOOR_Y,q[1],nx,0,nz,.55),mb.v(q[0],yb,q[1],nx,0,nz),mb.v(a[0],ya,a[1],nx,0,nz));
       coping(mb,a,q,ya,yb);
     }
   }

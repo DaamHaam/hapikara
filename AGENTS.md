@@ -33,7 +33,10 @@ Cité égyptienne imaginaire entre le Nil et le désert, survolable dans le navi
 - `source/src/` : modules (voir le tableau du README d'Atlantis). Moteur à garder : `main.js`, `quality.js`, `math.js`, `collide.js`, `dev.js`, `sh_base.js`, `sh_light.js`. Monde à remplacer : `layout.js`, `city.js`, `plants.js`, `meshes.js`, `world.js`, plus matériaux de `sh_scene.js`/`sh_fx.js` et `music.js`.
 - `source/build.mjs` : concatène `src/` dans l'ordre donné et écrit `../index.html`.
 - `layout.js` est la source du réseau rectangulaire segmenté `CHANNELS`, des cellules convexes `BLOCKS`, des terrasses `TERRACES`/`cityH`, des biefs `BIEFS` et des escaliers de quai `QUAY_STEPS`. Sol, plantations, masques et collisions s'y réfèrent. L'enveloppe extérieure reste la superellipse 470 × 400, également utilisée par `sh_light.js`.
-- Accueil minimal sans image ni plan ; `L` seul ouvre les réglages sur ordinateur, `I` affiche les statistiques. Les essais d’ambiance ne persistent pas : « Sanctuaire voilé » avec soleil à 12° revient à chaque ouverture. Pierre et eau sont les premiers groupes du panneau ; grain modéré activé, relief renforcé désactivé, niveau sous-marin 3 et rayons à 2 par défaut. Les quatre niveaux sous-marins sont indépendants des trois qualités globales. Les canaux, le Nil et l’oasis sont plongeables ; les petits bassins hauts restent superficiels.
+- Accueil minimal sans image ni plan ; `L` seul ouvre les réglages sur ordinateur, `I` affiche les statistiques. Les essais d’ambiance ne persistent pas : « Sanctuaire voilé » avec soleil à 12° revient à chaque ouverture. Pierre, vie sous-marine et eau sont les premiers groupes du panneau ; grain à 1,25, relief renforcé supprimé, poissons à 1, niveau sous-marin 3 et rayons à 2 par défaut. Les quatre niveaux sous-marins sont indépendants des trois qualités globales. Les canaux, le Nil et l’oasis sont plongeables ; les petits bassins hauts restent superficiels.
+- `crypt.js` partage le plan du passage immergé et de la crypte entre maillage et collisions. Les types `INTERIOR` restent seuls visibles depuis la partie intérieure ; miroir et ombres extérieures y sont suspendus. La petite ouverture solaire est recalculée avec le soleil au chargement, sans passage possible pour la caméra.
+- `aquatics.js` génère les poissons à deux LOD, les trésors et les mosaïques. Quatre bancs de 60/40/20 poissons en High/Medium/Low, animation dans le vertex shader, densité réglable par `L`, sans simulation JS par poisson ni ombre/reflet miroir.
+- Installation mobile : métadonnées Apple, zones sûres et favicon SVG intégrée ; `source/tools/make-icon.py` produit `apple-touch-icon.png` (icône d’installation facultative, extérieure au rendu 3D).
 - `source/src/discoveries.js` : petits sanctuaires, abris et campement statiques, maillages et boîtes de collision partagés, choix d’un terrain sec et suffisamment plat près des sites souhaités ; ensembles de jarres et fragments sous-marins. `city.js` les implante et expose leurs positions aux captures de développement.
 - `source/src/egypt.js` : générateurs des bâtiments, végétaux et ornements égyptiens ; `PDN` dans `layout.js` fournit les dimensions du pyramidion à la géométrie et à la réfraction.
 - `source/tools/qa-export.py` exporte les captures vérifiées et les rapports bruts dans `.github/screenshots/` (Pillow, uniquement pour les outils). `qa-palm-control.mjs` fabrique dans `/tmp` une variante de contrôle avec les anciennes palmes, sans modifier le livrable.
@@ -41,7 +44,7 @@ Cité égyptienne imaginaire entre le Nil et le désert, survolable dans le navi
 
 ## Invariants métier
 
-- Un seul `index.html` autonome, sans fichier externe.
+- Un seul `index.html` autonome pour toute la scène 3D, sans ressource externe de scène. Seule exception : `apple-touch-icon.png`, facultatif pour l’icône sur l’écran d’accueil ; son absence ne bloque pas la visite.
 - Aucune allocation JS par image.
 - Rien de visuel d'Atlantis ne doit subsister dans le rendu final.
 - Garder `LICENSE` avec la mention de copyright d'Atlantis.

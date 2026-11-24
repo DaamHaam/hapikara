@@ -9,7 +9,8 @@ const n=Number(html.slice(end+4).match(/^\d+/)[0]),s=html.slice(start,end),data=
 for(let i=0,j=0,a=0,k=0;j<n;i++){assert(i<s.length,'truncated payload');a=a<<7|s.charCodeAt(i)&127;k+=7;if(k>7){k-=8;data[j++]=a>>k;a&=(1<<k)-1;}}
 const code=inflateRawSync(data).toString('utf8');
 new Function(code); // Parse, never execute the browser program.
-assert(!/<(?:script|img|audio|video|link|iframe)\b[^>]*(?:src|href)\s*=/i.test(html),'external resource in HTML');
+assert(!/<(?:script|img|audio|video|iframe)\b[^>]*(?:src|href)\s*=/i.test(html),'external scene resource in HTML');
+for(const link of html.matchAll(/<link\b[^>]*>/gi))assert(/rel=apple-touch-icon\b[^>]*href=apple-touch-icon\.png|href="data:image\/svg\+xml,/i.test(link[0]),'unexpected external link asset');
 assert(!code.includes('window.__shot')&&!code.includes('/__qa'),'development tools leaked into production');
 assert(readFileSync(new URL('../../LICENSE',import.meta.url),'utf8').includes('Maksymilian'),'upstream copyright missing');
 console.log(`Bundle OK: ${Buffer.byteLength(html)} bytes; gzip ${gzipSync(html,{level:9}).byteLength} bytes; standalone, valid JS, no dev tools, MIT attribution present.`);

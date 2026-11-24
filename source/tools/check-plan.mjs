@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 const read = f => readFileSync(new URL('../src/'+f,import.meta.url),'utf8');
-const source = ['math.js'].map(read).join('\n') + '\nconst LOOK=new Float32Array(27);LOOK[20]=12;LOOK[21]=-44;\n' + ['layout.js'].map(read).join('\n') + '\n' + read('sh_scene.js').split('// per view')[0] + '\nconst LEAFK=1;\n' + ['meshes.js','egypt.js','discoveries.js','collide.js'].map(read).join('\n');
+const source = ['math.js'].map(read).join('\n') + '\nconst LOOK=new Float32Array(27);LOOK[20]=12;LOOK[21]=-44;\n' + ['layout.js','crypt.js'].map(read).join('\n') + '\n' + read('sh_scene.js').split('// per view')[0] + '\nconst LEAFK=1;\n' + ['meshes.js','egypt.js','discoveries.js','aquatics.js','collide.js'].map(read).join('\n');
 vm.runInNewContext(source + `
 const assert = (b,m) => {if(!b) throw Error(m)};
 setHard({boxes:[],bridges:[]}); landY=terrainH;
@@ -41,6 +41,8 @@ const meshes=[mesh,meshPyramid(),meshAcropolis(),meshCascades(),meshSphinx(0),me
 for(let v=1;v<=20;v++)meshes.push(meshVillaE(v,0).mesh);
 for(let l=0;l<5;l++)meshes.push(meshPalm(11,l));
 meshes.push(meshCanalFinds());
+meshes.push(meshCrypt(),meshFlame(),meshMosaic(),meshTreasure(0),meshTreasure(1));
+for(let k=0;k<3;k++)for(let lod=0;lod<2;lod++)meshes.push(meshFish(k,lod));
 for(const [x,z,k]of DISCOVERY_SITES){
  const p=discoveryAt(x,z,terrainH);assert(p,'missing discovery '+k);
  assert(!inCity(p[0],p[2])&&p[1]-p[3]<2.7,'discovery site ground');
@@ -62,5 +64,19 @@ assert(F[CX]<140.4&&F[CX]>139&&F[CY]===5,'swept submerged quay collision');
 F.set([130,0,200]);collide(130,5,200);assert(abs(F[CY]-FLOOR_Y-CLEAR)<1e-6,'solid canal bottom');
 F.set([130,9,200]);collide(130,5,200);assert(F[CY]===9,'water surface remains passable');
 assert(waterSurfaceAt(130,200)===WATER&&waterSurfaceAt(155,200)<-1e8,'submersion footprint');
+// Complete round trip: only a submerged camera can cross the mouth; ramp and bend are traversable.
+function go(x,y,z){const px=F[CX],py=F[CY],pz=F[CZ];F[CX]=x;F[CY]=y;F[CZ]=z;collide(px,py,pz);}
+F.set([130,4.8,36]);for(let x=129.75;x>=54;x-=.25)go(x,F[CY],36);
+assert(abs(F[CX]-54)<.01&&abs(F[CY]-11.7)<.01,'crypt ascent');
+for(let z=35.75;z>=0;z-=.25)go(54,F[CY],z);
+assert(abs(F[CZ])<.01&&cryptInside(F[CX],F[CY],F[CZ]),'crypt bend');
+go(54,100,0);assert(F[CY]<=23.11,'crypt ceiling');
+F.set([130,8,36]);for(let x=129.75;x>=110;x-=.25)go(x,8,36);
+assert(F[CX]>119.6,'mouth inaccessible above water');
+F.set([-17.6,15.8,11]);for(let z=11.25;z<16;z+=.25)go(F[CX],15.8,z);
+assert(F[CZ]<12,'sun aperture cannot be traversed');
+F.set([54,11.7,0]);for(let z=.25;z<=36;z+=.25)go(54,F[CY],z);
+for(let x=54.25;x<=130;x+=.25)go(x,F[CY],36);
+assert(F[CX]>129&&F[CY]<5.5,'crypt exit stays submerged');
 console.log('Plan OK:',BLOCKS.length,'convex cells,',dry,'land and',wet,'water samples;',checked,'rendered tops,',meshes.length,'finite meshes; terrace/bief/stair/bridge collisions agree.');
 `, {console});

@@ -5,6 +5,7 @@
 const CLEAR = 0.9, CLEAR_W = 0.55; // clearance above solid ground, and above water
 const COL = new Float64Array(3); // last query: floor, ceiling, 1 where the floor is natural ground or water
 let landY = null; // set by main.js once the world is built
+let cryptMoving=false; // preserve the cavity while its sloping ceiling moves below the previous camera height
 // boxes [x0, z0, x1, z1, top] in a grid of 16 m cells; bridges [x0, z0, x1, z1, deck, along z, hump]
 let HB = null, HR = null, GRID = null; const GC = 16, GN = 256, GO = 2048;
 function setHard(h) {
@@ -42,6 +43,12 @@ function acroStairY(x,z) {
 }
 function surfaceAtPoint(x, z, y0) {
   COL[1] = 1e9; COL[2] = 0;
+  const chamber=cryptZone(x,y0,z,cryptMoving);
+  if(chamber>=0){
+    let f=cryptFloor(chamber,x);
+    for(const b of CRYPT_SOLIDS)if(x>b[0]&&x<b[2]&&z>b[1]&&z<b[3])f=max(f,b[4]);
+    COL[0]=f+CLEAR;COL[1]=cryptCeil(chamber,x)-CLEAR;return;
+  }
   for (let i = 0; i < HR.length; i += 7) if (x > HR[i] && x < HR[i + 2] && z > HR[i + 1] && z < HR[i + 3]) {
     const u = HR[i + 5] ? (z - HR[i + 1]) / (HR[i + 3] - HR[i + 1]) : (x - HR[i]) / (HR[i + 2] - HR[i]);
     deck(HR[i+4] + HR[i+6] * (sin(PI*u)-1), FLOOR_Y+CLEAR-CLEAR_W, y0); return;
@@ -66,6 +73,7 @@ function surfaceAtPoint(x, z, y0) {
 }
 // Water access is limited to real wet footprints; shallow temple bowls remain above-water.
 function waterSurfaceAt(x,z){
+  if(x>=58&&x<=120&&z>=32&&z<=40&&cryptFloor(x<96?1:0,x)<WATER)return WATER;
   if(inCity(x,z))return canalAt(x,z)?WATER:-1e9;
   if(oasisD(x,z)<58&&landY&&landY(x,z)<2.6)return 2.6;
   return landY&&landY(x,z)<0?0:-1e9;
@@ -83,14 +91,16 @@ function surfaceAt(x,z,y0){
 // lifts it; anything built higher than a stair step is a wall it slides along per axis. Long steps go in <= .7 m pieces.
 function collide(px, py, pz) {
   if (!landY) return;
+  cryptMoving=cryptZone(px,py,pz)>=0;
   const tx = F[CX], ty = F[CY], tz = F[CZ], n = min(128, ceil(hypot(tx - px, tz - pz) / .7));
-  if (n < 2) { collide1(px, py, pz); return; }
+  if (n < 2) { collide1(px, py, pz);cryptMoving=false; return; }
   let cx = px, cy = py, cz = pz, dx = (tx - px) / n, dz = (tz - pz) / n; const dy = (ty - py) / n;
   for (let i = 0; i < n; i++) {
     F[CX] = cx + dx; F[CY] = cy + dy; F[CZ] = cz + dz; collide1(cx, cy, cz);
     if (F[CX] === cx) dx = 0; if (F[CZ] === cz) dz = 0;
     cx = F[CX]; cy = F[CY]; cz = F[CZ];
   }
+  cryptMoving=false;
 }
 function collide1(px, py, pz) {
   let x = F[CX], y = F[CY], z = F[CZ];

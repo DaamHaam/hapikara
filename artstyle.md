@@ -86,13 +86,15 @@ Un rendu moins riche en micro-détail que les références est acceptable. Un re
 **Un seul état du monde :** neuf, abondant, à une heure fixe (section 9). Pas de ruine, de nuit, de tempête de sable, de crue destructrice.
 
 **Ne jamais inclure :**
-- personnes, silhouettes, animaux vivants, oiseaux, poissons (les **statues** de sphinx, de béliers ou de faucons sont autorisées, en pierre, sans visage humain détaillé)
+- personnes, silhouettes, animaux vivants et oiseaux ; exception validée : petits bancs de poissons discrets dans le Nil, argentés, olive ou dorés, sans aspect cartoon (les **statues** de sphinx, de béliers ou de faucons sont autorisées, en pierre, sans visage humain détaillé)
 - texte lisible, lettres latines, logos, interface ou hologrammes dans la scène (les bandeaux de pseudo-hiéroglyphes sculptés sont autorisés comme texture, flous à distance)
 - ordres classiques grecs (dorique, ionique, corinthien), frontons triangulaires, coupoles, arcs en plein cintre, éléments gréco-romains ou islamiques
 - machines : moteurs, tuyaux, fils, engrenages, écrans, gratte-ciel en verre
 - néon, éclairs, rayons laser, particules magiques, symboles lumineux flottants
 - ruines, usure, sable envahissant la ville, palette sépia ou poussiéreuse, brume permanente
 - la cliché « temple de Louxor » à l'identique : tout est réinventé
+
+**Découvertes validées :** quelques vestiges discrets hors de la cité, coffres et sarcophages vides dans les hauts-fonds, mosaïques vert et or sous les canaux. Un passage entièrement immergé sous l’acropole conduit à une galerie puis à la chambre secrète de la pyramide. Grès chaud, malachite, or patiné, pénombre et braseros ; une étroite ouverture laisse un rayon solaire atteindre le sarcophage. Aucun mort ni personnage, aucune porte ou lumière magique.
 
 ## 5. Plan du monde
 

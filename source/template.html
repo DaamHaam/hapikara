@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang=fr><head><meta charset=utf-8><title>Hapikara — Cité égyptienne</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=theme-color content=#092d36>
+<html lang=fr><head><meta charset=utf-8><title>Hapikara — Cité égyptienne</title><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name=theme-color content=#092d36><meta name=apple-mobile-web-app-capable content=yes><meta name=mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-title content=Hapikara><meta name=apple-mobile-web-app-status-bar-style content=black-translucent><link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png><link rel=icon href="/*ICON*/">
 <style>
 :root{color-scheme:dark;--ink:#092d36;--gold:#efd28e;--paper:#fff3d4;--jade:#41ccb0}*{box-sizing:border-box}[hidden]{display:none!important}
 html{background:var(--ink)}body{position:fixed;inset:0;margin:0;overflow:hidden;background:var(--ink);color:var(--paper);font:15px/1.5 system-ui,sans-serif}
@@ -23,6 +23,7 @@ html[data-look=open] #m{display:none}html[data-look=open] #c{filter:none}html[da
 @media(max-height:500px){#m{padding:20px 40px}#welcome{padding:0}h1{font-size:48px}.subtitle{margin:5px 0 12px}#p{margin:12px 0}#g{gap:12px}#k,#h{margin:15px 0 0}#look-panel{top:12px}}
 @media(pointer:coarse){#k{display:none}#h{display:block}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media(pointer:coarse){#m{padding-left:max(25px,env(safe-area-inset-left));padding-right:max(25px,env(safe-area-inset-right));padding-top:max(20px,env(safe-area-inset-top));padding-bottom:max(25px,env(safe-area-inset-bottom))}#o{right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom))}}
 </style></head>
 <body class=l><canvas id=c tabindex=-1 aria-label="La cité de Hapikara en trois dimensions"></canvas>
 <main id=m><section id=welcome><h1>Hapikara</h1><p class=subtitle>Cité égyptienne</p><div id=p><i id=b></i></div><p id=s>La cité prend forme…</p>

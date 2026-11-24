@@ -24,7 +24,7 @@ if (!AUTO && !mob) {
   });
   // New experiments first; preserve LOOK indices shared with the shaders and imports.
   const fields=$('look-fields');
-  fields.prepend(groups.get('Pierre'),groups.get('Sous l’eau'));
+  fields.prepend(groups.get('Pierre'),groups.get('Vie sous-marine'),groups.get('Sous l’eau'));
   const sunHelp=document.createElement('p');sunHelp.textContent='La position du soleil recharge la cité pour accorder le ciel, les reflets et les ombres.';
   const sunApply=document.createElement('button');sunApply.id='sun-apply';sunApply.textContent='Appliquer la position du soleil';
   groups.get('Position du soleil').append(sunHelp,sunApply);

@@ -6,7 +6,7 @@ const read=f=>readFileSync(new URL('../src/'+f,import.meta.url),'utf8');
 const context=vm.createContext({Float32Array,Number,JSON,sessionStorage:{removeItem(k){delete this[k]}},AUTO:false,QP:new URLSearchParams(),URLSearchParams});
 vm.runInContext(read('math.js')+'\n'+read('ambiance.js')+`
   if(LOOK.length!==27)throw Error('uniform contract');
-  if(LOOK[20]!==12||LOOK[22]!==3||LOOK[24]!==2||LOOK[26]!==0)throw Error('agreed defaults');
+  if(LOOK[20]!==12||LOOK[22]!==3||LOOK[24]!==2||LOOK[25]!==1.25||LOOK[26]!==1)throw Error('agreed defaults');
   if(readLook({version:2,values:{sun:1.6}}))throw Error('future format accepted');
   if(readLook({version:1,values:{sun:NaN,exposure:'oops'}}))throw Error('invalid number');
   if(!readLook({version:1,values:{sun:999,haze:-4,exposure:.84}}))throw Error('valid import refused');

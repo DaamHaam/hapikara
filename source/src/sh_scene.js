@@ -1,6 +1,6 @@
 // shaders 2/4: instancing, GPU culling, materials (G-buffer) and shadow casters
 // material ids, shared by mesh generators and shaders
-const M = { MARBLE: 0, PAVE: 1, PLASTER: 2, GOLD: 3, QUAY: 4, FLOOR: 5, WINDOW: 6, BARK: 7, ALLOY: 8, TRIM: 9, TERRAIN: 10, CORE: 11, TERRACE: 12, GROUND: 13, STEP: 14, ROCK: 15, FALL: 16, SEA: 17, PAINT: 18, SANDST: 19, GRANITE: 20, PALM: 21, PALMBARK: 22, UWSTONE: 23, LEAF: 32 };
+const M = { MARBLE: 0, PAVE: 1, PLASTER: 2, GOLD: 3, QUAY: 4, FLOOR: 5, WINDOW: 6, BARK: 7, ALLOY: 8, TRIM: 9, TERRAIN: 10, CORE: 11, TERRACE: 12, GROUND: 13, STEP: 14, ROCK: 15, FALL: 16, SEA: 17, PAINT: 18, SANDST: 19, GRANITE: 20, PALM: 21, PALMBARK: 22, UWSTONE: 23, FLAME:24, FISH:25, MOSAIC:26, LEAF: 32 };
 // leaf atlas tiles (material = M.LEAF + tile): crowns, then vines (TRAIL fringe, VLEAF / VBLOSSOM carpets)
 const LT = { OLIVE: 0, BROAD: 1, PINE: 2, CYPRESS: 3, BLOSSOM: 4, HYDRANGEA: 5, TRAIL: 6, LAVENDER: 7, VLEAF: 8, VBLOSSOM: 9, PALM: 10, LILY: 11 };
 
@@ -27,6 +27,9 @@ fn emit(slot: u32, i: u32, f: f32, inv: u32) {
 @compute @workgroup_size(64) fn cull(@builtin(global_invocation_id) id: vec3u) {
   let i = id.x; if (i >= arrayLength(&inst)) { return; }
   let it = inst[i]; let mt = types[it.ty]; let c = it.p.xyz;
+  let flags=u32(mt.e.y);
+  if(view.look7.x>.5&&(flags&128u)==0u){return;}
+  if((flags&256u)!=0u&&(view.look6.y<=0.||fract(f32(i)*.7548777)>=view.look6.y)){return;}
   for (var k = 0; k < 6; k++) { if (dot(view.planes[k].xyz, c) + view.planes[k].w < -it.rad) { return; } }
   let d = max(max(distance(view.lodc.xyz, c) - it.rad * .5, 0.) * view.misc.z, view.lodb.x);
   // gone beyond the far limit; lodc.w removes the level's LOD scale here, so far forests stay on Medium/Low
@@ -82,8 +85,15 @@ fn transform(v: VI) -> VO {
   let e = vis[v.ii]; let it = inst[e & 0xffffffu];
   let mat = u32(v.ext.x * 255. + .5);
   let s = vec3f(it.p.w, it.p.w * it.sy, it.p.w);
-  let lp = v.pos * s;
+  var lp = v.pos * s;
   var q = it.q; var org = it.p.xyz;
+  if(mat==25u){
+    let sd=f32(it.tint>>24u)/255.;let t=view.cam.w;let a=t*.22+floor(it.p.z/80.)*.9;
+    org+=vec3f(7.*sin(a),.25*sin(t*.8+sd*6.),5.*cos(a));
+    let yaw=atan2(5.*sin(a),7.*cos(a));q=vec4f(0.,sin(yaw*.5),0.,cos(yaw*.5));
+    lp.z+=sin(t*7.+sd*6.-v.pos.x*4.)*(.05+.16*sat(-v.pos.x))*it.p.w;
+  }
+  if(mat==24u){let t=view.cam.w;lp.x+=sin(t*4.+org.x)*lp.y*.08;lp.z+=cos(t*3.3+org.z)*lp.y*.07;lp.y*=.85+.15*sin(t*8.+org.x);}
   if (mat == 0u && v.ext.w > .99) {
     // podium crystals hover and turn on their own slow clocks (misc.w = 0 while baking shadows: middle height)
     let ph = org.x * .37 + org.z * .61; let t = view.cam.w * view.misc.w; let h = (t * .11 + ph) * .5;
@@ -345,7 +355,19 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
       petal = FLOWERS[u32(i.tint.a * 255. + .5) & 7u] * (.75 + .6 * c.r) * (.85 + .3 * v); o.rough = .5;
     }
     if (c.g > .5) { o.alb = petal; o.trans = .4; } else { o.trans = .75; }
-  } else if (mat == 21u) {
+  } else if(mat==24u){o.alb=vec3f(1.,.35,.035);o.rough=1.;glass=1.;}
+  else if(mat==25u){
+    let stripe=.85+.15*sin(i.lp.x*14.+i.uv.x*255.);
+    o.alb=i.tint.rgb*i.tint.rgb*stripe*mix(vec3f(.7,.8,.65),vec3f(1.2,1.15,1.),sat(N.y*.5+.5));
+    if(i.uv.y>.5){o.alb=vec3f(.006);}
+    o.metal=.18;o.rough=.32;
+  }else if(mat==26u){
+    let q=i.lp.xz;let r=length(q);let a=atan2(q.y,q.x);
+    let lotus=abs(r-(1.55+.35*cos(a*8.)));let ring=abs(r-2.55);
+    let motif=1.-ss(.04,.08+fw,min(lotus,ring));
+    let tiles=min(fract(q.x*5.),fract(q.y*5.));let grout=ss(.02,.07,tiles);
+    o.alb=mix(vec3f(.025,.19,.13),vec3f(.7,.46,.12),motif)*(.72+.28*grout);o.rough=.55;
+  }else if (mat == 21u) {
     // Broad continuous leaf; veins are shading only, derivative filtered, never holes.
     let q=i.uv.xy; let v=q.y*10.+abs(q.x-.5)*3.; let fwv=max((abs(uvx.y)+abs(uvy.y))*10.+(abs(uvx.x)+abs(uvy.x))*3.,.02);
     let vein=1.-ss(.03,.03+fwv,abs(fract(v)-.5));
@@ -513,13 +535,6 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
       o.alb*=1.+(gr.a-.5)*.16*amount*near;
       o.rough=clamp(o.rough+(gr.g-.5)*.12*amount*near,.12,.96);
       o.nb+=triN(p,dx,dy,w,7.,true)*.14*amount*near;
-    }
-    // Opt-in: two extra scales of erosion and fissures, disabled by default.
-    if(view.look6.y>.001){
-      let er=tri(tNoiseA,p,dx,dy,w,.65);
-      let crack=(1.-ss(.02,.08,abs(er.r-.5)))*(1.-ss(.06,.3,fw));
-      o.alb*=1.-crack*.2*view.look6.y;
-      o.nb+=(triN(p,dx,dy,w,.65,true)*.3+triN(p,dx,dy,w,3.,true)*.18)*view.look6.y;
     }
   }
   N = normalize(N - o.nb);

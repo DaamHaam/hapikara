@@ -182,6 +182,7 @@ let nVis = 0;
 Wd.types.forEach((t, i) => {
   for (let l = 0; l < 4; l++) { if (l < t.lods.length) { tyU[i * 12 + l] = slots.length; slots.push({ mesh: Wd.meshes[t.lods[l]], kind: t.kind, flags: t.flags, first: nVis, n: t.n, lod: l }); nVis += t.n; } else tyU[i * 12 + l] = NONE; }
   tyF.set(t.d, i * 12 + 4); tyF[i * 12 + 8] = t.d23;
+  tyF[i*12+9]=t.flags;
 });
 const argData = new Uint32Array(slots.length * 5);
 slots.forEach((s, i) => argData.set([s.mesh.ni, 0, s.mesh.i0, s.mesh.v0, s.first], i * 5));
@@ -332,6 +333,7 @@ passShadow.timestampWrites = tsBE(2);
 // the last visit left it. PIXTOP: a level's maximum.
 let W = 0, H = 0, MW = 0, MH = 0, DW = 0, DH = 0, targets = [], hist = null;
 let passG, passG2, passGm, passAO, passVol, bgVol, passPolish, bgPolish, passLight, passLightM, passX1, passX1b, passXm, passWater, passX2, passTAA = [], passPost, bloomPass = [], bloomBG = [];
+let passAOinside;
 let bgLight, bgLightM, bgAO, bgFx, bgFxM, bgTAA = [], bgPost = [], cpA, cpB, cpD, cpDc, cpSize;
 const NB = NBLOOM, FIXW = +QP.get('w') || 0, FIXH = +QP.get('h') || 0;
 const PIXTOP = QL(1e9, 2560 * 1440, 1280 * 720), PIXMIN = mob ? 25e4 : 4e5;
@@ -362,6 +364,7 @@ function resize() {
   passG2 = { colorAttachments: [0, 1, 2].map((i) => colorAtt(g[i].createView(), false)), depthStencilAttachment: { view: g[3].createView(), depthLoadOp: 'load', depthStoreOp: 'store' }, timestampWrites: tsE(4) };
   const tVol = SHAFTS ? T(W >> 2, H >> 2, 'rg16float') : tWhite;
   if (SSAO) { passAO = { colorAttachments: [colorAtt(tAO.createView(), true)], timestampWrites: SHAFTS ? tsB(5) : tsBE(5) }; bgAO = group(lAO, [ubo[V_MAIN], g[3], g[1], g[2]]); }
+  if(SSAO)passAOinside={...passAO,timestampWrites:tsBE(5)};
   if (SHAFTS) { passVol = { colorAttachments: [colorAtt(tVol.createView(), true)], timestampWrites: SSAO ? tsE(5) : tsBE(5) }; bgVol = group(lVol, [ubo[V_MAIN], sCmp, g[3], tSh[1], tSh[2]]); }
   passLight = { colorAttachments: [colorAtt(tA.createView(), true)], timestampWrites: tsBE(6) }; if (MIRROR) passLightM = { colorAttachments: [colorAtt(tMA.createView(), true)] };
   if (POLISH) { passPolish = { colorAttachments: [colorAtt(tA.createView(), false)], timestampWrites: tsB(7) }; bgPolish = group(lPolish, [ubo[V_MAIN], sLin, tB, tDc, g[1], g[2], cubeView(tEnv)]); }
@@ -415,10 +418,12 @@ addEventListener('resize', resize);
 const JIT = new Float32Array(32); // Halton (2, 3) sub-pixel offsets
 for (let i = 0; i < 16; i++) { const h = (n, b) => { let f = 1, r = 0; while (n > 0) { f /= b; r += f * (n % b); n = floor(n / b); } return r; }; JIT[i * 2] = h(i + 1, 2) - 0.5; JIT[i * 2 + 1] = h(i + 1, 3) - 0.5; }
 const PVP = new Float32Array(16), submitList = [null];
-let hud = false;
+let hud = false, wasCrypt=false;
 function render() {
   const U = UB[V_MAIN], M = UB[V_MIR], S = UB[V_SH], fr = F[FRAME], t = F[TIME], par = fr & 1;
   const cx = F[CX], cy = F[CY], cz = F[CZ], j = (fr & 15) * 2;
+  const crypt=cryptInside(cx,cy,cz);U[212]=crypt?1:0;M[212]=0;S[212]=0;
+  if(crypt!==wasCrypt){F[RESET]=1;wasCrypt=crypt;}
   // unjittered first: that matrix is next frame's reprojection target
   setCam(U, cx, cy, cz, F[YAW], F[PIT], W, H, 0, 0);
   for (let i = 0; i < 16; i++) { U[32 + i] = PVP[i]; PVP[i] = U[i]; }
@@ -430,7 +435,7 @@ function render() {
   U[O_PULSE] = tp; U[O_PULSE + 1] = 0.5 + 0.5 * sin(t * TAU / 7); U[O_PULSE + 2] = exp(-tq * tq);
   U[O_MISC] = F[RESET]; U[O_MISC + 1] = 0; U[O_MISC + 2] = LODK; U[O_MISC + 3] = LOOK_ACTIVE[16]; U[O_LODC] = cx; U[O_LODC + 1] = cy; U[O_LODC + 2] = cz; U[O_LODC + 3] = 1 / LODK;
   // canal mirror only when canal water is in view and the camera is low enough (fades 170-235 m)
-  let mir = MIRROR ? 1 - sstep(170, 235, cy) : 0;
+  let mir = MIRROR&&!crypt ? 1 - sstep(170, 235, cy) : 0;
   for (let k = 0; k < 5; k++) { const o = O_PL + k * 4; if (U[o + 1] * WATER + U[o + 3] < -445) mir = 0; }
   U[O_PULSE + 3] = mir;
   if (CASC) {
@@ -458,10 +463,10 @@ function render() {
   let r = e.beginRenderPass(passWaves[0]); r.setPipeline(pWaves); r.setBindGroup(0, bgWaves); r.draw(3); r.end();
   for (let i = 1; i < 6; i++) { r = e.beginRenderPass(passWaves[i]); r.setPipeline(pMip[HDR]); r.setBindGroup(0, waterBG[i - 1]); r.draw(3); r.end(); }
   // visibility and LOD for the three views
-  const c = e.beginComputePass(passCull); cullView(c, V_MAIN); if (mir > 0) cullView(c, V_MIR); if (CASC) cullView(c, V_SH); c.end();
+  const c = e.beginComputePass(passCull); cullView(c, V_MAIN); if (mir > 0) cullView(c, V_MIR); if (CASC&&!crypt) cullView(c, V_SH); c.end();
   if (CASC) {
     r = e.beginRenderPass(passShadow); r.setBindGroup(0, bgScene[V_SH]); r.setVertexBuffer(0, vbMesh); r.setIndexBuffer(ibMesh, 'uint32');
-    r.setPipeline(pSh32[0]); drawList(r, V_SH, LS[K.SOLID].near); r.setPipeline(pSh32[1]); drawList(r, V_SH, LS[K.LEAF].near); r.end();
+    if(!crypt){r.setPipeline(pSh32[0]); drawList(r, V_SH, LS[K.SOLID].near); r.setPipeline(pSh32[1]); drawList(r, V_SH, LS[K.LEAF].near);}r.end();
   }
   // mirror view: G-buffer, lighting, crystal and glass
   if (mir > 0) {
@@ -484,13 +489,13 @@ function render() {
     r.setPipeline(pLeafLow); drawList(r, V_MAIN, LS[K.LEAF].all);
   }
   r.setPipeline(pG[0]); drawList(r, V_MAIN, LS[K.SOLID].gnd); r.end();
-  if (SSAO) { r = e.beginRenderPass(passAO); r.setPipeline(pAO); r.setBindGroup(0, bgAO); r.draw(3); r.end(); }
-  if (SHAFTS) { r = e.beginRenderPass(passVol); r.setPipeline(pVol); r.setBindGroup(0, bgVol); r.draw(3); r.end(); }
+  if (SSAO) { r = e.beginRenderPass(crypt?passAOinside:passAO); r.setPipeline(pAO); r.setBindGroup(0, bgAO); r.draw(3); r.end(); }
+  if (SHAFTS&&!crypt) { r = e.beginRenderPass(passVol); r.setPipeline(pVol); r.setBindGroup(0, bgVol); r.draw(3);r.end(); }
   r = e.beginRenderPass(passLight); r.setPipeline(pLight); r.setBindGroup(0, bgLight); r.draw(3); r.end();
   // crystal refracts the lit scene; thin crystal refracts scene + crystal (the great crystal shows through the lotus);
   // water mirrors and refracts that; glass and cascades blend on top. Each step reads a copy of the picture so far.
   e.copyTextureToTexture(cpA, cpB, cpSize); e.copyTextureToTexture(cpD, cpDc, cpSize);
-  if (POLISH) { r = e.beginRenderPass(passPolish); r.setPipeline(pPolish); r.setBindGroup(0, bgPolish); r.draw(3); r.end(); }
+  if (POLISH) { r = e.beginRenderPass(passPolish); if(!crypt){r.setPipeline(pPolish); r.setBindGroup(0, bgPolish); r.draw(3);}r.end(); }
   r = e.beginRenderPass(passX1); r.setBindGroup(0, bgScene[V_MAIN]); r.setBindGroup(1, bgFx); r.setVertexBuffer(0, vbMesh); r.setIndexBuffer(ibMesh, 'uint32');
   r.setPipeline(pCrystal); drawList(r, V_MAIN, lsSolidX); r.end();
   if (LV < 2) {

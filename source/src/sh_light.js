@@ -202,11 +202,35 @@ fn shafts(fc: vec2f, z: f32, rd: vec3f) -> vec3f {
   }
   return view.sunc.rgb * (min(hg, .8) * 1.2e-5 + 1e-6) * acc / ws * 800. * view.look2.z;
 }
+fn cryptLight(wp:vec3f,N:vec3f,alb:vec3f,metal:f32,V:vec3f,dist:f32,flame:f32)->vec3f{
+  if(flame>.8){return vec3f(8.,2.3,.12)*(.85+.15*sin(view.cam.w*8.+wp.x));}
+  var col=alb*vec3f(.035,.055,.045);
+  let fires=array<vec3f,${CRYPT_FIRES.length}>(${CRYPT_FIRES.map(p=>'vec3f('+p.map(v=>v.toFixed(3)).join(',')+')').join(',')});
+  for(var k=0;k<${CRYPT_FIRES.length};k++){
+    let dv=fires[k]+vec3f(0.,.5,0.)-wp;let d2=max(dot(dv,dv),.1);let L=normalize(dv);
+    let flick=.92+.08*sin(view.cam.w*5.+f32(k)*3.);
+    let diffuse=.12+.88*max(dot(N,L),0.);
+    col+=alb*vec3f(1.,.35,.075)*diffuse*48./(2.+d2)*flick;
+    col+=vec3f(1.,.6,.18)*pow(max(dot(N,normalize(L+V)),0.),24.)*metal*18./(2.+d2);
+  }
+  let focusPoint=vec3f(${CRYPT_TARGET.map(v=>v.toFixed(3)).join(',')});let L=view.sun.xyz;
+  let h=dot(wp-focusPoint,L);let off=length((wp-focusPoint)-L*h);
+  col+=alb*vec3f(2.6,1.95,.85)*exp(-off*off*1.2)*max(dot(N,L),.1);
+  // Closest approach to a finite Gaussian shaft: stable even when seen edge-on.
+  let reach=min(dist,100.);let rd=-V;let q=view.cam.xyz-focusPoint;
+  let v=rd-L*dot(rd,L);let v2=max(dot(v,v),.001);
+  let t=clamp(-dot(q-L*dot(q,L),v)/v2,0.,reach);
+  let p=q+rd*t;let along=dot(p,L);let radial=length(p-L*along);
+  let ends=ss(-.8,.2,along)*(1.-ss(${(CRYPT_RAY.length-.3).toFixed(3)},${(CRYPT_RAY.length+.3).toFixed(3)},along));
+  let beam=exp(-radial*radial*1.8)*min(reach,sqrt(1.745/v2))*ends;
+  return col+vec3f(.85,.61,.25)*beam*.3;
+}
 @fragment fn fs(@builtin(position) fc: vec4f) -> @location(0) vec4f {
   let px = vec2i(fc.xy); let dp = textureLoad(tD, px, 0);
   let ndc = fc.xy * view.res.zw * vec2f(2., -2.) + vec2f(-1., 1.) - view.jit.xy;
   let ray = view.fwd.xyz + view.right.xyz * ndc.x * view.right.w + view.up.xyz * ndc.y * view.up.w; let rd = normalize(ray);
   if (dp == 0.) {
+    if(view.look7.x>.5){return vec4f(vec3f(.006,.012,.01)+vec3f(3.,2.,.8)*pow(max(dot(rd,view.sun.xyz),0.),600.),1.);}
     // nothing drawn below the horizon: the sea beyond its 95 km mesh, long dissolved into haze, so show the haze
     if (rd.y < 0.) { return vec4f(aerial(vec3f(0.), view.cam.xyz, rd, view.cam.y / max(0. - rd.y, 1e-5)) + shafts(fc.xy, 1e6, rd), 1.); }
     return vec4f(sky(rd, true) + shafts(fc.xy, 1e6, rd), 1.);
@@ -215,6 +239,7 @@ fn shafts(fc: vec2f, z: f32, rd: vec3f) -> vec3f {
   let g0 = textureLoad(tG0, px, 0); let g1 = textureLoad(tG1, px, 0); let g2 = textureLoad(tG2, px, 0);
   let alb = g0.rgb * g0.rgb; let N = normalize(g1.xyz); let rough = g1.a; let metal = g2.g; let trans = g2.b;
   let V = -rd; let L = view.sun.xyz;
+  if(view.look7.x>.5){return vec4f(cryptLight(wp,N,alb,metal,V,dist,g2.a),1.);}
   let sh = shadow(wp, N);
   var ao = pow(g2.r, view.look0.w);
   if (LV < 2 && view.misc.y < .5) { ao *= pow(ssao(fc.xy, z), 2.3 * view.look0.w); }

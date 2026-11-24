@@ -2,7 +2,7 @@
 const K = { SOLID: 0, LEAF: 1, CRYSTAL: 2, GLASS: 3, WATER: 4, CASCADE: 5 };
 // flags: not in the camera cascade / mirror / any shadow map / baked shadows (moving things); never culled; drawn
 // last (ground); thin crystal, drawn after the solid crystals so they show through
-const NO_NEAR = 1, NO_MIRROR = 2, NO_SHADOW = 4, NO_BAKE = 8, ALWAYS = 16, DRAW_LAST = 32, THIN = 64;
+const NO_NEAR = 1, NO_MIRROR = 2, NO_SHADOW = 4, NO_BAKE = 8, ALWAYS = 16, DRAW_LAST = 32, THIN = 64, INTERIOR = 128, FISH_SCHOOL = 256;
 const Q0 = [0, 0, 0, 1];
 const rgb = (r, g, b, a = 1) => (round(clamp(a, 0, 1) * 255) << 24 | round(clamp(b, 0, 1) * 255) << 16 | round(clamp(g, 0, 1) * 255) << 8 | round(clamp(r, 0, 1) * 255)) >>> 0;
 // places paved in the city: the acropolis, the avenues, the temple blocks either side of the avenue, the quaysides
@@ -87,6 +87,13 @@ function buildWorld() {
   put(type([meshCascades()], K.CASCADE), 0, 0, 0);
 
   populate({ type, put, paint, MAP, balRun, gH: land.heightAt, hard, wm });
+  populateAquatics({type,put,gH:land.drawnAt});
+  const cryptFlags=INTERIOR|NO_SHADOW|NO_BAKE|NO_MIRROR;
+  put(type([meshCrypt()],K.SOLID,1e9,1e9,280,0,cryptFlags),0,0,0);
+  const flame=type([meshFlame()],K.SOLID,1e9,1e9,100,0,cryptFlags);
+  for(const p of CRYPT_FIRES)put(flame,p[0],p[1],p[2]);
+  const pool=new MB(4);waterPoly(pool,rect(79.5,32,96,40),WATER,0);
+  put(type([pool.build()],K.WATER,1e9,1e9,150,0,cryptFlags),0,0,0);
   put(type([wm.build()], K.WATER), 0, 0, 0);
   return { meshes, types, inst: IB.slice(0, nI * 48), nI, MAP, LANDMAP, ground: land.drawnAt, hard };
 }

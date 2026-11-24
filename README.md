@@ -12,11 +12,21 @@ Pierre dorée, pierres précieuses et eau vert-jade qui ruisselle de partout, de
 
 ![La cité entre le Nil et le désert](.github/screenshots/aerial.jpg)
 
-## Matières, pyramide et découvertes — v0.4.0
+## Passage secret et vie sous-marine — v0.5.0
+
+Un passage sous l’eau, dans le canal à l’est de l’acropole, mène à une galerie ascendante puis à la chambre de la pyramide : sarcophage vide, braseros et rayon solaire passant par une ouverture trop petite pour la caméra. Plan des murs et collisions sont communs ; la sortie impose de replonger. À l’intérieur, la cité extérieure et son miroir ne sont plus dessinés.
+
+Quatre bancs de poissons parcourent le Nil : 240/160/80 individus selon les trois qualités, trois silhouettes, deux niveaux de détail et une animation GPU sans simulation individuelle. Dans `L`, leur densité peut être réduite jusqu’à zéro. Quatre ensembles de trésors ponctuent les hauts-fonds ; des mosaïques à lotus apparaissent dans les canaux.
+
+Grain de pierre à **1,25** ; relief renforcé supprimé. L’installation sur l’écran d’accueil bénéficie d’une icône et de marges adaptées à l’encoche. Toute la scène reste dans le HTML ; seul le PNG facultatif de l’icône d’installation est séparé. Aucun mode hors connexion n’est ajouté.
+
+[Captures et vérifications](.github/screenshots/iteration6/README.md).
+
+## Matières, pyramide et découvertes — v0.4.0 (historique)
 
 Soleil de fin de journée à **12°** par défaut. La pyramide conserve sa silhouette à degrés, avec des corniches sculptées, de petits pilastres et des panneaux vert malachite/or à la place des larges bandes alternées bleu-rouge-vert. Le grain des pierres et les épaules des joints sont accentués de près et filtrés à distance.
 
-Dans `L`, **Pierre** et **Sous l’eau** apparaissent en premier. Le grain modéré est activé ; le **relief renforcé**, plus coûteux, reste désactivé. Le niveau sous-marin « rayons » et leur intensité maximale sont maintenant les valeurs par défaut ; la densité de l’eau reste à 0,085. Douze ensembles statiques de jarres, pierres gravées et fragments de colonne ponctuent les fonds des canaux.
+Cette version introduisait le grain modéré et un relief renforcé optionnel (retiré en v0.5.0). Le niveau sous-marin « rayons » et leur intensité maximale sont les valeurs par défaut ; la densité de l’eau reste à 0,085. Douze ensembles statiques de jarres, pierres gravées et fragments de colonne ponctuent les fonds des canaux.
 
 Quatre destinations extérieures : un sanctuaire du désert à l’ouest, un campement près de la cité, un mémorial près de l’oasis de la cascade et un abri sur la rive du Nil. L’implantation recherche un terrain sec assez plat ; les pierres et piliers ont des collisions, les voiles des abris restent décoratives.
 
@@ -80,7 +90,7 @@ npm install
 npm run build
 ```
 
-Contrôles CPU et livrable : `cd source && npm run check:plan && npm run check:ambiance && npm run check:bundle`. Le fichier minifié autonome reste proche de **103 ko** (88 ko gzip), sans ressource externe. Pour reproduire les captures et le benchmark, lancer `python3 source/tools/qa-server.py` à la racine, puis ouvrir dans Chrome `http://localhost:8137/dev.html?auto&lv=1&w=1440&h=900&qa=release-medium&bench&nots` après `npm run build:dev`. Les captures de développement et les outils de mesure ne sont pas inclus dans `index.html`.
+Contrôles CPU et livrable : `cd source && npm run check:plan && npm run check:ambiance && npm run check:bundle`. Le fichier minifié autonome fait environ **109 ko** (92 ko gzip), sans ressource externe de scène. Pour reproduire les nouvelles captures, lancer `python3 source/tools/qa-server.py` à la racine, puis ouvrir `http://localhost:8137/dev.html?auto&lv=1&w=1440&h=900&qa=secrets-medium&smoke&secrets` après `npm run build:dev` (`lv=0/1/2` : High/Medium/Low). Ajouter `bench` pour le parcours chronométré. Les captures de développement et les outils de mesure ne sont pas inclus dans `index.html`.
 
 ## Licence
 

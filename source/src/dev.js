@@ -170,12 +170,12 @@
       for(let level=0;level<4;level++){LOOK_ACTIVE[22]=level;syncLook();F[RESET]=1;await send({name:'underwater-'+level+'.png',image:(await window.__shot({cam:[130,4.8,180,130,4.6,155],time:10}))[0]});report.views.push({underwater:level,stats:window.__stats()});}LOOK_ACTIVE.set(LOOK);syncLook();F[RESET]=1;
       if(QP.has('materials')){
         report.materials=[];
-        for(const [grain,relief]of [[0,0],[1,0],[1,1]]){
-          LOOK_ACTIVE[25]=grain;LOOK_ACTIVE[26]=relief;syncLook();F[RESET]=1;
+        for(const grain of [0,1.25]){
+          LOOK_ACTIVE[25]=grain;syncLook();F[RESET]=1;
           const cam=[342,8.2,123,343,8,118];
-          await send({name:'stone-'+grain+'-'+relief+'.png',image:(await window.__shot({cam,time:10}))[0]});
+          await send({name:'stone-'+grain+'.png',image:(await window.__shot({cam,time:10}))[0]});
           let sum=0,peak=0;for(let j=0;j<24;j++){draw();await Q.onSubmittedWorkDone();sum+=gpuMs[NP];peak=max(peak,gpuMs[NP]);}
-          report.materials.push({grain,relief,gpuMean:sum/24,gpuPeak:peak});
+          report.materials.push({grain,gpuMean:sum/24,gpuPeak:peak});
         }
         LOOK_ACTIVE.set(LOOK);syncLook();F[RESET]=1;
         report.discoveries=window.__discoveries;
@@ -183,6 +183,21 @@
           await send({name:'discovery-'+d.kind+'.png',image:(await window.__shot({cam:[d.x+27,d.y+12,d.z+28,d.x,d.y+3,d.z],time:10}))[0]});
         }
         await send({name:'pyramid-detail.png',image:(await window.__shot({cam:[110,62,100,0,65,0],time:10}))[0]});
+      }
+      if(QP.has('secrets')){
+        report.aquatics=window.__aquatics;report.secretViews=[];
+        const sx=nileX(-65)+77;
+        for(const [name,cam]of [['entrance',[128,4.8,36,110,4.8,36]],['gallery',[89,6.5,36,65,10.5,36]],['crypt',[43,15,5,-6,12.5,0]],['sarcophagus',[4,15,6,-6,12.3,0]],['fish',[sx,-2.8,-45,sx,-3,-65]],['treasure',[nileX(-160)+23,-1.5,-150,nileX(-160)+22,-3,-160]],['mosaic',[130,5.2,40,130,3.1,36]]]){
+          await send({name:name+'.png',image:(await window.__shot({cam,time:10}))[0]});report.secretViews.push({name,stats:window.__stats(),count:await window.__count()});
+        }
+        report.fishCost=[];
+        for(const density of [0,1]){
+          LOOK_ACTIVE[26]=density;syncLook();F[RESET]=1;
+          await send({name:'fish-density-'+density+'.png',image:(await window.__shot({cam:[sx,-2.8,-45,sx,-3,-65],time:10}))[0]});
+          let sum=0,peak=0;for(let j=0;j<32;j++){draw();await Q.onSubmittedWorkDone();sum+=gpuMs[NP];peak=max(peak,gpuMs[NP]);}
+          report.fishCost.push({density,gpuMean:sum/32,gpuPeak:peak,count:await window.__count()});
+        }
+        LOOK_ACTIVE.set(LOOK);syncLook();F[RESET]=1;
       }
       if(QP.has('bench')) report.benchmark=await window.__bench();
       if(GPU_ERRORS.length)throw Error(GPU_ERRORS.join('\n'));
