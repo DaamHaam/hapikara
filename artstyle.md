@@ -83,6 +83,8 @@ Un rendu moins riche en micro-détail que les références est acceptable. Un re
 
 ## 4. Périmètre et exclusions
 
+**Ajouts validés du Plan 2 :** cabanes de bois et tentes espacées hors de la cité, marchés/voiles fixes, faïence, malachite et cuivre patiné, lotus et barques statiques. Une grande barque cérémonielle évoque une traversée onirique, sans prétention de reconstitution historique. Un seul levier ancien actionne une dalle à l’entrée immergée ; scarabée partagé au-dessus de la porte et sur le levier, repris discrètement ailleurs. Une seule exception personnelle aux inscriptions latines : les lettres **DAM**, petites et intégrées à la pierre, sans texte flottant ni signature d’accueil. Musique et ambiance de l’eau conservées.
+
 **Un seul état du monde :** neuf, abondant, à une heure fixe (section 9). Pas de ruine, de nuit, de tempête de sable, de crue destructrice.
 
 **Ne jamais inclure :**

@@ -1,6 +1,6 @@
 {
   "name": "hapikara",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "description": "A procedural Egyptian oasis city rendered with WebGPU, bundled into one HTML file",
   "type": "module",
@@ -10,7 +10,8 @@
     "check:bundle": "node tools/check-bundle.mjs",
     "build": "node build.mjs",
     "build:readable": "node build.mjs --readable",
-    "build:dev": "node build.mjs --dev"
+    "build:dev": "node build.mjs --dev",
+    "check:mechanism": "node tools/check-mechanism.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.2"

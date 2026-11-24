@@ -2,10 +2,10 @@
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 const read = f => readFileSync(new URL('../src/'+f,import.meta.url),'utf8');
-const source = ['math.js'].map(read).join('\n') + '\nconst LOOK=new Float32Array(27);LOOK[20]=12;LOOK[21]=-44;\n' + ['layout.js','crypt.js'].map(read).join('\n') + '\n' + read('sh_scene.js').split('// per view')[0] + '\nconst LEAFK=1;\n' + ['meshes.js','egypt.js','discoveries.js','aquatics.js','collide.js'].map(read).join('\n');
+const source = ['math.js'].map(read).join('\n') + '\nconst LOOK=new Float32Array(27);LOOK[20]=12;LOOK[21]=-44;\n' + ['layout.js','crypt.js','mechanism.js'].map(read).join('\n') + '\n' + read('sh_scene.js').split('// per view')[0] + '\nconst LEAFK=1;\n' + ['meshes.js','egypt.js','discoveries.js','aquatics.js','scenery.js','collide.js'].map(read).join('\n');
 vm.runInNewContext(source + `
 const assert = (b,m) => {if(!b) throw Error(m)};
-setHard({boxes:[],bridges:[]}); landY=terrainH;
+setHard({boxes:[],bridges:[]}); landY=terrainH;GATE_OPEN=1;
 let dry=0,wet=0;
 for(let x=-440.3;x<440;x+=3.7) for(let z=-370.2;z<370;z+=4.1) {
  if(inRing(x,z)||!inCity(x,z)) continue;
@@ -41,7 +41,9 @@ const meshes=[mesh,meshPyramid(),meshAcropolis(),meshCascades(),meshSphinx(0),me
 for(let v=1;v<=20;v++)meshes.push(meshVillaE(v,0).mesh);
 for(let l=0;l<5;l++)meshes.push(meshPalm(11,l));
 meshes.push(meshCanalFinds());
-meshes.push(meshCrypt(),meshFlame(),meshMosaic(),meshTreasure(0),meshTreasure(1));
+meshes.push(meshCrypt(),meshFlame(),meshMosaic(),meshTreasure(0),meshTreasure(1),meshScarab(),meshGate(),meshLever(),meshSignature(),meshFaience(),meshInlay());
+for(let lod=0;lod<2;lod++)meshes.push(meshWoodHut(lod),meshMarket(lod),meshCeremonialBoat(lod));
+for(let k=0;k<3;k++)meshes.push(meshCanalGarden(k));
 for(let k=0;k<3;k++)for(let lod=0;lod<2;lod++)meshes.push(meshFish(k,lod));
 for(const [x,z,k]of DISCOVERY_SITES){
  const p=discoveryAt(x,z,terrainH);assert(p,'missing discovery '+k);
@@ -78,6 +80,15 @@ assert(F[CZ]<12,'sun aperture cannot be traversed');
 F.set([54,11.7,0]);for(let z=.25;z<=36;z+=.25)go(54,F[CY],z);
 for(let x=54.25;x<=130;x+=.25)go(x,F[CY],36);
 assert(F[CX]>129&&F[CY]<5.5,'crypt exit stays submerged');
+GATE_OPEN=0;
+F.set([130,4.8,36]);go(110,4.8,36);assert(F[CX]>=119.72,'closed door blocks entrance');
+for(const z of [32.2,39.8])for(const px of [119.9,120.3,120.7]){F.set([px,4.8,z]);go(px-.1,4.8,z);assert(F[CX]>=119.72&&abs(F[CY]-4.8)<.01,'closed door overlap recovers without lifting');const x=F[CX];go(x+.1,F[CY],F[CZ]);assert(F[CX]>x+.05,'closed door permits retreat');}
+GATE_OPEN=1;
+for(const z of [32.2,39.8])for(const px of [119.9,120.3,120.7])for(const dx of [-.1,.1]){
+ F.set([px,4.8,z]);go(px+dx,4.8,z);
+ assert(abs(F[CX]-px)>.05&&cryptCameraFits(F[CX],F[CZ])&&abs(F[CY]-4.8)<.01,'jamb recovery permits small forward/back steps without lifting');
+ const x=F[CX];go(x+.1,F[CY],F[CZ]);assert(F[CX]>x,'jamb recovery remains mobile');
+}
 // Both walls of the ascending gallery, then the bend: pool terrain must never lift us out.
 for(const x of [60,70,78,90])for(const side of [-1,1]){
  const y=cryptFloor(1,x)+1.25;F.set([x,y,36]);
@@ -116,7 +127,7 @@ for(checkLevel=0;checkLevel<3;checkLevel++){
    for(const [dx,dz]of [[2.3,0],[-2.3,0],[0,2.3],[0,-2.3]])assert(y-.15-s*.5>terrainH(xx+dx,zz+dz),'fish penetrates bed');
   }
  }});
- assert(fishN===[320,240,160][checkLevel],'shoal count by quality');
+ assert(fishN===[384,288,192][checkLevel],'shoal count by quality');
 }
 console.log('Plan OK:',BLOCKS.length,'convex cells,',dry,'land and',wet,'water samples;',checked,'rendered tops,',meshes.length,'finite meshes; terrace/bief/stair/bridge collisions agree.');
 `, {console});

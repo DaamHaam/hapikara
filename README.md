@@ -12,7 +12,15 @@ Pierre dorée, pierres précieuses et eau vert-jade qui ruisselle de partout, de
 
 ![La cité entre le Nil et le désert](.github/screenshots/aerial.jpg)
 
-## Chambre funéraire et poissons visibles — v0.6.0
+## Mécanisme, traversée et découvertes — v0.7.0 / Plan 2
+
+Les deux montants de l’entrée immergée permettent maintenant de se dégager même si la caméra les chevauche légèrement. La porte commence fermée. Un levier au scarabée, près du débarcadère sur la rive opposée, affiche **Actionner** à proximité : bascule, claquement/frottement synthétiques, fondu montrant l’ouverture et retour à la position/orientation exactes. La séquence peut être passée ; la porte reste ouverte pendant la visite et se réinitialise à la suivante. La musique d’origine est conservée.
+
+Douze bancs de petits, moyens et grands poissons (384/288/192 individus selon la qualité), taille maximale réduite. Dix-huit mosaïques et 118 nouvelles compositions ponctuent les canaux. Cinq cabanes, trois tentes, quatre marchés avec voiles fixes, neuf panneaux de faïence, huit bouquets de lotus, quatre incrustations, une grande barque cérémonielle et trois petites apportent des découvertes statiques. Le scarabée revient en quelques lieux ; une gravure **DAM** se cache près d’un canal.
+
+L’accueil n’annonce plus `L` et `I`, qui restent actifs pour les essais sur ordinateur. Les réglages d’eau, de lumière et l’intérieur sont conservés. La VR et d’autres clins d’œil restent reportés. [Captures, mesures et limites](.github/screenshots/iteration8/README.md) ; essais utilisateur à valider dans `PLANS.md`.
+
+## Chambre funéraire et poissons visibles — v0.6.0 (historique)
 
 Le passage possède des limites physiques indépendantes du sol extérieur : longer ses parois ne doit plus remonter la caméra sur la pyramide. Les braseros sont fixés aux murs. La chambre suit la référence artistique validée : sarcophage fermé anthropomorphe, masque et coiffe vert/or, bras croisés sculptés, coffres, pièces, coupes, vases canopes et panneaux de pseudo-hiéroglyphes.
 
@@ -100,7 +108,7 @@ npm install
 npm run build
 ```
 
-Contrôles CPU et livrable : `cd source && npm run check:plan && npm run check:ambiance && npm run check:bundle`. Le fichier minifié autonome fait environ **112 ko** (95 ko gzip), sans ressource externe de scène. Pour reproduire les nouvelles captures, lancer `python3 source/tools/qa-server.py` à la racine, puis ouvrir `http://localhost:8137/dev.html?auto&lv=1&w=1440&h=900&qa=secrets-medium&smoke&secrets` après `npm run build:dev` (`lv=0/1/2` : High/Medium/Low). Ajouter `bench` pour le parcours chronométré. Les captures de développement et les outils de mesure ne sont pas inclus dans `index.html`.
+Contrôles CPU et livrable : `cd source && npm run check:plan && npm run check:ambiance && npm run check:bundle`. Le fichier minifié autonome fait environ **118 ko** (100 ko gzip), sans ressource externe de scène. Pour reproduire les nouvelles captures, lancer `python3 source/tools/qa-server.py` à la racine, puis ouvrir `http://localhost:8137/dev.html?auto&lv=1&w=1440&h=900&qa=secrets-medium&smoke&secrets` après `npm run build:dev` (`lv=0/1/2` : High/Medium/Low). Ajouter `bench` pour le parcours chronométré. Les captures de développement et les outils de mesure ne sont pas inclus dans `index.html`.
 
 ## Licence
 

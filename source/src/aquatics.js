@@ -33,11 +33,21 @@ function meshTreasure(kind){
   }return m.build();
 }
 function meshMosaic(){const m=new MB(4);m.mat=M.MOSAIC;m.poly([[-3,0,-3],[3,0,-3],[3,0,3],[-3,0,3]],[0,1,0]);return m.build();}
+function meshCanalGarden(kind){
+  const m=new MB(2048);m.mat=M.UWSTONE;
+  if(kind!==1){
+    for(const [x,z]of [[-1,.4],[1.1,-.7]])m.lathe([[.22,0],[.43,.3],[.45,.9],[.26,1.2],[.15,1.4]],{seg:10,cx:x,cz:z});
+  }
+  if(kind!==0){m.box(-2,0,-1,-.4,.5,.2,.12);m.tube([[.3,.3,.8,.35],[1.2,.4,1,.4],[2.2,.45,1.2,.3]],10,true);}
+  m.mat=M.PAINT;m.ea=PC.MALA;
+  for(let j=0;j<5;j++){const a=j*2.4,x=cos(a)*1.7,z=sin(a)*1.7;m.tube([[x,0,z,.06],[x+.18, .65,z+.12,.05],[x+.4,1.35+(j%2)*.4,z+.25,.025]],5,false);}
+  m.ea=0;return m.build();
+}
 function populateAquatics({type,put,gH}){
   const rng=RNG(713541),fish=[0,1,2].map(k=>type([meshFish(k,0),meshFish(k,1)],K.SOLID,45,1e9,200,0,NO_SHADOW|NO_BAKE|NO_MIRROR|FISH_SCHOOL));
   const counts=QL(32,24,16),sites=[];
-  for(let k=0;k<10;k++){
-    const z=-280+k*62;let x=nileX(z)+[28,40,52][k%3],bed=-1e9;
+  for(let k=0;k<12;k++){
+    const z=-320+k*58;let x=nileX(z)+[28,40,52][k%3],bed=-1e9;
     // Reserve the whole shoal's footprint, including shader motion, on the wet shelf.
     for(let attempt=0;attempt<15;attempt++){
       bed=-1e9;for(let a=-10;a<=10;a+=5)for(let b=-10;b<=10;b+=5)bed=max(bed,gH(x+a,z+b));
@@ -46,12 +56,22 @@ function populateAquatics({type,put,gH}){
     const y=max(bed+1.2,-1.7-(k%3)*.7);sites.push([x,y,z]);
     for(let j=0;j<counts;j++){
       const px=x+(rng()-.5)*9,pz=z+(rng()-.5)*9,py=y+(rng()-.5)*.7;
-      put(fish[(k+j)%3],px,py,pz,.55+rng()*.5,Q0,rgb(.76+rng()*.2,.79+rng()*.18,.59+rng()*.3,rng()));
+      put(fish[(k+j)%3],px,py,pz,[.19,.34,.55][k%3]+rng()*[.13,.15,.23][k%3],Q0,rgb(.76+rng()*.2,.79+rng()*.18,.59+rng()*.3,rng()));
     }
   }
   const treasure=[0,1].map(k=>type([meshTreasure(k)],K.SOLID,1e9,1e9,180));
   for(const [z,off,k]of [[-160,22,0],[-20,30,1],[135,26,0],[275,35,1]]){const x=nileX(z)+off;put(treasure[k],x,gH(x,z)+.12,z,1,qYaw(z*.13));}
   const mosaic=type([meshMosaic()],K.SOLID,1e9,1e9,150);
-  for(const [x,z]of [[130,36],[130,90],[-130,-200],[266,200]])if(canalAt(x,z))put(mosaic,x,FLOOR_Y+.035,z);
-  if(AUTO)window.__aquatics={schools:sites,fish:10*counts,treasures:4,mosaics:4};
+  const mosaics=[];
+  for(const [x,z]of [[130,36],[130,90],[-130,-200],[266,200],[130,245],[130,-200],[-130,140],[-130,-80],[-310,-270],[-310,250],[266,310],[310,-90],[370,210],[-220,130],[-230,-130],[200,-250],[330,270],[210,-310]])if(canalAt(x,z)){put(mosaic,x,FLOOR_Y+.055,z,1.15);mosaics.push([x,FLOOR_Y+.055,z]);}
+  const gardens=[0,1,2].map(k=>type([meshCanalGarden(k)],K.SOLID,1e9,1e9,130,0,NO_SHADOW|NO_BAKE|NO_MIRROR)),bottom=[];
+  for(const b of CHANNELS){
+    const vertical=b[3]-b[1]>b[2]-b[0],length=vertical?b[3]-b[1]:b[2]-b[0];
+    for(let d=24;d<length-15;d+=53){
+      const x=vertical?(b[0]+b[2])/2:b[0]+d,z=vertical?b[1]+d:(b[1]+b[3])/2;
+      if(!canalAt(x-3,z-3)||!canalAt(x+3,z+3)||bottom.some(p=>hypot(p[0]-x,p[2]-z)<23)||mosaics.some(p=>hypot(p[0]-x,p[2]-z)<10))continue;
+      put(gardens[bottom.length%3],x,FLOOR_Y+.04,z,1,qYaw(bottom.length*2.4));bottom.push([x,FLOOR_Y+.04,z]);
+    }
+  }
+  if(AUTO)window.__aquatics={schools:sites,fish:12*counts,sizeClasses:[[.19,.32],[.34,.49],[.55,.78]],treasures:4,mosaics,bottom};
 }

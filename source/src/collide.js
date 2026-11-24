@@ -91,7 +91,13 @@ function surfaceAt(x,z,y0){
 // lifts it; anything built higher than a stair step is a wall it slides along per axis. Long steps go in <= .7 m pieces.
 function collide(px, py, pz) {
   if (!landY) return;
-  cryptMoving=cryptZone(px,py,pz)>=0;
+  cryptMoving=cryptZone(px,py,pz)>=0||cryptAtMouth(px,py,pz);
+  // Recover an already overlapping camera before testing small movement steps.
+  // Otherwise every direction fails the full-radius test and both jambs become traps.
+  if(cryptMoving&&!cryptCameraFits(px,pz)&&cryptRecover(px,pz)){
+    F[CX]+=CRYPT_RECOVERY[0]-px;F[CZ]+=CRYPT_RECOVERY[1]-pz;
+    px=CRYPT_RECOVERY[0];pz=CRYPT_RECOVERY[1];
+  }
   const tx = F[CX], ty = F[CY], tz = F[CZ], n = min(128, ceil(hypot(tx - px, tz - pz) / .7));
   if (n < 2) { collide1(px, py, pz);cryptMoving=false; return; }
   let cx = px, cy = py, cz = pz, dx = (tx - px) / n, dz = (tz - pz) / n; const dy = (ty - py) / n;
@@ -104,9 +110,14 @@ function collide(px, py, pz) {
 }
 function collide1(px, py, pz) {
   let x = F[CX], y = F[CY], z = F[CZ];
+  if(GATE_OPEN<.99&&py>2.2&&py<7.3&&z>31.3&&z<40.7){
+    if(px>118.2&&px<119.73){x=max(x,119.73);F[VX]=0;}
+    else if(px>=119&&x<119.73){x=119.73;F[VX]=0;}
+    else if(px<=118.2&&x>117.47){x=117.47;F[VX]=0;}
+  }
   // Interior walls are explicit limits, not an exterior height step. In particular,
   // the sacred pool outside used to lift the camera through the gallery's left wall.
-  if(cryptMoving&&cryptZone(px,py,pz,true)>=0){
+  if(cryptMoving&&(cryptZone(px,py,pz,true)>=0||cryptAtMouth(px,py,pz))){
     if(!cryptCameraFits(x,z)){
       if(cryptCameraFits(x,pz)){z=pz;F[VZ]=0;}
       else if(cryptCameraFits(px,z)){x=px;F[VX]=0;}

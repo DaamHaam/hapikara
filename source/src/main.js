@@ -423,6 +423,7 @@ function render() {
   const U = UB[V_MAIN], M = UB[V_MIR], S = UB[V_SH], fr = F[FRAME], t = F[TIME], par = fr & 1;
   const cx = F[CX], cy = F[CY], cz = F[CZ], j = (fr & 15) * 2;
   const crypt=cryptInside(cx,cy,cz);U[212]=crypt?1:0;M[212]=0;S[212]=0;
+  for(let i=0;i<UB.length;i++){UB[i][213]=GATE_OPEN;UB[i][214]=leverTurn;UB[i][215]=mechanismFade;}
   if(crypt!==wasCrypt){F[RESET]=1;wasCrypt=crypt;}
   // unjittered first: that matrix is next frame's reprojection target
   setCam(U, cx, cy, cz, F[YAW], F[PIT], W, H, 0, 0);
@@ -567,6 +568,7 @@ function frame(now) {
   let dt = dtr / 1000; if (dt > 0.1) dt = 0.1;
   if (DYN && !FPS && dtr < 1e3 && (dynT += dtr) > 0) { dynN++; if (dtr > dynMax) dynMax = dtr; if (dynT > (menu ? 400 : 1000)) tune(); }
   F[TIME] += dt; F[DT] = dt;
+  if(mechanismPhase){mdx=mdy=lkx=lky=l2x=l2y=0;stepMechanism(dt);render();return;}
   // touch: the finger's offset from where it went down steers like a joystick
   if (tId >= 0) {
     const tr = 4 / min(innerWidth, innerHeight); let jx = (tx - tx0) * tr, jy = (ty - ty0) * tr;
@@ -589,6 +591,7 @@ function frame(now) {
   F[YAW] = yaw; F[PIT] = pitch; F[VX] = vx; F[VY] = vy; F[VZ] = vz; F[CX] = x; F[CY] = y; F[CZ] = z;
   // collision (collide.js); key C disables it
   if (solid) { collide(px, py, pz); x = F[CX]; y = F[CY]; z = F[CZ]; }
+  updateMechanismPrompt();
   for (let i = 1; i < SLOW; i++) render0(); // ?slow: extra frames drawn and discarded
   render();
   if (hud) {
@@ -599,6 +602,7 @@ function frame(now) {
 
 // input and menu
 const key = (e, v) => {
+  if(mechanismPhase)return;
   switch (e.code) {
     case 'KeyW': case 'ArrowUp': kf = v; break; case 'KeyS': case 'ArrowDown': kb = v; break; case 'KeyA': case 'ArrowLeft': kl = v; break; case 'KeyD': case 'ArrowRight': kr = v; break;
     case 'KeyE': ku = v; break; case 'KeyQ': kd = v; break; case 'ShiftLeft': case 'ShiftRight': ks = v; break;
@@ -617,7 +621,7 @@ const capture = () => { if (mob) return; const p = canvas.requestPointerLock({ u
 addEventListener('mousemove', (e) => { if (document.pointerLockElement === canvas) { mdx += e.movementX; mdy += e.movementY; } });
 // Touch follows the screen axes in both orientations; a second finger accelerates.
 const touch = (e) => {
-  e.preventDefault(); if (menu) return; tN = e.touches.length;
+  e.preventDefault(); if (menu||mechanismPhase) return; tN = e.touches.length;
   let f = null, first = false; for (let i = 0; i < tN; i++) if (e.touches[i].identifier === tId) f = e.touches[i];
   if (!f) { tId = -1; if (tN) { f = e.touches[0]; tId = f.identifier; first = true; } }
   if (f) {
@@ -629,14 +633,14 @@ const touch = (e) => {
 for (const n of ['touchstart', 'touchmove', 'touchend', 'touchcancel']) canvas.addEventListener(n, touch, { passive: false });
 
 // the scene keeps rendering, blurred, behind the menu
-const ui = (m) => { if (dead) return; menu = m; body.className = m ? 'm' : document.pointerLockElement ? 'g p' : 'g'; if (m) release(); };
+const ui = (m) => { if (dead) return; menu = m; body.className = m ? 'm' : document.pointerLockElement ? 'g p' : 'g'; if (m) release(); updateMechanismPrompt(); };
 $('d').onclick = () => {
   ui(false); $('d').textContent = 'Reprendre la visite';
   // Phones may enter landscape; if unavailable, portrait controls remain aligned with the screen.
   if (mob) document.documentElement.requestFullscreen?.()?.then(() => screen.orientation.lock('landscape')).catch(() => 0); else capture();
 };
 $('o').onclick = () => ui(true);
-canvas.addEventListener('click', capture);
+canvas.addEventListener('click',()=>{if(!activateMechanism())capture();});
 document.addEventListener('pointerlockchange', () => { if (!mob) ui(!document.pointerLockElement); });
 // detail buttons: the current level is lit, the others reload with theirs
 $('q').querySelectorAll('button').forEach((b, i) => { if (i === 2 - LV) b.className = 'on'; else b.onclick = () => { try { localStorage.atlantis = 2 - i; } catch {} location.href = location.href.replace(/[?&]lv=\d/, ''); }; });

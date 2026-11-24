@@ -200,6 +200,33 @@
         }
         LOOK_ACTIVE.set(LOOK);syncLook();F[RESET]=1;
       }
+      if(QP.has('plan2')){
+        report.scenery=window.__scenery;report.plan2=[];
+        const scene=window.__scenery,site=MECHANISM_SITE;
+        GATE_OPEN=0;leverTurn=0;mechanismPhase=0;menu=false;
+        F[CX]=110;F[CY]=4.8;F[CZ]=36;collide(130,4.8,36);if(F[CX]<119.72)throw Error('QA closed door collision failed');
+        await send({name:'gate-closed.png',image:(await window.__shot({cam:[132,4.8,36,119,4.8,36],time:10}))[0]});
+        await send({name:'lever-idle.png',image:(await window.__shot({cam:[site[0]-6,site[1]+2.5,site[2]+1,site[0],site[1]+2.8,site[2]],time:10}))[0]});
+        const saved=Array.from(F.slice(0,5));if(!activateMechanism())throw Error('QA lever activation refused');
+        for(let i=0;i<390;i++){
+          stepMechanism(1/60);F[TIME]+=1/60;draw();if(i%8===7)await Q.onSubmittedWorkDone();
+          if(i===155||i===270)await send({name:i===155?'gate-opening.png':'gate-open.png',image:grab()});
+        }
+        if(mechanismPhase!==0||GATE_OPEN!==1||!saved.every((v,i)=>F[i]===v))throw Error('QA exact return failed');
+        report.mechanism={open:GATE_OPEN,returnedExactly:true,phase:mechanismPhase};
+        report.jambs=[];
+        for(const z of [32.2,39.8])for(const dx of [-.1,.1]){
+          F[CX]=119.9+dx;F[CY]=4.8;F[CZ]=z;collide(119.9,4.8,z);
+          if(abs(F[CX]-119.9)<.05||!cryptCameraFits(F[CX],F[CZ]))throw Error('QA full-world jamb recovery failed');
+          report.jambs.push({z,dx,result:[F[CX],F[CY],F[CZ]]});
+        }
+        const h=scene.huts[0],t=scene.tents[0],market=scene.markets[0],facade=scene.faience[0],boat=scene.boats[0],bottom=window.__aquatics.bottom[15];
+        const views=[['hut',[h[0]+14,h[1]+8,h[2]+16,h[0],h[1]+2,h[2]]],['tent',[t[0]+15,t[1]+9,t[2]+16,t[0],t[1]+2,t[2]]],['market',[market[0]+11,market[1]+6,market[2]+12,market[0],market[1]+2,market[2]]],['faience',[facade[0],facade[1],facade[2]-9,facade[0],facade[1],facade[2]]],['ceremonial-boat',[boat[0]-26,15,boat[2]+29,boat[0],2,boat[2]]],['signature',[-121,8.3,210,-119,8.3,210]],['mosaic-new',[130,5.1,251,130,3.1,245]],['bottom-new',[bottom[0],5,bottom[2]+7,bottom[0],3.4,bottom[2]]]];
+        views.push(['gate-symbol',[128,8.8,40,119.18,7.25,36]]);
+        for(let k=0;k<3;k++){const p=window.__aquatics.schools[k];views.push(['fish-size-'+k,[p[0],p[1]+.6,p[2]+10,p[0],p[1],p[2]]]);}
+        const lp=scene.lotus[0];views.push(['lotus',[lp[0]+3,8.5,lp[2]+4,lp[0],6.5,lp[2]]]);
+        for(const [name,cam]of views){await send({name:name+'.png',image:(await window.__shot({cam,time:10}))[0]});report.plan2.push({name,stats:window.__stats()});}
+      }
       if(QP.has('bench')) report.benchmark=await window.__bench();
       if(GPU_ERRORS.length)throw Error(GPU_ERRORS.join('\n'));
       await send({name:'report.json',report});
@@ -207,3 +234,5 @@
     } catch(e) { await send({name:'error.json',report:{error:e.stack}}); console.error(e); }
   },0);
 }
+
+if(QP.has('lever')){const p=MECHANISM_SITE;lookAt(p[0]-6,p[1]+2.5,p[2]+1,p[0],p[1]+2.8,p[2]);ui(false);}

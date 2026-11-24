@@ -23,6 +23,7 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
   // [x, z, radius] claimed by buildings
   const occ = [], free = (x, z, r) => { for (const o of occ) if ((x - o[0]) ** 2 + (z - o[1]) ** 2 < (r + o[2]) ** 2) return false; return true; };
   const tree = (k, x, y, z, s = 1, lap = 0.6, walls = true) => {
+    if(sceneryReserved(x,z))return false;
     for(const d of outsideSites)if(hypot(x-d.site[0],z-d.site[2])<17)return false;
     const seed = (rng() * 256) | 0, ty = trees[k][seed & 1], sc = s * rr(0.85, 1.2), q = qYaw(rng() * TAU), tint = tintOf(k, seed), sy = rr(0.9, 1.15);
     if ((walls && !free(x, z, k === 'palm' ? 0.8 : crowns[ty] * sc * 0.45 - 1.2)) || !roomFor(x, z, crowns[ty] * sc * (k === 'palm' ? 0.55 : 1), lap)) return false;

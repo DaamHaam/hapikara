@@ -392,6 +392,6 @@ fn agx(c: vec3f) -> vec3f {
   c=(c-.18)*view.look1.y+.18;
   c*=vec3f(1.+view.look1.w*.1,1.,1.-view.look1.w*.12); c=sat3(c);
   let n = ign(fc.xy) + ign(fc.xy + 37.) - 1.;
-  return vec4f(c + n / 255., 1.);
+  return vec4f(c*(1.-sat(view.look7.w)) + n / 255., 1.);
 }
 `;

@@ -88,6 +88,8 @@ function buildWorld() {
 
   populate({ type, put, paint, MAP, balRun, gH: land.heightAt, hard, wm });
   populateAquatics({type,put,gH:land.drawnAt});
+  populateScenery({type,put,gH:land.drawnAt,hard});
+  populateMechanism({type,put,gH:land.drawnAt,hard});
   const cryptFlags=INTERIOR|NO_SHADOW|NO_BAKE|NO_MIRROR;
   put(type([meshCrypt()],K.SOLID,1e9,1e9,280,0,cryptFlags),0,0,0);
   const flame=type([meshFlame()],K.SOLID,1e9,1e9,100,0,cryptFlags);

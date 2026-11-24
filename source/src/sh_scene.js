@@ -1,6 +1,6 @@
 // shaders 2/4: instancing, GPU culling, materials (G-buffer) and shadow casters
 // material ids, shared by mesh generators and shaders
-const M = { MARBLE: 0, PAVE: 1, PLASTER: 2, GOLD: 3, QUAY: 4, FLOOR: 5, WINDOW: 6, BARK: 7, ALLOY: 8, TRIM: 9, TERRAIN: 10, CORE: 11, TERRACE: 12, GROUND: 13, STEP: 14, ROCK: 15, FALL: 16, SEA: 17, PAINT: 18, SANDST: 19, GRANITE: 20, PALM: 21, PALMBARK: 22, UWSTONE: 23, FLAME:24, FISH:25, MOSAIC:26, HIERO:27, EYE:28, LEAF: 32 };
+const M = { MARBLE: 0, PAVE: 1, PLASTER: 2, GOLD: 3, QUAY: 4, FLOOR: 5, WINDOW: 6, BARK: 7, ALLOY: 8, TRIM: 9, TERRAIN: 10, CORE: 11, TERRACE: 12, GROUND: 13, STEP: 14, ROCK: 15, FALL: 16, SEA: 17, PAINT: 18, SANDST: 19, GRANITE: 20, PALM: 21, PALMBARK: 22, UWSTONE: 23, FLAME:24, FISH:25, MOSAIC:26, HIERO:27, EYE:28, DOOR:29, LEVER:30, DECOR:31, LEAF: 32 };
 // leaf atlas tiles (material = M.LEAF + tile): crowns, then vines (TRAIL fringe, VLEAF / VBLOSSOM carpets)
 const LT = { OLIVE: 0, BROAD: 1, PINE: 2, CYPRESS: 3, BLOSSOM: 4, HYDRANGEA: 5, TRAIL: 6, LAVENDER: 7, VLEAF: 8, VBLOSSOM: 9, PALM: 10, LILY: 11 };
 
@@ -87,6 +87,8 @@ fn transform(v: VI) -> VO {
   let s = vec3f(it.p.w, it.p.w * it.sy, it.p.w);
   var lp = v.pos * s;
   var q = it.q; var org = it.p.xyz;
+  if(mat==29u){org.y+=view.look7.y*3.4;}
+  if(mat==30u){let a=-.95*view.look7.z;lp.y-=2.1;q=qmul(q,vec4f(0.,0.,sin(a*.5),cos(a*.5)));org+=qrot(it.q,vec3f(0.,2.1,0.));}
   if(mat==25u){
     let sd=f32(it.tint>>24u)/255.;let t=view.cam.w;let a=t*.22+floor(it.p.z/80.)*.9;
     org+=vec3f(3.5*sin(a),.15*sin(t*.8+sd*6.),2.5*cos(a));
@@ -366,8 +368,15 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
     let lotus=abs(r-(1.55+.35*cos(a*8.)));let ring=abs(r-2.55);
     let motif=1.-ss(.04,.08+fw,min(lotus,ring));
     let tiles=min(fract(q.x*5.),fract(q.y*5.));let grout=ss(.02,.07,tiles);
-    o.alb=mix(vec3f(.025,.19,.13),vec3f(.7,.46,.12),motif)*(.72+.28*grout);o.rough=.55;
-  }else if(mat==28u){o.alb=vec3f(.003,.006,.005);o.rough=.4;}
+    o.alb=mix(vec3f(.09,.38,.28),vec3f(.84,.65,.25),motif)*(.72+.28*grout);o.rough=.55;
+  }else if(mat==31u){
+    let kind=u32(i.uv.x*255.+.5);let A=tri(tNoiseA,p,dx,dy,w,1.2);
+    if(kind==1u){let along=select(p.x,p.z,abs(N.x)>.5);let seam=1.-ss(.015,.045,min(fract(along/.6),1.-fract(along/.6))*.6);o.alb=vec3f(.19,.105,.045)*(.8+.4*A.g)*(1.-.45*seam);o.rough=.83;}
+    else if(kind==2u){let q=fract(i.lp.xy*3.)-.5;let edge=max(abs(q.x),abs(q.y));let diamond=1.-ss(.27,.31,abs(q.x)+abs(q.y));o.alb=mix(vec3f(.045,.25,.18),vec3f(.58,.72,.57),diamond);o.alb*=.65+.35*(1.-ss(.44,.49,edge));o.rough=.28;o.metal=.12;}
+    else{o.alb=mix(vec3f(.4,.22,.09),vec3f(.06,.24,.17),ss(.35,.7,A.g));o.metal=.7;o.rough=.6;}
+  }else if(mat==29u){o.alb=vec3f(.64,.47,.28)*(.92+.08*sin(p.y*8.));o.rough=.8;}
+  else if(mat==30u){o.alb=vec3f(.55,.34,.09);o.metal=.7;o.rough=.4;}
+  else if(mat==28u){o.alb=vec3f(.003,.006,.005);o.rough=.4;}
   else if(mat==27u){
     let u=select(p.z,p.x,abs(N.z)>.5)/1.45;let v=p.y/1.65;
     let q=vec2f(fract(u)-.5,fract(v)-.5);let k=u32(h21(vec2f(floor(u),floor(v)))*6.);

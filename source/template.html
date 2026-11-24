@@ -22,13 +22,15 @@ html[data-look=open] #m{display:none}html[data-look=open] #c{filter:none}html[da
 @media(max-width:650px){#m{align-items:end;padding:25px;background:linear-gradient(0deg,#062e39e8,#062e3940 65%,#062e3900)}#welcome{padding:0}h1{font-size:44px}.subtitle{font-size:22px;margin:6px 0 16px}#p{margin:14px 0}#k,#h{margin:18px 0 0}#look-panel{top:14px}html[data-look=open] #i{display:none}}
 @media(max-height:500px){#m{padding:20px 40px}#welcome{padding:0}h1{font-size:48px}.subtitle{margin:5px 0 12px}#p{margin:12px 0}#g{gap:12px}#k,#h{margin:15px 0 0}#look-panel{top:12px}}
 @media(pointer:coarse){#k{display:none}#h{display:block}}
+#action{position:absolute;z-index:3;left:50%;bottom:max(25px,env(safe-area-inset-bottom));transform:translateX(-50%);background:#efd28ee8;color:#092d36;border:1px solid #fff1bb;min-height:44px;padding:10px 24px;box-shadow:0 3px 20px #021b2480}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 @media(pointer:coarse){#m{padding-left:max(25px,env(safe-area-inset-left));padding-right:max(25px,env(safe-area-inset-right));padding-top:max(20px,env(safe-area-inset-top));padding-bottom:max(25px,env(safe-area-inset-bottom))}#o{right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom))}}
 </style></head>
 <body class=l><canvas id=c tabindex=-1 aria-label="La cité de Hapikara en trois dimensions"></canvas>
 <main id=m><section id=welcome><h1>Hapikara</h1><p class=subtitle>Cité égyptienne</p><div id=p><i id=b></i></div><p id=s>La cité prend forme…</p>
 <div id=g><button id=d>Explorer la cité</button><div id=q><span>Qualité</span><button>Légère</button><button>Équilibrée</button><button>Détaillée</button></div></div>
-<p id=k>Flèches ou W A S D · Q / E descendre et monter<br>Maj accélérer · L ambiance · I informations · Échap accueil</p><p id=h>Un doigt pour avancer et regarder.<br>Deux doigts pour accélérer.</p></section></main>
+<p id=k>Flèches ou W A S D · Q / E descendre et monter<br>Maj accélérer · Échap accueil</p><p id=h>Un doigt pour avancer et regarder.<br>Deux doigts pour accélérer.</p></section></main>
+<button id=action hidden>Actionner</button>
 <button id=o aria-label="Retour à l’accueil">⌂</button>
 <aside id=look-panel aria-labelledby=look-title hidden><header class=panel-head><h2 id=look-title>Atelier d’ambiance</h2><button id=look-close aria-label="Fermer l’atelier">×</button></header><div class=panel-body><p>Réglez la lumière en regardant la cité. Les réglages valent pour cette visite. Le prochain démarrage revient à « Sanctuaire voilé ».</p><div class=presets><button data-look=royal>Soleil royal</button><button data-look=gardens>Jardins du Nil</button><button data-look=sanctuary>Sanctuaire voilé</button></div><div id=look-fields></div><div class=panel-actions><button id=look-compare aria-pressed=false>Comparer à l’ouverture</button><button id=look-reset>Tout réinitialiser</button><button id=water-reset>Réinitialiser l’eau</button><button id=look-copy>Copier mes réglages</button><button id=look-import>Importer des réglages</button></div><textarea id=look-data aria-label="Réglages à copier ou importer" hidden spellcheck=false></textarea><p id=look-status role=status aria-live=polite></p></div></aside>
 

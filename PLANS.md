@@ -2,10 +2,10 @@
 
 ## État
 
-- Version livrée : v0.6.0 — Plan 1 codé et contrôlé automatiquement, **à tester par Damien**. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
-- Plan 1 à tester ; Plan 2 en préparation, non lancé : poissons, raccord de l’entrée et mécanisme unique validés dans leur principe. VR toujours reportée, emplacement conservé. Référence visuelle v1 validée comme direction artistique.
+- Version livrée : v0.7.0 — Plan 2 codé et contrôlé automatiquement, **à tester par Damien**. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
+- Plan 2 à tester ; Plan 3 en préparation (clins d’œil supplémentaires). Tests antérieurs non confirmés conservés. VR toujours reportée, emplacement conservé.
 - La revue du code depuis `revue-ok` reste à faire avant la prochaine clôture ; la génération de cette référence ne constitue pas une revue.
-- Retours après v0.6.0 : poissons bien visibles, y compris depuis l’extérieur de l’eau ; passage intérieur approuvé en l’état, sans nouvelle refonte. Blocage sur les deux montants extérieurs de l’entrée : priorité n°1 du Plan 2. Aucun nouveau code autorisé pour ces retours.
+- Retours après v0.6.0 : poissons bien visibles, y compris depuis l’extérieur de l’eau ; passage intérieur approuvé en l’état, sans nouvelle refonte. Blocage sur les deux montants extérieurs de l’entrée : priorité n°1 du Plan 2. Ces retours ont été intégrés au Plan 2 lancé ensuite par Damien.
 
 ## Plan 1 — Fiabiliser le passage et enrichir la découverte
 
@@ -37,15 +37,15 @@
 
 Les tests v0.5.0 ci-dessus restent en attente faute de validation explicite ; ils peuvent être réalisés avec v0.6.0. Avant le prochain plan, proposer à Damien de retirer ceux que son usage a déjà confirmés, sans les retirer d’office.
 
-## Plan 2 — En préparation, non lancé
+## Plan 2 — Livré en v0.7.0, à tester
 
 ### Retours v0.6.0 pour la prochaine session
 
-1. **Poissons — validé pour le prochain plan, pas encore lancé :** conserver leur bonne visibilité ; ajouter des bancs de petits poissons en complément des plus grands, et réduire la taille maximale actuelle. Plusieurs classes cohérentes par banc, plus grands plafonnés autour de 75–80 % de la taille actuelle, maillages réutilisés. Ces réglages seront à juger visuellement après implémentation.
-2. **PRIORITÉ N°1 — blocage aux deux montants extérieurs de l’entrée immergée :** Damien reste coincé en touchant un montant en entrant ; regard libre, mouvements horizontaux bloqués, mouvement vertical encore possible, redémarrage nécessaire. Nouveau signalement et capture sur le montant opposé, au seuil sous l’eau ; aucun blocage similaire rencontré ailleurs lors de ses promenades. Diagnostic CPU sans modification du code : aux positions (119.9, 4.8, 32.2) et (119.9, 4.8, 39.8), avance/recul de 0.1 m refusés, montée de 0.1 m acceptée ; latéral également refusé au premier diagnostic. La caméra partiellement engagée dans le bord échoue à `cryptCameraFits` pour chaque petit pas. Prévoir récupération/glissade permettant de se dégager sans relancer ; tests des deux angles, entrée/sortie, recul, petits pas, diagonales et raccord extérieur/intérieur. Corriger ce défaut avant d’ajouter une porte à cette entrée. **Conserver le passage intérieur en l’état.** Le signalement « à corriger en priorité » complète le plan en préparation ; aucune exécution générale du plan demandée à ce stade.
-3. **Mécanisme unique et porte coulissante — principe validé, exécution non lancée.** Entrée immergée initialement fermée par une dalle discrète ; gros levier ancien sur la rive opposée du Nil, activable volontairement en s’approchant avec un bouton « Actionner » par clic/toucher. Le mécanisme bascule avec un claquement sourd. Fondu vers une courte vue de la porte qui s’ouvre, puis retour à la position et l’orientation exactes du joueur. Porte maintenue ouverte toute la visite, **sans minuterie** ; Damien valide sa **réinitialisation fermée à chaque nouvelle visite**, sans mémorisation persistante. Un seul mécanisme pour l’instant. Prévoir absence de double activation, tactile, son respectant le réglage muet, séquence écourtable et collisions cohérentes. Coût de rendu attendu faible ; effort principal dans les interactions, transitions et tests. **À préciser :** apparence/emplacement exact et durée de la séquence. Aucun code à ce stade.
+1. **Poissons :** conserver leur bonne visibilité ; ajouter des bancs de petits poissons en complément des plus grands, et réduire la taille maximale actuelle. Plusieurs classes cohérentes par banc, plus grands plafonnés autour de 75–80 % de la taille actuelle, maillages réutilisés. Ces réglages seront à juger visuellement après implémentation.
+2. **PRIORITÉ N°1 — blocage aux deux montants extérieurs de l’entrée immergée :** Damien reste coincé en touchant un montant en entrant ; regard libre, mouvements horizontaux bloqués, mouvement vertical encore possible, redémarrage nécessaire. Nouveau signalement et capture sur le montant opposé, au seuil sous l’eau ; aucun blocage similaire rencontré ailleurs lors de ses promenades. Diagnostic CPU sans modification du code : aux positions (119.9, 4.8, 32.2) et (119.9, 4.8, 39.8), avance/recul de 0.1 m refusés, montée de 0.1 m acceptée ; latéral également refusé au premier diagnostic. La caméra partiellement engagée dans le bord échoue à `cryptCameraFits` pour chaque petit pas. Prévoir récupération/glissade permettant de se dégager sans relancer ; tests des deux angles, entrée/sortie, recul, petits pas, diagonales et raccord extérieur/intérieur. Corriger ce défaut avant d’ajouter une porte à cette entrée. **Conserver le passage intérieur en l’état.** Récupération et tests livrés en v0.7.0 ; validation utilisateur encore attendue.
+3. **Mécanisme unique et porte coulissante.** Entrée immergée initialement fermée par une dalle discrète ; gros levier ancien sur la rive opposée du Nil, activable volontairement en s’approchant avec un bouton « Actionner » par clic/toucher. Le mécanisme bascule avec un claquement sourd. Fondu vers une courte vue de la porte qui s’ouvre, puis retour à la position et l’orientation exactes du joueur. Porte maintenue ouverte toute la visite, **sans minuterie** ; Damien valide sa **réinitialisation fermée à chaque nouvelle visite**, sans mémorisation persistante. Un seul mécanisme pour l’instant. Prévoir absence de double activation, tactile, son respectant le réglage muet, séquence écourtable et collisions cohérentes. Coût de rendu attendu faible ; effort principal dans les interactions, transitions et tests. Levier près du débarcadère de la rive opposée ; séquence d’environ six secondes, écourtable.
 4. **Musique :** validée par Damien ; conserver la musique procédurale actuelle sans la modifier. Le claquement/frottement du mécanisme est un effet distinct.
-5. **Accueil :** retirer les mentions « L ambiance » **et « I informations »** des indications affichées. Les raccourcis `L` / `I`, l’atelier et les statistiques restent actifs pour les essais personnels de Damien, sans nouvel accès visible. Noté pour le prochain plan, non exécuté.
+5. **Accueil :** retirer les mentions « L ambiance » **et « I informations »** des indications affichées. Les raccourcis `L` / `I`, l’atelier et les statistiques restent actifs pour les essais personnels de Damien, sans nouvel accès visible. Livré en v0.7.0.
 6. **Décors habités hors de la cité :** quelques cabanes en bois au milieu des champs et quelques tentes espacées dans le désert, sans personnage ni animation. Proposition de densité à ajuster : 4–6 cabanes et 2–3 petits groupes de tentes, avec sol et implantation plausibles.
 7. **Navigation et ambiance spirituelle :** un ou deux bateaux plus grands et quelques barques. Proposition : une grande barque cérémonielle statique, bois sombre, touches vert/or et pavillon de lin, près d’un débarcadère de la rive opposée ; évoquer une traversée onirique et spirituelle sans ajouter de mécanisme, de transport du joueur ni d’animation. Nombre final et emplacement à préciser ; cette direction est une proposition, pas une reconstitution historique.
 8. **Mystère retenu :** même symbole sur le mécanisme distant et **au-dessus de la porte fermée**. Proposition : scarabée, également gravé en quelques lieux éloignés ; lier ces présences sans ajouter de quête ni d’autres mécanismes. Le scarabée récurrent est validé ; son emploi comme symbole de porte reste un choix artistique proposé.
@@ -53,7 +53,22 @@ Les tests v0.5.0 ci-dessus restent en attente faute de validation explicite ; il
 10. **Esthétique retenue :** bouquets de lotus, quelques façades en faïence, voiles d’ombrage fixes, petits coins de marché, incrustations de malachite et de cuivre patiné près de l’eau. Décors statiques et maillages réutilisés privilégiés. Conserver eau verte, lumière et musique actuelles.
 11. **Signature et origine du monde :** cité inspirée d’un ancien rêve lucide de Damien, où il survolait des canaux d’eau verte. Signature discrète à découvrir dans le décor : **uniquement les lettres « DAM »**, jamais le prénom complet, sans signature dans l’accueil. Petite gravure physique intégrée à la pierre dans un recoin près d’un canal, sans balisage ni texte flottant ; emplacement laissé à la composition du décor. Cette signature constitue l’exception voulue aux inscriptions lisibles dans la scène.
 
-**Préparation :** aucune question bloquante restante. Emplacement précis des décors, apparence du levier et durée courte de la séquence sont des choix courants d’implémentation à résoudre dans le cadre convenu. Plan 2 prêt à être lancé sur ordre explicite ; la VR demeure reportée et exclue de ce lancement sauf demande spécifique. Aucun code lancé pendant la préparation.
+**Livré :** récupération des deux montants, porte coulissante et levier au scarabée ; fondu, bruit synthétique, retour exact et ouverture unique ; douze bancs de trois tailles ; dix-huit mosaïques et 118 compositions de fond supplémentaires ; cinq cabanes, trois tentes, quatre marchés avec voiles fixes, neuf panneaux de faïence, quatre incrustations, huit bouquets de lotus, une grande barque et trois petites ; gravure DAM. Musique, réglages d’ambiance et intérieur de la crypte conservés. L/I actifs mais non annoncés dans l’accueil. Le simple rechargement réinitialise la porte ; le recalcul du soleil depuis l’atelier conserve la visite et son état ouvert, comme la position de caméra déjà conservée.
+
+**Contrôles :** plan/maillages/collisions, automate du mécanisme, réglages et bundle ; régressions des deux montants avec porte ouverte/fermée, collisions du monde complet, captures WebGPU des trois qualités, interaction réelle du bouton et remise à zéro à la relance. Aucun test sur téléphone physique dans cette session ; l’audition et le dosage du son restent à valider par Damien. Captures et rapports : `.github/screenshots/iteration8/`.
+
+### Tests utilisateur du Plan 2 — à valider
+
+- Toucher chacun des deux montants de l’entrée sous l’eau : pouvoir reculer/se dégager, porte fermée puis ouverte, sans relancer ; entrer et ressortir après activation.
+- Sur la rive opposée près du débarcadère, approcher le levier en le regardant : bouton Actionner utilisable à la souris et au toucher, levier basculant, son discret, fondu montrant la porte et retour exact.
+- Essayer Passer ; vérifier que la porte reste ouverte sans minuterie et qu’une nouvelle visite la remet fermée. Tester aussi le respect du mode muet.
+- Juger les trois tailles de poissons et leur visibilité depuis la surface et sous l’eau.
+- Repérer davantage de mosaïques et de petits décors au fond des canaux, sans gêne pour se déplacer.
+- Découvrir cabanes, tentes, marché/voiles, faïence, lotus, incrustations et barques ; juger implantation, fluidité et ambiance.
+- Vérifier que l’accueil n’annonce plus L/I, que ces raccourcis restent actifs sur ordinateur et que la musique est conservée.
+- Découvrir la petite gravure DAM ; vérifier que sa discrétion convient.
+
+Le Plan 3 reçoit uniquement les nouveaux clins d’œil pour la suite. VR exclue de cette livraison.
 
 ### Réservoir d’idées demandé — propositions non retenues automatiquement
 
@@ -100,3 +115,7 @@ Sélection retenue : E1, E3, E4, E6, E8. Les barques sont précisées au point 7
 ### Réalité virtuelle — toujours pour plus tard, emplacement conservé
 
 WebXR / HTC Vive : déplacement selon casque ou manette, montée/descente, niveaux de qualité et essais matériels. Projet Sous-Marin à tester séparément. Non lancé ; les tests casque devront être identifiés comme bloquants avant de construire sur leur résultat.
+
+## Plan 3 — En préparation : petits clins d’œil pour la suite
+
+Trouver d’autres petites découvertes peu coûteuses, personnelles ou oniriques, dans l’esprit du mécanisme inspiré de Zelda et des lettres DAM laissées par un visiteur temporel. Réflexion seulement ; aucun ajout de ce type au périmètre du Plan 2 sans demande. La VR reste à son emplacement précédent, reportée ; aucun déplacement décidé par l’agent.

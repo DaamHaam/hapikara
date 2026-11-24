@@ -16,11 +16,20 @@ function cryptZone(x,y,z,footprint=false){
   return -1;
 }
 const cryptInside=(x,y,z)=>x<95.5&&cryptZone(x,y,z)>=0;
+const cryptAtMouth=(x,y,z)=>x>=119&&x<=120.75&&y>=3.05&&y<=6.4&&z>=32&&z<=40;
 function cryptCameraFits(x,z){
   for(let k=0;k<9;k++){
     const a=(k-1)*TAU/8,xx=x+(k?cos(a)*.72:0),zz=z+(k?sin(a)*.72:0);
     if(cryptZone(xx,0,zz,true)<0&&!(xx>=119&&xx<=141&&zz>=32&&zz<=40))return false;
   }return true;
+}
+const CRYPT_RECOVERY=new Float64Array(2);
+function cryptRecover(x,z){
+  let best=1e9;
+  for(let i=0;i<=CRYPT_ROOMS.length;i++){
+    const b=CRYPT_ROOMS[i],xx=clamp(x,(b?b[0]:119)+.73,(b?b[2]:141)-.73),zz=clamp(z,(b?b[1]:32)+.73,(b?b[3]:40)-.73),d=(xx-x)**2+(zz-z)**2;
+    if(d<best&&cryptCameraFits(xx,zz)){best=d;CRYPT_RECOVERY[0]=xx;CRYPT_RECOVERY[1]=zz;}
+  }return best<2.25;
 }
 // Entry of the sunlight at the first wall/roof met along the configured sun direction.
 const CRYPT_RAY=(()=>{

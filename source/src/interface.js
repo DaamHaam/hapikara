@@ -1,3 +1,4 @@
+initMechanism();
 // Lighting workshop. All DOM work happens on interaction, never inside render().
 if (!AUTO && !mob) {
   const panel=$('look-panel'),status=$('look-status'),data=$('look-data');
@@ -29,7 +30,7 @@ if (!AUTO && !mob) {
   const sunApply=document.createElement('button');sunApply.id='sun-apply';sunApply.textContent='Appliquer la position du soleil';
   groups.get('Position du soleil').append(sunHelp,sunApply);
   sunApply.onclick=()=>{
-    try{sessionStorage.hapikaraPendingLook=JSON.stringify(lookPayload());sessionStorage.hapikaraCamera=JSON.stringify(Array.from(F.slice(0,5)));sessionStorage.hapikaraOpenLook='1';}catch{}
+    try{sessionStorage.hapikaraPendingLook=JSON.stringify(lookPayload());sessionStorage.hapikaraCamera=JSON.stringify(Array.from(F.slice(0,5)));sessionStorage.hapikaraPendingGate=GATE_OPEN>=1?'1':'0';sessionStorage.hapikaraOpenLook='1';}catch{}
     const url=new URL(location.href);url.searchParams.delete('lookDefault');location.href=url.href;
   };
   const show=(open)=>{
@@ -65,7 +66,8 @@ if (!AUTO && !mob) {
   });
   try{
     const saved=JSON.parse(sessionStorage.hapikaraCamera||'null');
-    if(Array.isArray(saved)&&saved.length===5&&saved.every(Number.isFinite)){F.set(saved,0);F[RESET]=1;}
+    const gateCarry=sessionStorage.hapikaraPendingGate;sessionStorage.removeItem('hapikaraPendingGate');
+    if(Array.isArray(saved)&&saved.length===5&&saved.every(Number.isFinite)){F.set(saved,0);if(gateCarry==='1')GATE_OPEN=leverTurn=1;F[RESET]=1;}
     sessionStorage.removeItem('hapikaraCamera');
     if(sessionStorage.hapikaraOpenLook){sessionStorage.removeItem('hapikaraOpenLook');show(true);}
   }catch{}

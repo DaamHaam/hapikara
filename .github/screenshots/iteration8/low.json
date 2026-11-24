@@ -1,0 +1,1204 @@
+{
+  "environment": {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+    "visibility": "visible",
+    "width": 1214,
+    "height": 758,
+    "level": "Low",
+    "timestamps": true
+  },
+  "gpu": {
+    "vendor": "apple",
+    "architecture": "metal-3",
+    "device": "",
+    "description": ""
+  },
+  "path": "path: peak speed 67.5 m/s, peak yaw rate 39.7 deg/s, lowest 1.2 m above ground or water (at 39.1 s)",
+  "planting": {
+    "trees": 5927,
+    "palms": 5485,
+    "palmsInCity": 434,
+    "esplanadeFountains": 4
+  },
+  "views": [
+    {
+      "pose": 0,
+      "stats": "waves 0.20  cull 0.00  shadow 0.00  mirror 0.13  gbuffer 2.69  ao 0.00  light 2.49  transp 0.52  taa 0.79  bloom 0.92  post 0.98  | total 5.37 ms",
+      "count": "main: 0.53 M tris · solid 457 inst 0.35 M · crystal 1 inst 0.00 M · water 3 inst 0.03 M · cascade 1 inst 0.01 M · leaf 2417 inst 0.14 M\n   top: 727x90(l3)  697x90(l3)  68x734(s1)  1x44368(s0)  1x31776(w0)  2x10610(s2)  2x7934(s2)  1x15072(s0)  3x4586(s2)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "pose": 1,
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.44  ao 0.00  light 1.11  transp 0.39  taa 0.66  bloom 0.79  post 0.85  | total 3.93 ms",
+      "count": "main: 0.51 M tris · solid 600 inst 0.37 M · crystal 1 inst 0.00 M · water 3 inst 0.03 M · cascade 8 inst 0.01 M · leaf 1925 inst 0.09 M\n   top: 1x44368(s0)  1x31776(w0)  42x734(s1)  2x13298(s1)  253x90(l3)  2x10610(s2)  232x90(l3)  6x2691(s0)  2x7934(s2)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "pose": 2,
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.44  ao 0.00  light 1.31  transp 0.72  taa 0.98  bloom 1.05  post 1.11  | total 4.26 ms",
+      "count": "main: 0.44 M tris · solid 525 inst 0.33 M · crystal 1 inst 0.00 M · water 3 inst 0.03 M · cascade 8 inst 0.01 M · leaf 1610 inst 0.07 M\n   top: 1x44368(s0)  1x31776(w0)  2x13298(s1)  210x90(l3)  185x90(l3)  2x7934(s2)  1x15072(s0)  13x1140(s0)  17x734(s1)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "pose": 3,
+      "stats": "waves 0.20  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.18  ao 0.00  light 1.25  transp 0.59  taa 0.72  bloom 0.85  post 0.92  | total 4.13 ms",
+      "count": "main: 0.30 M tris · solid 277 inst 0.20 M · crystal 1 inst 0.00 M · water 4 inst 0.03 M · cascade 3 inst 0.01 M · leaf 1026 inst 0.05 M\n   top: 1x44368(s0)  1x31776(w0)  271x90(l3)  245x90(l3)  1x17434(s0)  1x15072(s0)  1x9830(s0)  1x9576(c0)  1x5706(s1)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "pose": 4,
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.31  ao 0.00  light 1.11  transp 0.33  taa 0.72  bloom 0.79  post 0.85  | total 3.80 ms",
+      "count": "main: 0.39 M tris · solid 495 inst 0.27 M · crystal 1 inst 0.00 M · water 3 inst 0.03 M · cascade 7 inst 0.01 M · leaf 1668 inst 0.07 M\n   top: 1x44368(s0)  1x31776(w0)  208x90(l3)  204x90(l3)  2x7934(s2)  1x15072(s0)  1x13298(s1)  9x1140(s0)  1x9830(s0)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "pose": 5,
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.57  ao 0.00  light 1.31  transp 0.46  taa 0.79  bloom 0.85  post 0.98  | total 4.00 ms",
+      "count": "main: 0.50 M tris · solid 425 inst 0.34 M · crystal 1 inst 0.00 M · water 3 inst 0.03 M · cascade 1 inst 0.01 M · leaf 1847 inst 0.11 M\n   top: 598x90(l3)  68x734(s1)  533x90(l3)  1x44368(s0)  1x31776(w0)  2x10610(s2)  2x7934(s2)  1x15072(s0)  3x4586(s2)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "underwater": 0,
+      "stats": "waves 0.26  cull 0.00  shadow 0.00  mirror 0.13  gbuffer 1.64  ao 0.00  light 1.38  transp 0.52  taa 0.79  bloom 0.85  post 1.05  | total 4.33 ms"
+    },
+    {
+      "underwater": 1,
+      "stats": "waves 0.33  cull 0.07  shadow 0.00  mirror 0.20  gbuffer 1.70  ao 0.00  light 1.44  transp 0.52  taa 0.79  bloom 0.85  post 1.05  | total 4.46 ms"
+    },
+    {
+      "underwater": 2,
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.64  ao 0.00  light 1.38  transp 0.46  taa 0.79  bloom 0.92  post 1.05  | total 4.33 ms"
+    },
+    {
+      "underwater": 3,
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.84  ao 0.00  light 1.77  transp 0.46  taa 0.79  bloom 0.92  post 1.05  | total 4.85 ms"
+    }
+  ],
+  "aquatics": {
+    "schools": [
+      [
+        643.1095290506523,
+        -1.7,
+        -320
+      ],
+      [
+        661.1964882517107,
+        -2.4,
+        -262
+      ],
+      [
+        678.297278880382,
+        -3.0999999999999996,
+        -204
+      ],
+      [
+        658.2541098591353,
+        -1.7,
+        -146
+      ],
+      [
+        672.977288183197,
+        -2.4,
+        -88
+      ],
+      [
+        686.4495744169835,
+        -3.0999999999999996,
+        -30
+      ],
+      [
+        662.7260009206722,
+        -1.7,
+        28
+      ],
+      [
+        673.929174746849,
+        -2.4,
+        86
+      ],
+      [
+        684.2403723045255,
+        -3.0999999999999996,
+        144
+      ],
+      [
+        657.8869985376814,
+        -1.7,
+        202
+      ],
+      [
+        667.1272127085682,
+        -2.4,
+        260
+      ],
+      [
+        676.2327014101829,
+        -3.0999999999999996,
+        318
+      ]
+    ],
+    "fish": 192,
+    "sizeClasses": [
+      [
+        0.19,
+        0.32
+      ],
+      [
+        0.34,
+        0.49
+      ],
+      [
+        0.55,
+        0.78
+      ]
+    ],
+    "treasures": 4,
+    "mosaics": [
+      [
+        130,
+        3.055,
+        36
+      ],
+      [
+        130,
+        3.055,
+        90
+      ],
+      [
+        -130,
+        3.055,
+        -200
+      ],
+      [
+        266,
+        3.055,
+        200
+      ],
+      [
+        130,
+        3.055,
+        245
+      ],
+      [
+        130,
+        3.055,
+        -200
+      ],
+      [
+        -130,
+        3.055,
+        140
+      ],
+      [
+        -130,
+        3.055,
+        -80
+      ],
+      [
+        -310,
+        3.055,
+        -270
+      ],
+      [
+        -310,
+        3.055,
+        250
+      ],
+      [
+        266,
+        3.055,
+        310
+      ],
+      [
+        310,
+        3.055,
+        -90
+      ],
+      [
+        370,
+        3.055,
+        210
+      ],
+      [
+        -220,
+        3.055,
+        130
+      ],
+      [
+        -230,
+        3.055,
+        -130
+      ],
+      [
+        200,
+        3.055,
+        -250
+      ],
+      [
+        330,
+        3.055,
+        270
+      ],
+      [
+        210,
+        3.055,
+        -310
+      ]
+    ],
+    "bottom": [
+      [
+        -310,
+        3.04,
+        -343
+      ],
+      [
+        -310,
+        3.04,
+        -290
+      ],
+      [
+        -310,
+        3.04,
+        -237
+      ],
+      [
+        -297,
+        3.04,
+        -177
+      ],
+      [
+        -266,
+        3.04,
+        -164
+      ],
+      [
+        -266,
+        3.04,
+        -111
+      ],
+      [
+        -266,
+        3.04,
+        -58
+      ],
+      [
+        -266,
+        3.04,
+        -5
+      ],
+      [
+        -266,
+        3.04,
+        48
+      ],
+      [
+        -266,
+        3.04,
+        101
+      ],
+      [
+        -266,
+        3.04,
+        154
+      ],
+      [
+        -297,
+        3.04,
+        169
+      ],
+      [
+        -310,
+        3.04,
+        235
+      ],
+      [
+        -310,
+        3.04,
+        288
+      ],
+      [
+        -310,
+        3.04,
+        341
+      ],
+      [
+        -130,
+        3.04,
+        -396
+      ],
+      [
+        -130,
+        3.04,
+        -343
+      ],
+      [
+        -130,
+        3.04,
+        -290
+      ],
+      [
+        -130,
+        3.04,
+        -237
+      ],
+      [
+        -130,
+        3.04,
+        -184
+      ],
+      [
+        -130,
+        3.04,
+        -131
+      ],
+      [
+        -130,
+        3.04,
+        -25
+      ],
+      [
+        -130,
+        3.04,
+        28
+      ],
+      [
+        -130,
+        3.04,
+        81
+      ],
+      [
+        -130,
+        3.04,
+        187
+      ],
+      [
+        -130,
+        3.04,
+        240
+      ],
+      [
+        -130,
+        3.04,
+        293
+      ],
+      [
+        -130,
+        3.04,
+        346
+      ],
+      [
+        130,
+        3.04,
+        -396
+      ],
+      [
+        130,
+        3.04,
+        -343
+      ],
+      [
+        130,
+        3.04,
+        -290
+      ],
+      [
+        130,
+        3.04,
+        -237
+      ],
+      [
+        130,
+        3.04,
+        -184
+      ],
+      [
+        130,
+        3.04,
+        -131
+      ],
+      [
+        130,
+        3.04,
+        -78
+      ],
+      [
+        130,
+        3.04,
+        -25
+      ],
+      [
+        130,
+        3.04,
+        134
+      ],
+      [
+        130,
+        3.04,
+        187
+      ],
+      [
+        130,
+        3.04,
+        293
+      ],
+      [
+        130,
+        3.04,
+        346
+      ],
+      [
+        266,
+        3.04,
+        -343
+      ],
+      [
+        266,
+        3.04,
+        -290
+      ],
+      [
+        266,
+        3.04,
+        -237
+      ],
+      [
+        280,
+        3.04,
+        -180
+      ],
+      [
+        310,
+        3.04,
+        -166
+      ],
+      [
+        310,
+        3.04,
+        -113
+      ],
+      [
+        310,
+        3.04,
+        -60
+      ],
+      [
+        310,
+        3.04,
+        -7
+      ],
+      [
+        310,
+        3.04,
+        46
+      ],
+      [
+        280,
+        3.04,
+        70
+      ],
+      [
+        266,
+        3.04,
+        137
+      ],
+      [
+        266,
+        3.04,
+        190
+      ],
+      [
+        266,
+        3.04,
+        243
+      ],
+      [
+        266,
+        3.04,
+        296
+      ],
+      [
+        266,
+        3.04,
+        349
+      ],
+      [
+        370,
+        3.04,
+        -343
+      ],
+      [
+        370,
+        3.04,
+        -290
+      ],
+      [
+        370,
+        3.04,
+        -237
+      ],
+      [
+        370,
+        3.04,
+        -184
+      ],
+      [
+        370,
+        3.04,
+        -131
+      ],
+      [
+        370,
+        3.04,
+        -78
+      ],
+      [
+        370,
+        3.04,
+        -25
+      ],
+      [
+        370,
+        3.04,
+        28
+      ],
+      [
+        370,
+        3.04,
+        81
+      ],
+      [
+        370,
+        3.04,
+        134
+      ],
+      [
+        370,
+        3.04,
+        187
+      ],
+      [
+        370,
+        3.04,
+        240
+      ],
+      [
+        370,
+        3.04,
+        293
+      ],
+      [
+        370,
+        3.04,
+        346
+      ],
+      [
+        -456,
+        3.04,
+        -250
+      ],
+      [
+        -403,
+        3.04,
+        -250
+      ],
+      [
+        -350,
+        3.04,
+        -250
+      ],
+      [
+        -244,
+        3.04,
+        -250
+      ],
+      [
+        -191,
+        3.04,
+        -250
+      ],
+      [
+        303,
+        3.04,
+        -250
+      ],
+      [
+        409,
+        3.04,
+        -250
+      ],
+      [
+        -456,
+        3.04,
+        -130
+      ],
+      [
+        -403,
+        3.04,
+        -130
+      ],
+      [
+        -350,
+        3.04,
+        -130
+      ],
+      [
+        -297,
+        3.04,
+        -130
+      ],
+      [
+        -244,
+        3.04,
+        -130
+      ],
+      [
+        -191,
+        3.04,
+        -130
+      ],
+      [
+        -85,
+        3.04,
+        -130
+      ],
+      [
+        -32,
+        3.04,
+        -130
+      ],
+      [
+        21,
+        3.04,
+        -130
+      ],
+      [
+        74,
+        3.04,
+        -130
+      ],
+      [
+        180,
+        3.04,
+        -130
+      ],
+      [
+        233,
+        3.04,
+        -130
+      ],
+      [
+        286,
+        3.04,
+        -130
+      ],
+      [
+        339,
+        3.04,
+        -130
+      ],
+      [
+        445,
+        3.04,
+        -130
+      ],
+      [
+        -456,
+        3.04,
+        130
+      ],
+      [
+        -403,
+        3.04,
+        130
+      ],
+      [
+        -350,
+        3.04,
+        130
+      ],
+      [
+        -297,
+        3.04,
+        130
+      ],
+      [
+        -244,
+        3.04,
+        130
+      ],
+      [
+        -191,
+        3.04,
+        130
+      ],
+      [
+        -138,
+        3.04,
+        130
+      ],
+      [
+        -85,
+        3.04,
+        130
+      ],
+      [
+        -32,
+        3.04,
+        130
+      ],
+      [
+        21,
+        3.04,
+        130
+      ],
+      [
+        74,
+        3.04,
+        130
+      ],
+      [
+        333,
+        3.04,
+        130
+      ],
+      [
+        439,
+        3.04,
+        130
+      ],
+      [
+        -403,
+        3.04,
+        270
+      ],
+      [
+        -350,
+        3.04,
+        270
+      ],
+      [
+        -244,
+        3.04,
+        270
+      ],
+      [
+        -191,
+        3.04,
+        270
+      ],
+      [
+        -138,
+        3.04,
+        270
+      ],
+      [
+        143,
+        3.04,
+        270
+      ],
+      [
+        196,
+        3.04,
+        270
+      ],
+      [
+        249,
+        3.04,
+        270
+      ],
+      [
+        302,
+        3.04,
+        270
+      ],
+      [
+        355,
+        3.04,
+        270
+      ],
+      [
+        408,
+        3.04,
+        270
+      ],
+      [
+        199,
+        3.04,
+        -310
+      ],
+      [
+        199,
+        3.04,
+        -270
+      ],
+      [
+        300,
+        3.04,
+        200
+      ]
+    ]
+  },
+  "secretViews": [
+    {
+      "name": "entrance",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.57  ao 0.00  light 1.84  transp 0.39  taa 0.72  bloom 0.85  post 0.98  | total 4.39 ms",
+      "count": "main: 0.33 M tris · solid 440 inst 0.25 M · crystal 0 inst 0.00 M · water 4 inst 0.03 M · cascade 7 inst 0.01 M · leaf 1185 inst 0.04 M\n   top: 1x44368(s0)  1x31776(w0)  2x9950(s1)  1x17434(s0)  1x15072(s0)  143x90(l3)  132x90(l3)  9x1140(s0)  1x9830(s0)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "name": "gallery",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 0.85  ao 0.00  light 1.25  transp 0.33  taa 0.72  bloom 0.85  post 0.92  | total 3.08 ms",
+      "count": "main: 0.02 M tris · solid 5 inst 0.02 M · crystal 0 inst 0.00 M · water 1 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: 1x17434(s0)  3x64(s0)  1x44(s0)  1x2(w0)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "name": "crypt",
+      "stats": "waves 0.26  cull 0.00  shadow 0.00  mirror 0.13  gbuffer 0.92  ao 0.00  light 1.25  transp 0.20  taa 0.59  bloom 0.66  post 0.79  | total 3.15 ms",
+      "count": "main: 0.02 M tris · solid 4 inst 0.02 M · crystal 0 inst 0.00 M · water 1 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: 1x17434(s0)  2x64(s0)  1x44(s0)  1x2(w0)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "name": "sarcophagus",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 0.85  ao 0.00  light 1.25  transp 0.20  taa 0.52  bloom 0.72  post 0.98  | total 3.21 ms",
+      "count": "main: 0.02 M tris · solid 3 inst 0.02 M · crystal 0 inst 0.00 M · water 1 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: 1x17434(s0)  1x64(s0)  1x44(s0)  1x2(w0)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "name": "mask",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 0.92  ao 0.00  light 1.31  transp 0.20  taa 0.59  bloom 0.72  post 0.79  | total 3.01 ms",
+      "count": "main: 0.02 M tris · solid 2 inst 0.02 M · crystal 0 inst 0.00 M · water 1 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: 1x17434(s0)  1x44(s0)  1x2(w0)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "name": "aperture",
+      "stats": "waves 0.26  cull 0.00  shadow 0.00  mirror 0.13  gbuffer 1.70  ao 0.00  light 2.03  transp 0.13  taa 0.59  bloom 0.72  post 0.79  | total 3.67 ms",
+      "count": "main: 0.02 M tris · solid 2 inst 0.02 M · crystal 0 inst 0.00 M · water 1 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: 1x17434(s0)  1x44(s0)  1x2(w0)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "name": "pyramid-opening",
+      "stats": "waves 0.20  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.64  ao 0.00  light 1.11  transp 0.72  taa 0.98  bloom 1.18  post 1.25  | total 4.46 ms",
+      "count": "main: 0.50 M tris · solid 505 inst 0.31 M · crystal 0 inst 0.00 M · water 4 inst 0.03 M · cascade 8 inst 0.01 M · leaf 2288 inst 0.15 M\n   top: 752x90(l3)  742x90(l3)  68x734(s1)  1x44368(s0)  1x31776(w0)  2x13298(s1)  2x10610(s2)  1x17434(s0)  1x15072(s0)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "name": "fish",
+      "stats": "waves 0.26  cull 0.00  shadow 0.00  mirror 0.13  gbuffer 1.64  ao 0.00  light 2.16  transp 0.46  taa 0.79  bloom 0.85  post 1.05  | total 4.39 ms",
+      "count": "main: 0.23 M tris · solid 129 inst 0.09 M · crystal 0 inst 0.00 M · water 2 inst 0.03 M · cascade 1 inst 0.01 M · leaf 1048 inst 0.10 M\n   top: 505x90(l3)  482x90(l3)  1x31776(w0)  1x9576(c0)  23x160(l2)  20x160(l2)  1x3094(s0)  1x3094(s0)  1x3094(s0)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "name": "treasure",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.70  ao 0.00  light 2.23  transp 0.33  taa 0.72  bloom 0.85  post 0.98  | total 4.52 ms",
+      "count": "main: 0.23 M tris · solid 113 inst 0.09 M · crystal 0 inst 0.00 M · water 2 inst 0.03 M · cascade 1 inst 0.01 M · leaf 999 inst 0.10 M\n   top: 483x90(l3)  430x90(l3)  1x31776(w0)  1x9576(c0)  36x160(l2)  26x160(l2)  1x3094(s0)  1x3094(s0)  1x3094(s0)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "name": "mosaic",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.11  ao 0.00  light 1.38  transp 0.33  taa 0.66  bloom 0.79  post 0.92  | total 3.87 ms",
+      "count": "main: 0.38 M tris · solid 355 inst 0.23 M · crystal 0 inst 0.00 M · water 4 inst 0.03 M · cascade 3 inst 0.01 M · leaf 1685 inst 0.11 M\n   top: 517x90(l3)  506x90(l3)  1x44368(s0)  1x31776(w0)  1x17434(s0)  6x2691(s0)  1x15072(s0)  1x13298(s1)  1x9950(s1)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    }
+  ],
+  "fishCost": [
+    {
+      "density": 0,
+      "gpuMean": 5.257216000000001,
+      "gpuPeak": 6.5536,
+      "count": "main: 0.23 M tris · solid 65 inst 0.09 M · crystal 0 inst 0.00 M · water 2 inst 0.03 M · cascade 1 inst 0.01 M · leaf 1048 inst 0.10 M\n   top: 505x90(l3)  482x90(l3)  1x31776(w0)  1x9576(c0)  23x160(l2)  20x160(l2)  1x3094(s0)  1x3094(s0)  1x3094(s0)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    },
+    {
+      "density": 1,
+      "gpuMean": 5.261312000000001,
+      "gpuPeak": 6.22592,
+      "count": "main: 0.23 M tris · solid 129 inst 0.09 M · crystal 0 inst 0.00 M · water 2 inst 0.03 M · cascade 1 inst 0.01 M · leaf 1048 inst 0.10 M\n   top: 505x90(l3)  482x90(l3)  1x31776(w0)  1x9576(c0)  23x160(l2)  20x160(l2)  1x3094(s0)  1x3094(s0)  1x3094(s0)\nmirror: 0.00 M tris · solid 0 inst 0.00 M · crystal 0 inst 0.00 M · water 0 inst 0.00 M · cascade 0 inst 0.00 M · leaf 0 inst 0.00 M\n   top: \nshadow: 0.07 M tris · solid 66 inst 0.04 M · leaf 292 inst 0.02 M\n   top: 1x15072(s0)  1x9830(s0)  41x160(l2)  32x160(l2)  10x376(l1)  1x3180(s0)  1x2256(s0)  1x2170(s1)  1x2086(s1)"
+    }
+  ],
+  "scenery": {
+    "huts": [
+      [
+        -410,
+        9.539435597686998,
+        -530
+      ],
+      [
+        -90,
+        9.504532177387352,
+        -550
+      ],
+      [
+        245,
+        9.72896453254473,
+        -490
+      ],
+      [
+        -430,
+        10.021249025289361,
+        520
+      ],
+      [
+        170,
+        9.940519765097289,
+        560
+      ]
+    ],
+    "tents": [
+      [
+        -850,
+        21.949977945869865,
+        540
+      ],
+      [
+        -1130,
+        29.556191772651108,
+        -390
+      ],
+      [
+        -1440,
+        33.26323836197356,
+        400
+      ]
+    ],
+    "markets": [
+      [
+        185,
+        10,
+        -204
+      ],
+      [
+        -190,
+        16,
+        55
+      ],
+      [
+        200,
+        16,
+        181
+      ],
+      [
+        308,
+        10,
+        310
+      ]
+    ],
+    "faience": [
+      [
+        191,
+        18.9,
+        -37.83
+      ],
+      [
+        -358.6,
+        15.9,
+        -196.73
+      ],
+      [
+        -356,
+        15.700000000000001,
+        48.97
+      ],
+      [
+        -48.6,
+        15.9,
+        183.27
+      ],
+      [
+        54,
+        21.7,
+        -198.03
+      ],
+      [
+        204,
+        15.700000000000001,
+        313.97
+      ],
+      [
+        321.4,
+        15.9,
+        -216.73
+      ],
+      [
+        -426.3905706279911,
+        17.299999999999997,
+        -214.83583159150555
+      ],
+      [
+        -426.35606757365167,
+        21.1,
+        -88.01038479816168
+      ]
+    ],
+    "inlays": [
+      [
+        140.97,
+        8.3,
+        82
+      ],
+      [
+        -119.03,
+        8.3,
+        196
+      ],
+      [
+        256.03,
+        8.3,
+        220
+      ],
+      [
+        -140.97,
+        8.3,
+        -195
+      ]
+    ],
+    "lotus": [
+      [
+        122,
+        6.5,
+        70
+      ],
+      [
+        138,
+        6.5,
+        185
+      ],
+      [
+        -138,
+        6.5,
+        215
+      ],
+      [
+        -122,
+        6.5,
+        -175
+      ],
+      [
+        262,
+        6.5,
+        280
+      ],
+      [
+        372,
+        6.5,
+        -90
+      ],
+      [
+        130,
+        6.5,
+        -305
+      ],
+      [
+        310,
+        6.5,
+        68
+      ]
+    ],
+    "boats": [
+      [
+        1077.9989118610547,
+        0,
+        -240
+      ],
+      [
+        647.8658811516593,
+        0,
+        -115
+      ],
+      [
+        652.2047198603167,
+        0,
+        145
+      ],
+      [
+        642.6418504986397,
+        0,
+        330
+      ]
+    ],
+    "signature": [
+      -119.03,
+      8.3,
+      210
+    ]
+  },
+  "plan2": [
+    {
+      "name": "hut",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.90  ao 0.00  light 2.23  transp 0.33  taa 0.66  bloom 0.79  post 0.85  | total 4.33 ms"
+    },
+    {
+      "name": "tent",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 2.03  ao 0.00  light 2.36  transp 0.26  taa 0.59  bloom 0.79  post 0.85  | total 4.39 ms"
+    },
+    {
+      "name": "market",
+      "stats": "waves 0.26  cull 0.00  shadow 0.00  mirror 0.20  gbuffer 1.18  ao 0.00  light 1.31  transp 0.39  taa 0.66  bloom 0.79  post 0.85  | total 3.80 ms"
+    },
+    {
+      "name": "faience",
+      "stats": "waves 0.33  cull 0.00  shadow 0.00  mirror 0.20  gbuffer 1.51  ao 0.00  light 0.98  transp 0.26  taa 0.66  bloom 0.72  post 0.79  | total 3.87 ms"
+    },
+    {
+      "name": "ceremonial-boat",
+      "stats": "waves 0.33  cull 0.00  shadow 0.00  mirror 0.20  gbuffer 1.77  ao 0.00  light 1.97  transp 0.72  taa 1.05  bloom 1.25  post 1.31  | total 4.78 ms"
+    },
+    {
+      "name": "signature",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 2.03  ao 0.00  light 1.64  transp 0.26  taa 0.59  bloom 0.72  post 0.85  | total 4.52 ms"
+    },
+    {
+      "name": "mosaic-new",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.64  ao 0.00  light 1.57  transp 0.39  taa 0.72  bloom 0.85  post 1.05  | total 4.59 ms"
+    },
+    {
+      "name": "bottom-new",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.25  ao 0.00  light 1.84  transp 0.33  taa 0.72  bloom 0.85  post 0.98  | total 4.13 ms"
+    },
+    {
+      "name": "gate-symbol",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.44  ao 0.00  light 1.38  transp 0.59  taa 0.92  bloom 1.11  post 1.18  | total 4.26 ms"
+    },
+    {
+      "name": "fish-size-0",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.57  ao 0.00  light 2.10  transp 0.39  taa 0.79  bloom 0.85  post 1.05  | total 4.39 ms"
+    },
+    {
+      "name": "fish-size-1",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.57  ao 0.00  light 2.10  transp 0.39  taa 0.79  bloom 0.92  post 1.05  | total 4.39 ms"
+    },
+    {
+      "name": "fish-size-2",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.44  ao 0.00  light 1.97  transp 0.39  taa 0.72  bloom 0.92  post 1.05  | total 4.19 ms"
+    },
+    {
+      "name": "lotus",
+      "stats": "waves 0.26  cull 0.07  shadow 0.00  mirror 0.13  gbuffer 1.51  ao 0.00  light 1.57  transp 0.72  taa 1.05  bloom 1.18  post 1.31  | total 4.46 ms"
+    }
+  ],
+  "mechanism": {
+    "open": 1,
+    "returnedExactly": true,
+    "phase": 0
+  },
+  "jambs": [
+    {
+      "z": 32.2,
+      "dx": -0.1,
+      "result": [
+        119.80000000000001,
+        4.8,
+        32.73
+      ]
+    },
+    {
+      "z": 32.2,
+      "dx": 0.1,
+      "result": [
+        120,
+        4.8,
+        32.73
+      ]
+    },
+    {
+      "z": 39.8,
+      "dx": -0.1,
+      "result": [
+        119.80000000000001,
+        4.8,
+        39.27
+      ]
+    },
+    {
+      "z": 39.8,
+      "dx": 0.1,
+      "result": [
+        120,
+        4.8,
+        39.27
+      ]
+    }
+  ]
+}
