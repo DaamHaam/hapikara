@@ -568,7 +568,9 @@ function frame(now) {
   let dt = dtr / 1000; if (dt > 0.1) dt = 0.1;
   if (DYN && !FPS && dtr < 1e3 && (dynT += dtr) > 0) { dynN++; if (dtr > dynMax) dynMax = dtr; if (dynT > (menu ? 400 : 1000)) tune(); }
   F[TIME] += dt; F[DT] = dt;
+  pollGamepad(dt);
   if(mechanismPhase){mdx=mdy=lkx=lky=l2x=l2y=0;stepMechanism(dt);render();return;}
+  if(menu){render();return;}
   // touch: the finger's offset from where it went down steers like a joystick
   if (tId >= 0) {
     const tr = 4 / min(innerWidth, innerHeight); let jx = (tx - tx0) * tr, jy = (ty - ty0) * tr;
@@ -582,7 +584,7 @@ function frame(now) {
   const yaw = F[YAW] + dyw; let pitch = F[PIT] - dpt; pitch = pitch < -1.55 ? -1.55 : pitch > 1.55 ? 1.55 : pitch;
   // one finger flies forward, a second flies fast
   const submerged=waterSurfaceAt(F[CX],F[CZ])>F[CY];
-  const sp = (ks || tN > 1 ? 200 : 15) * spd * (submerged?.3:1), k = 1 - exp(-dt * 5), mf = kf - kb + (tN > 0 ? 1 : 0), mr = kr - kl, mu = ku - kd, cp = cos(pitch), sy = sin(yaw), cw = cos(yaw);
+  const sp = (ks || tN > 1 || PAD[5] ? 200 : 15) * spd * (submerged?.3:1), k = 1 - exp(-dt * 5), mf = clamp(kf - kb + (tN > 0 ? 1 : 0) + PAD[0],-1,1), mr = clamp(kr - kl + PAD[1],-1,1), mu = clamp(ku - kd + PAD[2],-1,1), cp = cos(pitch), sy = sin(yaw), cw = cos(yaw);
   const vx = F[VX] + ((sy * cp * mf + cw * mr) * sp - F[VX]) * k, vy = F[VY] + ((sin(pitch) * mf + mu) * sp - F[VY]) * k, vz = F[VZ] + ((-cw * cp * mf + sy * mr) * sp - F[VZ]) * k;
   let x = F[CX] + vx * dt, y = F[CY] + vy * dt, z = F[CZ] + vz * dt;
   const rad = sqrt(x * x + z * z); if (rad > 6000) { x *= 6000 / rad; z *= 6000 / rad; }
@@ -596,7 +598,7 @@ function frame(now) {
   render();
   if (hud) {
     hN++; if (dtr > hMax) hMax = dtr; F[HUDT] += dtr / 1000;
-    if (F[HUDT] > 0.5) { let s = `${(hN / F[HUDT]).toFixed(0)} fps · worst frame ${hMax.toFixed(1)} ms · GPU ${(gpuMs[NP] * SLOW).toFixed(2)} ms · ${W}x${H}${W < DW ? ` (${(100 * W / DW).toFixed(0)}% of ${DW}x${DH})` : ''} · ${LVN[LV]}\n`; for (let i = 0; i < NP; i++) s += `${PASSES[i]} ${gpuMs[i].toFixed(2)}  `; info.textContent = s + `\n${x.toFixed(0)}, ${y.toFixed(0)}, ${z.toFixed(0)} · yaw ${(((yaw / DEG) % 360 + 360) % 360).toFixed(0)}° pitch ${(pitch / DEG).toFixed(0)}° · speed ${((ks?200:15) * spd * (submerged?.3:1)).toFixed(spd < 0.8 ? 2 : 1)} m/s${solid ? '' : ' · collision off (C)'}`; F[HUDT] = 0; hN = 0; hMax = 0; }
+    if (F[HUDT] > 0.5) { let s = `${(hN / F[HUDT]).toFixed(0)} fps · worst frame ${hMax.toFixed(1)} ms · GPU ${(gpuMs[NP] * SLOW).toFixed(2)} ms · ${W}x${H}${W < DW ? ` (${(100 * W / DW).toFixed(0)}% of ${DW}x${DH})` : ''} · ${LVN[LV]}\n`; for (let i = 0; i < NP; i++) s += `${PASSES[i]} ${gpuMs[i].toFixed(2)}  `; info.textContent = s + `\n${x.toFixed(0)}, ${y.toFixed(0)}, ${z.toFixed(0)} · yaw ${(((yaw / DEG) % 360 + 360) % 360).toFixed(0)}° pitch ${(pitch / DEG).toFixed(0)}° · speed ${((ks||PAD[5]?200:15) * spd * (submerged?.3:1)).toFixed(spd < 0.8 ? 2 : 1)} m/s${solid ? '' : ' · collision off (C)'}`; F[HUDT] = 0; hN = 0; hMax = 0; }
   }
 }
 
@@ -615,7 +617,7 @@ const key = (e, v) => {
 };
 addEventListener('keydown', (e) => { if (!(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement) && (!menu || e.code === 'KeyI')) {if(e.code.startsWith('Arrow'))e.preventDefault();key(e, 1);} });
 addEventListener('keyup', (e) => key(e, 0));
-const release = () => { kf = kb = kl = kr = ku = kd = ks = 0; tId = -1; tN = 0; };
+const release = () => { PAD.fill(0); kf = kb = kl = kr = ku = kd = ks = 0; tId = -1; tN = 0; };
 addEventListener('blur', release);
 const capture = () => { if (mob) return; const p = canvas.requestPointerLock({ unadjustedMovement: true }); if (p && p.catch) p.catch(() => canvas.requestPointerLock()).catch(() => 0); };
 addEventListener('mousemove', (e) => { if (document.pointerLockElement === canvas) { mdx += e.movementX; mdy += e.movementY; } });
@@ -643,7 +645,7 @@ $('o').onclick = () => ui(true);
 canvas.addEventListener('click',()=>{if(!activateMechanism())capture();});
 document.addEventListener('pointerlockchange', () => { if (!mob) ui(!document.pointerLockElement); });
 // detail buttons: the current level is lit, the others reload with theirs
-$('q').querySelectorAll('button').forEach((b, i) => { if (i === 2 - LV) b.className = 'on'; else b.onclick = () => { try { localStorage.atlantis = 2 - i; } catch {} location.href = location.href.replace(/[?&]lv=\d/, ''); }; });
+$('q').querySelectorAll('button').forEach((b, i) => { if (i === 2 - LV) b.className = 'on'; else b.onclick = () => { try { localStorage.atlantis = 2 - i; } catch {} const url=new URL(location.href);url.searchParams.delete('lv');location.href=url.href; }; });
 
 // draw the first frames and wait for the GPU (pipelines compile on first use) before revealing
 lookAt(...POSES[2]); // canal-level welcome: jade water and reflections fill the free right-hand side

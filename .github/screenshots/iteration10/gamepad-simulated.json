@@ -1,0 +1,118 @@
+{
+  "simulated": true,
+  "records": [
+    {
+      "label": "neutral",
+      "menu": true,
+      "choice": 0,
+      "armed": true,
+      "mechanism": 0,
+      "gate": 0,
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "label": "Bas",
+      "menu": true,
+      "choice": 2,
+      "armed": true,
+      "mechanism": 0,
+      "gate": 0,
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "label": "A",
+      "menu": true,
+      "choice": 2,
+      "armed": true,
+      "mechanism": 0,
+      "gate": 0,
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "label": "Haut",
+      "menu": true,
+      "choice": 0,
+      "armed": true,
+      "mechanism": 0,
+      "gate": 0,
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "label": "A",
+      "menu": false,
+      "choice": 0,
+      "armed": true,
+      "mechanism": 0,
+      "gate": 0,
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "label": "Start",
+      "menu": true,
+      "choice": 0,
+      "armed": true,
+      "mechanism": 0,
+      "gate": 0,
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "label": "Start",
+      "menu": false,
+      "choice": 0,
+      "armed": true,
+      "mechanism": 0,
+      "gate": 0,
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "gpuErrors": []
+}

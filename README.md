@@ -12,6 +12,12 @@ Pierre dorée, pierres précieuses et eau vert-jade qui ruisselle de partout, de
 
 ![La cité entre le Nil et le désert](.github/screenshots/aerial.jpg)
 
+## Manette — v0.9.0 / Plan 4
+
+Brancher une manette USB ou Bluetooth reconnue avec une disposition standard par le navigateur, puis appuyer sur un bouton et relâcher. Stick gauche : se déplacer ; stick droit : regarder ; gâchettes gauche/droite : descendre/monter ; **A / Croix** : valider ou actionner ; **B / Rond** maintenu : accélérer ; **Start / Options** : accueil/reprise. Dans l’accueil, croix directionnelle ou stick gauche pour choisir la visite et les trois qualités ; A valide. Aide et sélection apparaissent seulement avec une manette détectée. Si le navigateur exige une interaction pour autoriser l’audio, cliquer ou appuyer sur une touche une fois.
+
+Contrôles : `cd source && npm run check:gamepad`. Tests de menus simulés et limites : `.github/screenshots/iteration10/`. L’essai USB/Bluetooth physique reste à faire.
+
 ## Levier visible et signatures — v0.8.0 / Plan 3
 
 Le levier agrandi se trouve sur l’esplanade du débarcadère opposé, devant le petit temple décalé. Les scarabées sont plus lisibles. **Espace** permet de l’actionner à proximité, comme le clic et le toucher ; un grondement de pierre distinct accompagne l’ouverture. Cinq petites signatures **DAM** sont réparties près de l’eau, sans balisage. Musique et conduit de lumière de la crypte inchangés.
@@ -114,7 +120,7 @@ npm install
 npm run build
 ```
 
-Contrôles CPU et livrable : `cd source && npm run check:plan && npm run check:ambiance && npm run check:bundle`. Le fichier minifié autonome fait environ **119 ko** (101 ko gzip), sans ressource externe de scène. Pour reproduire les nouvelles captures, lancer `python3 source/tools/qa-server.py` à la racine, puis ouvrir `http://localhost:8137/dev.html?auto&lv=1&w=1440&h=900&qa=secrets-medium&smoke&secrets` après `npm run build:dev` (`lv=0/1/2` : High/Medium/Low). Ajouter `bench` pour le parcours chronométré. Les captures de développement et les outils de mesure ne sont pas inclus dans `index.html`.
+Contrôles CPU et livrable : `cd source && npm run check:plan && npm run check:ambiance && npm run check:bundle`. Le fichier minifié autonome fait environ **120 ko** (102 ko gzip), sans ressource externe de scène. Pour reproduire les nouvelles captures, lancer `python3 source/tools/qa-server.py` à la racine, puis ouvrir `http://localhost:8137/dev.html?auto&lv=1&w=1440&h=900&qa=secrets-medium&smoke&secrets` après `npm run build:dev` (`lv=0/1/2` : High/Medium/Low). Ajouter `bench` pour le parcours chronométré. Les captures de développement et les outils de mesure ne sont pas inclus dans `index.html`.
 
 ## Licence
 

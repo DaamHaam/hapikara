@@ -120,6 +120,7 @@
     if (ctx.state === 'running' || muted) GESTURES.forEach((g) => removeEventListener(g, gesture, true));
   };
   if (!AUTO) {
+    padAudio=gesture; // Same audio graph; a controller action also attempts browser audio activation.
     GESTURES.forEach((g) => addEventListener(g, gesture, true));
     addEventListener('keydown', (e) => {
       if (e.code !== 'KeyM' || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;

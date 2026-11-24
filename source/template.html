@@ -3,7 +3,7 @@
 <style>
 :root{color-scheme:dark;--ink:#092d36;--gold:#efd28e;--paper:#fff3d4;--jade:#41ccb0}*{box-sizing:border-box}[hidden]{display:none!important}
 html{background:var(--ink)}body{position:fixed;inset:0;margin:0;overflow:hidden;background:var(--ink);color:var(--paper);font:15px/1.5 system-ui,sans-serif}
-button,a,input,textarea{font:inherit}button,a{color:inherit}button{cursor:pointer;background:#103d47;border:1px solid #dcb97466;padding:.65em 1em;border-radius:2px}button:hover{background:#20535c;border-color:var(--gold)}:focus-visible{outline:2px solid var(--gold);outline-offset:3px}button[aria-pressed=true],button.on{background:var(--gold);color:var(--ink)}button:disabled{opacity:.45;cursor:default}a{text-decoration:none}
+button,a,input,textarea{font:inherit}button,a{color:inherit}button{cursor:pointer;background:#103d47;border:1px solid #dcb97466;padding:.65em 1em;border-radius:2px}button:hover{background:#20535c;border-color:var(--gold)}:focus-visible{outline:2px solid var(--gold);outline-offset:3px}button[aria-pressed=true],button.on{background:var(--gold);color:var(--ink)}button[data-pad-focus]{outline:3px solid var(--gold);outline-offset:4px}#pad-help{font-size:12px;line-height:1.5;color:#d1e3dc;max-width:40em}button:disabled{opacity:.45;cursor:default}a{text-decoration:none}
 #c{position:absolute;width:100%;height:100%;touch-action:none;cursor:crosshair;transition:opacity 1s}.l #c{opacity:0}
 #m{position:absolute;inset:0;display:flex;align-items:center;padding:clamp(25px,6vw,95px);background:linear-gradient(90deg,#062e39e8,#062e3980 35%,#062e3900 66%);overflow:auto}.g #m{display:none}.l #g{visibility:hidden}
 #welcome{width:min(440px,100%);padding:30px 0}
@@ -28,7 +28,7 @@ html[data-look=open] #m{display:none}html[data-look=open] #c{filter:none}html[da
 </style></head>
 <body class=l><canvas id=c tabindex=-1 aria-label="La cité de Hapikara en trois dimensions"></canvas>
 <main id=m><section id=welcome><h1>Hapikara</h1><p class=subtitle>Cité égyptienne</p><div id=p><i id=b></i></div><p id=s>La cité prend forme…</p>
-<div id=g><button id=d>Explorer la cité</button><div id=q><span>Qualité</span><button>Légère</button><button>Équilibrée</button><button>Détaillée</button></div></div>
+<p id=pad-help hidden></p><div id=g><button id=d>Explorer la cité</button><div id=q><span>Qualité</span><button>Légère</button><button>Équilibrée</button><button>Détaillée</button></div></div>
 <p id=k>Flèches ou W A S D · Q / E descendre et monter<br>Maj accélérer · Échap accueil</p><p id=h>Un doigt pour avancer et regarder.<br>Deux doigts pour accélérer.</p></section></main>
 <button id=action hidden>Actionner</button>
 <button id=o aria-label="Retour à l’accueil">⌂</button>

@@ -2,8 +2,8 @@
 
 ## État
 
-- Version livrée : v0.8.0 — Plan 3 codé et contrôlé, **à tester par Damien**. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
-- Plan 3 à tester ; Plan 4 en préparation, sans périmètre défini. Plan 2 partiellement testé : mécanisme fonctionnel confirmé par Damien ; autres essais en attente. Tests antérieurs non confirmés conservés. VR toujours reportée, emplacement conservé.
+- Version livrée : v0.9.0 — Plan 4 (manette) codé et contrôlé, **à tester avec une manette physique par Damien**. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
+- Plan 4 à tester ; Plan 5 en préparation, sans périmètre défini. Plan 3 à tester. Plan 2 partiellement testé : mécanisme fonctionnel confirmé par Damien ; autres essais en attente. Tests antérieurs non confirmés conservés. VR toujours reportée, emplacement conservé.
 - La revue du code depuis `revue-ok` reste à faire avant la prochaine clôture ; la génération de cette référence ne constitue pas une revue.
 - Retours après v0.6.0 : poissons bien visibles, y compris depuis l’extérieur de l’eau ; passage intérieur approuvé en l’état, sans nouvelle refonte. Blocage sur les deux montants extérieurs de l’entrée : priorité n°1 du Plan 2. Ces retours ont été intégrés au Plan 2 lancé ensuite par Damien.
 
@@ -142,6 +142,28 @@ Repère de la signature actuelle (information à Damien, pas de déplacement dem
 
 Les anciens essais non confirmés restent en attente ; ils pourront être retirés sur confirmation de Damien.
 
-## Plan 4 — En préparation
+## Plan 4 — Livré v0.9.0 : support d’une manette
+
+**Exécution autorisée par Damien.** Manettes reconnues par le navigateur avec la disposition Gamepad `standard` (Xbox / PlayStation selon OS et navigateur), USB ou Bluetooth ; une manette active, clavier/souris/tactile toujours utilisables. Pas de VR.
+
+- Stick gauche : avancer/reculer et déplacement latéral, proportionnel ; stick droit : regarder. Zones mortes radiales à 18 %, direction diagonale normalisée, vitesse de regard indépendante de la fréquence d’affichage.
+- Gâchette gauche : descendre ; droite : monter, proportionnellement.
+- A / Croix : lancer/reprendre ou actionner le levier à proximité ; nouvel appui pour passer sa séquence. B / Rond : accélérer pendant l’appui avec la même vitesse que Maj. Start / Options : accueil / reprise.
+- Menus à la croix directionnelle ou au stick gauche : haut vers la visite, bas vers la qualité courante, gauche/droite entre les qualités, A valide. Sélection encadrée, aide uniquement lorsqu’une manette est détectée.
+- Branchement/reprise : attendre le retour au neutre pour éviter une activation involontaire ; boutons traités au nouvel appui. Déconnexion ou perte de focus : arrêt des mouvements, accueil, réarmement au neutre. Les manettes sans disposition standard n’imposent pas de commandes devinées ; indication dans l’accueil.
+- Appel au graphe audio existant sur un bouton de manette, sans changer musique, mélodie ou mixage. Le navigateur peut demander une première interaction clavier/souris/tactile pour autoriser le son.
+- Corrections liées : caméra immobile dans l’accueil ; choix de qualité conservant proprement les autres paramètres d’URL.
+
+**Contrôles :** check:gamepad (état et vrai frame), check:plan, check:mechanism, check:ambiance, build et check:bundle. Parcours de menus avec manette simulée dans le navigateur, puis chargement du livrable sans manette. Relecture du diff du Plan 4 faite ; revue globale depuis `revue-ok` toujours à faire avant clôture. Capture et rapport dans `.github/screenshots/iteration10/`. Aucun essai de manette physique dans cette session.
+
+### Tests utilisateur du Plan 4 — à valider
+
+- Brancher/appairer la manette, appuyer sur un bouton puis relâcher : aide affichée et visite lançable avec A/Croix. Choisir une qualité depuis la manette et retrouver les menus après le rechargement.
+- Vérifier déplacement, regard, absence de dérive, montée/descente aux gâchettes et accélération avec B/Rond ; juger le confort sur la télévision.
+- Actionner le levier avec A/Croix, puis tester le saut de séquence ; retour au bon endroit. Start/Options doit permettre l’accueil et la reprise sans mouvement de caméra dans le menu.
+- Débrancher/rebrancher et changer de fenêtre : aucun mouvement bloqué ni activation involontaire au retour. Clavier, souris et tactile restent fonctionnels.
+- Vérifier musique et sons avec la manette ; si le navigateur bloque le son au premier lancement, vérifier qu’un clic ou une touche le déverrouille.
+
+## Plan 5 — En préparation
 
 Aucun nouveau périmètre arrêté. Ne pas lancer sans ordre explicite.
