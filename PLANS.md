@@ -2,8 +2,8 @@
 
 ## État
 
-- Version livrée : v0.7.0 — Plan 2 codé et contrôlé automatiquement, **à tester par Damien**. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
-- Plan 2 partiellement testé : mécanisme fonctionnel confirmé par Damien ; autres essais en attente. Plan 3 en préparation (visibilité du levier, interaction et clins d’œil). Tests antérieurs non confirmés conservés. VR toujours reportée, emplacement conservé.
+- Version livrée : v0.8.0 — Plan 3 codé et contrôlé, **à tester par Damien**. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
+- Plan 3 à tester ; Plan 4 en préparation, sans périmètre défini. Plan 2 partiellement testé : mécanisme fonctionnel confirmé par Damien ; autres essais en attente. Tests antérieurs non confirmés conservés. VR toujours reportée, emplacement conservé.
 - La revue du code depuis `revue-ok` reste à faire avant la prochaine clôture ; la génération de cette référence ne constitue pas une revue.
 - Retours après v0.6.0 : poissons bien visibles, y compris depuis l’extérieur de l’eau ; passage intérieur approuvé en l’état, sans nouvelle refonte. Blocage sur les deux montants extérieurs de l’entrée : priorité n°1 du Plan 2. Ces retours ont été intégrés au Plan 2 lancé ensuite par Damien.
 
@@ -115,17 +115,33 @@ Sélection retenue : E1, E3, E4, E6, E8. Les barques sont précisées au point 7
 
 WebXR / HTC Vive : déplacement selon casque ou manette, montée/descente, niveaux de qualité et essais matériels. Projet Sous-Marin à tester séparément. Non lancé ; les tests casque devront être identifiés comme bloquants avant de construire sur leur résultat.
 
-## Plan 3 — En préparation : levier plus visible et petits clins d’œil
+## Plan 3 — Livré v0.8.0 : levier plus visible et signatures réparties
 
-Trouver d’autres petites découvertes peu coûteuses, personnelles ou oniriques, dans l’esprit du mécanisme inspiré de Zelda et des lettres DAM laissées par un visiteur temporel. Réflexion seulement ; aucun ajout de ce type au périmètre du Plan 2 sans demande. La VR reste à son emplacement précédent, reportée ; aucun déplacement décidé par l’agent.
+**Exécution autorisée par Damien :** levier plus visible, Espace, grondement de porte et plusieurs signatures DAM. Les autres idées de clins d’œil ne sont pas sélectionnées automatiquement. La VR reste à son emplacement précédent, reportée ; aucun déplacement décidé par l’agent.
 
 1. **Levier visible depuis la traversée du Nil.** Le placer sur la petite esplanade de la rive opposée, plus grand et clairement identifiable ; scarabée davantage mis en évidence pour rappeler celui de la porte immergée. Étudier un dégagement central, ou décaler le petit temple si nécessaire, en conservant un passage libre et des collisions cohérentes. Emplacement exact à confronter au décor lors de l’implémentation ; ne pas cacher le levier derrière le temple.
 2. **Touche Espace.** Permettre l’activation contextuelle du levier avec Espace en plus du clic/toucher, sans activation à distance ni répétition par maintien de la touche.
 3. **Ouverture de la porte audible.** Le claquement du loquet est entendu ; rendre distinct et plus perceptible le grondement sourd de pierre pendant l’ouverture. Une couche de frottement existe déjà mais ne ressort pas suffisamment dans l’essai de Damien. Respecter le mode muet et conserver la musique.
-4. **Sortie extérieure du conduit — défaut mineur.** Son bord semble dépasser le relief de la pyramide. Vérifier une terminaison affleurante, triangle par triangle, plutôt qu’une longueur commune aux quatre coins. Amélioration secondaire, signalée comme acceptable en l’état par Damien ; ne pas altérer la silhouette générale.
+4. **Signatures réparties.** Cinq gravures DAM au total, même petit maillage partagé : plaque historique, canal près de la pyramide, canal sud-est, canal nord et débarcadère opposé. Aucun texte flottant ni indication sur l’accueil. Les trois captures de repérage de la plaque historique restent dans `.github/screenshots/dam-guide/`.
 
-5. **Signature plus découvrable — piste à préparer.** Damien ne retrouve pas la plaque malgré les indications ; fournir trois captures réelles (proche, mi-distance, lointaine). Envisager plusieurs petites gravures DAM dans des lieux de passage, toujours discrètes ; nombre et emplacements non arrêtés. Aucun ajout exécuté.
-
-**Décision lumière :** Damien abandonne l’ajustement local de l’ouverture intérieure ; conserver la pièce, le soleil et le conduit lumineux actuels. Le petit dépassement extérieur reste uniquement le défaut mineur secondaire déjà accepté en l’état.
+**Décision lumière :** Damien abandonne l’ajustement local de l’ouverture intérieure ; conserver la pièce, le soleil et le conduit lumineux actuels. Le petit dépassement extérieur est également conservé en l’état ; aucune modification du conduit dans cette livraison.
 
 Repère de la signature actuelle (information à Damien, pas de déplacement demandé) : `[-119.03, 8.3, 210]`, sur la paroi est du canal nord-sud situé à l’ouest de la pyramide, au sud de celle-ci ; gravure à 1,8 m au-dessus de l’eau, à regarder depuis le canal en direction de la pyramide. Petit scarabée incrusté sur la même paroi à z=196, soit 14 m plus au nord.
+
+
+**Livré :** levier à l’avant de l’esplanade de la rive opposée (x=EAST_QUAY.x−7, z=−231, sol à 3,6 m), poignée plus grande, petit temple décalé à l’arrière sur le côté et collisions de colonnes déplacées avec lui ; zone libre d’arbres. Scarabées agrandis sur le socle et au-dessus de la porte. Espace active uniquement à proximité, hors menu/champ et hors répétition. Son de loquet conservé avec enveloppe distincte ; grondement de pierre renforcé et couche grave pendant l’ouverture. Quatre nouvelles plaques DAM, soit cinq en tout. Musique et conduit lumineux inchangés.
+
+**Contrôles :** check:plan, check:mechanism, check:ambiance, build, check:bundle ; captures WebGPU Équilibrée du levier depuis la traversée et de près, du scarabée de porte et des cinq plaques. Espace testé en interaction réelle, puis retour devant le levier basculé ; aucune erreur navigateur. Relecture du diff du Plan 3 effectuée ; elle ne remplace pas la revue globale depuis `revue-ok`, toujours en attente avant clôture. Rapport et captures : `.github/screenshots/iteration9/`.
+
+### Tests utilisateur du Plan 3 — à valider
+
+- Depuis la traversée du Nil, repérer spontanément le levier sur l’esplanade et reconnaître le scarabée commun avec la porte ; circuler librement autour du socle et des colonnes déplacées.
+- Actionner avec Espace sur ordinateur et avec le bouton sur téléphone ; retrouver sa position après la séquence. Maintenir Espace ne doit pas relancer ni écourter celle-ci.
+- Entendre un grondement distinct pendant l’ouverture de la porte, avec un volume agréable sur ordinateur et téléphone ; vérifier le mode muet.
+- Découvrir quelques plaques DAM au fil de la promenade ; juger leur répartition et leur discrétion.
+
+Les anciens essais non confirmés restent en attente ; ils pourront être retirés sur confirmation de Damien.
+
+## Plan 4 — En préparation
+
+Aucun nouveau périmètre arrêté. Ne pas lancer sans ordre explicite.

@@ -1,7 +1,7 @@
 // Static, reusable props: small signs of life, not more simulation.
 const SCENERY_ANCHORS=[[-450,-530,0],[-90,-550,0],[245,-490,0],[-430,520,0],[170,560,0],[-850,500,1],[-1150,-370,1],[-1420,380,1]];
 function sceneryReserved(x,z){
-  if(hypot(x-MECHANISM_SITE[0],z-MECHANISM_SITE[2])<13)return true;
+  if(x>EAST_QUAY[0]-24&&x<EAST_QUAY[0]+27&&z>-253&&z<-187)return true;
   for(const p of SCENERY_ANCHORS)if(hypot(x-p[0],z-p[1])<24)return true;
   return false;
 }
@@ -33,6 +33,8 @@ function meshInlay(){
   const m=new MB(2048);m.mat=M.DECOR;m.ea=3;m.box(-.95,-.6,-.04,.95,.6,0,.025);m.ea=0;
   m.add(meshScarab(),0,0,.025,0,.6);return m.build();
 }
+// [x,y,z,yaw]: flush with existing quay walls, always facing the water.
+const SIGNATURE_SITES=[[-119.03,8.3,210,-PI/2],[119.03,8.3,68,PI/2],[256.03,8.3,240,PI/2],[210,8.3,-119.03,PI],[EAST_QUAY[0]-21.03,2,-238,-PI/2]];
 function meshSignature(){
   const m=new MB(1024);m.mat=M.SANDST;m.box(-.65,-.3,-.04,.65,.3,0,.02);m.mat=M.EYE;
   const paths=[[[0,-.18],[0,.18],[.15,.18],[.26,.1],[.26,-.1],[.15,-.18],[0,-.18]],[[0,-.18],[.13,.18],[.26,-.18]],[[.05,-.04],[.21,-.04]],[[0,-.18],[0,.18],[.14,-.03],[.28,.18],[.28,-.18]]];
@@ -67,7 +69,7 @@ function sceneryUrbanPoint(cx,cz,hard){
   }return null;
 }
 function populateScenery({type,put,gH,hard}){
-  const reports={huts:[],tents:[],markets:[],faience:[],inlays:[],lotus:[],boats:[],signature:[-119.03,8.3,210]};
+  const reports={huts:[],tents:[],markets:[],faience:[],inlays:[],lotus:[],boats:[],signature:SIGNATURE_SITES[0].slice(0,3),signatures:SIGNATURE_SITES};
   const rigidWood=mesh=>{const bytes=new Uint8Array(mesh.vb);for(let i=0;i<mesh.nv;i++)if(bytes[i*20+16]===M.BARK){bytes[i*20+16]=M.DECOR;bytes[i*20+17]=1;}return mesh;};
   const tentAsset=meshDiscovery(1,0);
   const huts=type([meshWoodHut(),meshWoodHut(1)],K.SOLID,80,1e9,450),tent=type([rigidWood(tentAsset.mesh),rigidWood(meshDiscovery(1,1).mesh)],K.SOLID,100,1e9,500);
@@ -90,7 +92,8 @@ function populateScenery({type,put,gH,hard}){
   }
   const inlay=type([meshInlay()],K.SOLID,1e9,1e9,160);
   for(const [x,z,a]of [[140.97,82,-PI/2],[-119.03,196,-PI/2],[256.03,220,PI/2],[-140.97,-195,PI/2]]){put(inlay,x,8.3,z,1,qYaw(a));reports.inlays.push([x,8.3,z]);}
-  put(type([meshSignature()],K.SOLID,1e9,1e9,45),...reports.signature,1,qYaw(-PI/2));
+  const signature=type([meshSignature()],K.SOLID,1e9,1e9,70);
+  for(const [x,y,z,a]of SIGNATURE_SITES)put(signature,x,y,z,1,qYaw(a));
   const lotus=type([meshLotus(231)],K.SOLID,1e9,1e9,140,0,NO_SHADOW);
   for(const [x,z]of [[122,70],[138,185],[-138,215],[-122,-175],[262,280],[372,-90],[130,-305],[310,68]])if(canalAt(x,z)){put(lotus,x,WATER+.025,z,.7);reports.lotus.push([x,WATER,z]);}
   const ship=type([meshCeremonialBoat(),meshCeremonialBoat(1)],K.SOLID,120,1e9,700),boat=type([meshCeremonialBoat(1,false)],K.SOLID,1e9,1e9,350);

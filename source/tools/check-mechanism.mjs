@@ -18,7 +18,17 @@ assert(saved.every((v,i)=>F[i]===v)&&mechanismFade===0,'exact position and orien
 assert(!activateMechanism(),'no repeated activation');
 GATE_OPEN=0;assert(activateMechanism(),'restart fixture');stepMechanism(.5);finishMechanism();
 assert(GATE_OPEN===1&&mechanismPhase===0&&saved.every((v,i)=>F[i]===v),'skip restores player and leaves door open');
+GATE_OPEN=leverTurn=0;
+const press=(extra={})=>{const e={code:'Space',repeat:false,defaultPrevented:false,target:{tagName:'CANVAS'},preventDefault(){this.defaultPrevented=true;},...extra};mechanismKey(e);return e;};
+assert(!press({repeat:true}).defaultPrevented&&mechanismPhase===0,'held Space ignored');
+for(const target of [{tagName:'INPUT'},{tagName:'TEXTAREA'},{tagName:'SELECT'},{tagName:'BUTTON'},{isContentEditable:true}]){press({target});assert(mechanismPhase===0,'Space must not hijack form controls');}
+menu=true;press();assert(mechanismPhase===0,'Space ignored in menu');menu=false;
+F[CX]-=30;press();assert(mechanismPhase===0,'no distant Space activation');F[CX]+=30;
+assert(press().defaultPrevented&&mechanismPhase===1,'Space activates nearby lever and prevents scrolling');
+press();assert(mechanismPhase===1,'Space does not skip or reactivate the running sequence');finishMechanism();
+assert(MECHANISM_SITE[0]>EAST_QUAY[0]-17&&MECHANISM_SITE[0]<EAST_QUAY[0]+20&&MECHANISM_SITE[2]>-246&&MECHANISM_SITE[2]<-194,'lever stands on landing with clearance');
+
 `;
 vm.runInNewContext(source+harness,{console});
 vm.runInNewContext(source+"\nif(GATE_OPEN!==0||mechanismPhase!==0)throw Error('reload state leaked');",{console});
-console.log('Mechanism OK: proximity, pause, one opening, fade, exact return, skip and fresh-visit reset.');
+console.log('Mechanism OK: proximity, pause, one opening, fade, exact return, skip, contextual Space, landing clearance and fresh-visit reset.');

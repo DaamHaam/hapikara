@@ -227,6 +227,14 @@
         const lp=scene.lotus[0];views.push(['lotus',[lp[0]+3,8.5,lp[2]+4,lp[0],6.5,lp[2]]]);
         for(const [name,cam]of views){await send({name:name+'.png',image:(await window.__shot({cam,time:10}))[0]});report.plan2.push({name,stats:window.__stats()});}
       }
+      if(QP.has('plan3')){
+        const site=MECHANISM_SITE;report.plan3={signatures:window.__scenery.signatures,mechanism:Array.from(site)};
+        const views=[['lever-landing',[site[0]-37,18,site[2]+26,site[0]+3,7,site[2]+8]],['lever-crossing',[site[0]-85,12,site[2],site[0],7,site[2]]],['lever-close',[site[0]-10,site[1]+4,site[2]+2,site[0],site[1]+3,site[2]]],['scarab-door',[129,8.2,37,119.18,7.9,36]]];
+        for(let i=0;i<window.__scenery.signatures.length;i++){
+          const [x,y,z,a]=window.__scenery.signatures[i];views.push(['signature-'+i,[x+sin(a)*3,y+.3,z+cos(a)*3,x,y,z]]);
+        }
+        for(const [name,cam]of views)await send({name:name+'.png',image:(await window.__shot({cam,time:10}))[0]});
+      }
       if(QP.has('bench')) report.benchmark=await window.__bench();
       if(GPU_ERRORS.length)throw Error(GPU_ERRORS.join('\n'));
       await send({name:'report.json',report});

@@ -115,8 +115,8 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
   obelisk(560, LAND, -40, 0.55); obelisk(560, LAND, 40, 0.55);
   const landingHall=type([meshHall(5,1,6,7,0),meshHall(5,1,6,7,1),meshHall(5,1,6,7,2)],K.SOLID,150,450,1800);
   put(landingHall,601,6.2,-68,1,qYaw(PI/2));
-  put(landingHall,ex-14,3.6,-213,1,qYaw(PI/2));
-  for(let z=-225;z<=-201;z+=6)box(ex-14.9,z-.9,ex-13.1,z+.9,10.6);
+  put(landingHall,ex+13,3.6,-210,1,qYaw(PI/2));
+  for(let z=-222;z<=-198;z+=6)box(ex+12.1,z-.9,ex+13.9,z+.9,10.6);
   for(let z=-80;z<=-56;z+=6)box(600.1,z-.9,601.9,z+.9,13.2);
   for (let x = 480; x < QX0 - 6; x += 11) for (let z = -QZ + 6; z <= QZ - 6; z += 11) if (abs(z) > 30 && !(abs(z - 44) < 6 || abs(z + 44) < 6) && rng() < 0.6) tree('palm', x + rr(-2, 2), LAND, z + rr(-2, 2), 1, 0.4, false);
   for (let x = 480; x < QX0 - 4; x += 3) for (const sz of [-1, 1]) if (rng() < 0.3) shrub((rng() * 5) | 0, x, LAND, sz * rr(27, 60), 1.1);
