@@ -142,8 +142,26 @@ function meshPyramid() {
   for (let k = 0; k < PYR.n; k++) {
     const h = pyrH(k), y0 = pyrY(k), y1 = pyrY(k + 1);
     mb.mat = M.SANDST; mb.box(-h, y0 - (k ? 0.2 : 0.5), -h, h, y1, h, 0.08, false);
-    bandSq(mb, h, y1 - 3.2, y1 - .55, .08, [PC.LAPIS,PC.CARN,PC.MALA][k%3], true);
-    bandSq(mb,h,y0+.6,y0+1.05,.04,PC.GOLDP,false);
+    // Carved crown on each tier, below the existing wet tread. No new wall of primary colours.
+    ringProf(mb,-h,-h,h,h,[[0,y1-1.15],[.12,y1-1.02],[.18,y1-.85],[.1,y1-.68],[.28,y1-.36],[.42,y1-.12],[.42,y1-.03]],M.SANDST);
+    bandSq(mb,h+.43,y1-.3,y1-.17,.015,PC.GOLDP,false);
+    if(k===0||k===3||k===6)bandSq(mb,h,y0+.65,y0+1.15,.09,PC.MALA,false);
+    // Paired green votive panels, with gold lotus/solar medallions; leave the stairs free.
+    for(let side=0;side<4;side++){
+      const a=side*PI/2;mb.fr=[0,0,0,cos(a),sin(a),1];
+      for(const sd of [-1,1]){
+        const butt=sd*h*.82;
+        // Shallow engaged piers break the long flat face, without changing the tier outline.
+        mb.mat=M.SANDST;mb.box(butt-.65,y0+.35,-h-.36,butt+.65,y1-1.2,-h+.08,.13);
+        const x=sd*h*.48,ym=(y0+y1)/2,ww=k>3?1.6:2.2,hh=(y1-y0)*.27;
+        mb.mat=M.SANDST;mb.box(x-ww-.35,ym-hh-.35,-h-.32,x+ww+.35,ym+hh+.4,-h+.08,.12);
+        mb.mat=M.PAINT;mb.ea=PC.MALA;mb.box(x-ww,ym-hh,-h-.37,x+ww,ym+hh,-h-.33,.035);mb.ea=0;
+        mb.mat=M.GOLD;
+        const outline=[];for(let j=0;j<=24;j++){const t=j*TAU/24,shape=k===1||k===4?pow(abs(cos(t)),.6)*Math.sign(cos(t)):cos(t);outline.push([x+shape*ww*.75,ym+sin(t)*hh*(k===2?.5:.73),-h-.43,.065]);}mb.tube(outline,5,false);
+        for(const petal of [-1,0,1]){const ps=[];for(let j=0;j<=12;j++){const t=j*PI/12;ps.push([x+sin(t)*(petal*.65+sin(t)*.35),ym-hh*.45+(1-cos(t))*hh*.5,-h-.45,.055]);}mb.tube(ps,5,false);}
+      }
+      mb.fr=null;
+    }
   }
   // the east stair: up through the corners of the steps
   const sl = PYR.rise / PYR.step, xa = pyrH(0) + (pyrY(1) - T2.y) / sl;
@@ -151,12 +169,12 @@ function meshPyramid() {
   // Four small open crown kiosks frame, rather than conceal, the emerald.
   for(const sx of [-1]) for(const sz of [-1,1]) {
     const x=sx*16,z=sz*16;
-    for(const dx of [-1.7,1.7]) for(const dz of [-1.7,1.7]) {mb.fr=[x+dx,PYR_TOP+.1,z+dz,1,0,1];column(mb,0,0,4.8,.3,1,[PC.MALA,PC.CARN,PC.LAPIS]);mb.fr=null;}
+    for(const dx of [-1.7,1.7]) for(const dz of [-1.7,1.7]) {mb.fr=[x+dx,PYR_TOP+.1,z+dz,1,0,1];column(mb,0,0,4.8,.3,1,[PC.MALA,PC.GOLDP,PC.OCHRE]);mb.fr=null;}
     mb.mat=M.SANDST;mb.box(x-2.4,PYR_TOP+4.9,z-2.4,x+2.4,PYR_TOP+5.5,z+2.4,.06);
   }
   // gold socle under the pyramidion
   mb.mat = M.GOLD; mb.box(-PDN.h - 0.5, PYR_TOP - 0.1, -PDN.h - 0.5, PDN.h + 0.5, PYR_TOP + 0.6, PDN.h + 0.5, 0.05, false);
-  bandSq(mb, PDN.h + 0.5, PYR_TOP + 0.6, PYR_TOP + 1.5, 0.02, PC.LAPIS, true);
+  bandSq(mb, PDN.h + 0.5, PYR_TOP + 0.6, PYR_TOP + 1.5, 0.02, PC.MALA, true);
   return mb.build();
 }
 // pyramidion: a square gem on the gold socle (K.CRYSTAL), and its gold lattice

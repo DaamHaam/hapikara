@@ -68,6 +68,7 @@ struct View {
   look3: vec4f, // cloud density, water refraction/reflection, emerald absorption
   look4: vec4f, // wind, sharpening, bloom, shadow coolness
   look5: vec4f, // underwater level, density, rays, camera water surface (-1e9 in air)
+  look6: vec4f, // stone grain, optional stronger relief, reserved
 }
 `;
 // full-screen triangle

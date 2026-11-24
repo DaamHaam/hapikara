@@ -22,6 +22,9 @@ if (!AUTO && !mob) {
     input.type='range';input.id=label.htmlFor;input.min=f[3];input.max=f[4];input.step=f[5];input.value=LOOK[i];
     input.oninput=()=>{LOOK[i]=+input.value;apply();};sliders.push(input);outputs.push(out);fieldset.append(label,input);
   });
+  // New experiments first; preserve LOOK indices shared with the shaders and imports.
+  const fields=$('look-fields');
+  fields.prepend(groups.get('Pierre'),groups.get('Sous l’eau'));
   const sunHelp=document.createElement('p');sunHelp.textContent='La position du soleil recharge la cité pour accorder le ciel, les reflets et les ombres.';
   const sunApply=document.createElement('button');sunApply.id='sun-apply';sunApply.textContent='Appliquer la position du soleil';
   groups.get('Position du soleil').append(sunHelp,sunApply);
@@ -45,7 +48,7 @@ if (!AUTO && !mob) {
   });
   $('look-compare').onclick=()=>{comparing=!comparing;LOOK_ACTIVE.set(comparing?LOOK_BASE:LOOK);syncLook();F[RESET]=1;scheduleEnvironment();refresh();status.textContent=comparing?'Ambiance présente à l’ouverture. La position du soleil reste celle de cette visite.':'Vos essais sont affichés.';};
   $('look-reset').onclick=()=>{LOOK.set(LOOK_DEFAULT);apply();};
-  $('water-reset').onclick=()=>{for(const i of [13,14])LOOK[i]=LOOK_FIELDS[i][6];apply();};
+  $('water-reset').onclick=()=>{for(const i of [13,14,22,23,24])LOOK[i]=LOOK_DEFAULT[i];apply();};
   $('look-copy').onclick=async()=>{
     data.hidden=false;data.value=JSON.stringify(lookPayload(),null,2);data.focus();data.select();
     try{await navigator.clipboard.writeText(data.value);status.textContent='Réglages copiés. Vous pouvez les coller dans le chat.';}catch{status.textContent='Sélection prête : copiez ce texte avec le menu de votre appareil.';}

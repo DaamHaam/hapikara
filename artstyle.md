@@ -5,7 +5,7 @@
 
 Ce fichier définit **à quoi la scène doit ressembler**. Il s'adresse au développeur et au critique visuel, et ne contient aucune consigne d'implémentation. Les images de référence sont dans `concept-art/` (les huit images du premier niveau seulement ; ignorer les sous-dossiers `rejected/` et `source/`). La section 3 dit comment s'en servir.
 
-**La scène en une phrase :** Hapikara au début de l’après-midi, une cité-oasis de grès doré, de calcaire blanc et de pierres précieuses, posée sur une île en terrasses entre le Nil et le désert, où une eau vert-jade claire jaillit du sommet d'une pyramide de cristal émeraude et ruisselle partout, de bassin en bassin, jusqu'au fleuve. Elle doit respirer **l'abondance, la lumière et la fraîcheur**.
+**La scène en une phrase :** Hapikara en fin de journée, une cité-oasis de grès doré, de calcaire blanc et de pierres précieuses, posée sur une île en terrasses entre le Nil et le désert, où une eau vert-jade claire jaillit du sommet d'une pyramide de cristal émeraude et ruisselle partout, de bassin en bassin, jusqu'au fleuve. Elle doit respirer **l'abondance, la lumière et la fraîcheur**.
 
 ---
 
@@ -16,9 +16,9 @@ Une Égypte antique rêvée, jamais archéologique : neuve, intacte, lumineuse, 
 **Principes**
 1. **Cohérence.** Un axe processionnel est-ouest (du Nil vers le désert) et un réseau de canaux à coudes, interrompu par de grands îlots, gouvernent le plan, comme dans les vraies villes égyptiennes. Pas d'anneaux concentriques.
 2. **L'eau descend.** Toute l'eau part du sommet (la pyramide) et descend par gravité, en cascades, rigoles et escaliers d'eau, vers le Nil. On doit pouvoir suivre son trajet des yeux.
-3. **La lumière est franche.** Soleil haut et clair, ombres nettes mais jamais noires, rebonds dorés du sable et verts de l'eau. Les pierres précieuses brillent parce que le soleil les traverse, pas parce qu'elles sont « magiques ».
+3. **La lumière est franche.** Soleil bas à 12°, lumière rasante, ombres longues mais jamais noires, rebonds dorés du sable et verts de l'eau. Les pierres précieuses brillent parce que le soleil les traverse, pas parce qu'elles sont « magiques ».
 4. **Les symboles sont de la sculpture.** Ankh, djed, œil oudjat, disque solaire ailé, scarabée, lotus et papyrus sont gravés en bas-relief ou incrustés en pierre précieuse dans l'architecture, jamais flottants ni lumineux.
-5. **Le désert est un écrin.** Le désert à l'ouest et le Nil à l'est encadrent la cité verte ; le contraste sable/eau/verdure est la signature du paysage.
+5. **Le désert est un écrin.** Quelques traces d’occupation humaine et des sanctuaires oubliés ponctuent les extérieurs, sans foule ni animation. Le désert à l’ouest et le Nil à l’est encadrent la cité verte ; le contraste sable/eau/verdure est la signature du paysage.
 6. **Monumentalité aérienne.** Grande échelle, mais légère : colonnades ouvertes, pylônes percés, terrasses suspendues, voiles de lin tendues. Jamais écrasant ni sombre.
 
 **Silhouette :** une pyramide à degrés couronnée d'un pyramidion de cristal émeraude d'où jaillit l'eau, sur une acropole en terrasses, flanquée de quatre obélisques à pointe d'or, au-dessus de canaux vert-jade, avec le Nil scintillant à l'est et les falaises de grès rose du désert à l'ouest.
@@ -121,7 +121,7 @@ Le Nil coule du **sud vers le nord**, à l'**est** de la cité. Le désert et le
 
 ## 6. Éléments phares
 
-**A. Pyramide à degrés.** Sept degrés de grès doré clair, à arêtes adoucies, base de 126 m, sommet à environ 110 m. Sur chaque degré, l'eau déborde en **nappes minces et lisses** vers le degré inférieur (comme une fontaine à débordement), sur les quatre faces, en laissant des escaliers secs au milieu de chaque face. Deux petits kiosques ouverts occupent les angles arrière du sommet, en laissant le point focal dégagé. Bandeaux de symboles sculptés et incrustés de lapis et d'or sur chaque contremarche.
+**A. Pyramide à degrés.** Sept degrés de grès doré clair, à arêtes adoucies, base de 126 m, sommet à environ 110 m. Sur chaque degré, l'eau déborde en **nappes minces et lisses** vers le degré inférieur (comme une fontaine à débordement), sur les quatre faces, en laissant des escaliers secs au milieu de chaque face. Deux petits kiosques ouverts occupent les angles arrière du sommet, en laissant le point focal dégagé. Corniches et petits pilastres sculptés, panneaux votifs de malachite et d’or. Pas d’alternance systématique bleu-rouge-vert : or et vert dominent la pyramide, avec de larges plages de pierre calme.
 
 **B. Pyramidion d'émeraude (point focal).** Pointe pyramidale de 15 m de haut en émeraude claire et réfractante, sertie d'une fine résille d'or. Une source jaillit de sa base sur les quatre côtés. Il est **clair et réfractant** : le ciel et la cité se voient déformés à travers, des plans de clivage et inclusions internes accrochent la lumière, des franges vertes et dorées apparaissent sur les arêtes. C'est l'objet le plus brillant de la scène, mais comme une gemme au soleil, pas comme une lampe.
 
@@ -166,8 +166,8 @@ L'eau est le deuxième héros après le pyramidion. Elle est **légèrement vert
 
 ## 9. Lumière, ciel, atmosphère et couleur
 
-**Heure fixe : début d'après-midi, très lumineux.** Le ciel garde son bleu jusqu’à l’horizon ; le voile doré et la perspective aérienne sont réservés au lointain, sans filtre jaune sur les premiers plans.
-- **Soleil :** environ 32° d'élévation, venant du **sud-ouest** (au-dessus du désert). Lumière blanc-doré (environ #FFE9C4), ombres nettes. Dans les plans phares, qui regardent vers l'ouest, le soleil est de trois-quarts face : le pyramidion, l'eau, les palmes et le lin sont partiellement en contre-jour.
+**Heure par défaut : fin de journée lumineuse, soleil à 12°.** Le ciel garde son bleu jusqu’à l’horizon ; le voile doré et la perspective aérienne sont réservés au lointain, sans filtre jaune sur les premiers plans.
+- **Soleil :** 12° d’élévation par défaut, venant du **sud-ouest** (au-dessus du désert). Lumière blanc-doré (environ #FFE9C4), ombres nettes. Dans les plans phares, qui regardent vers l'ouest, le soleil est de trois-quarts face : le pyramidion, l'eau, les palmes et le lin sont partiellement en contre-jour.
 - **Ciel :** clair et lumineux, zénith bleu franc (#3F86C8) dégradé vers un bleu pâle (#A8D0EA) puis un horizon crème lumineux (#F4E6C8). Quelques nuages légers très hauts. Pas de lune, pas d'étoiles.
 - **Atmosphère :** chaude, sèche sur le désert (brume dorée légère, chaleur qui tremble au loin), plus humide et fraîche au-dessus de l'eau. Les falaises lointaines sont adoucies et teintées de rose-violet. Halo doux autour du soleil, rayons de lumière subtils à travers les palmes et les colonnades.
 - **Ombres :** ombres ouvertes ambrées par le rebond du sable et vertes près de l'eau. Ombres de contact profondes.

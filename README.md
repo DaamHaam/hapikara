@@ -12,7 +12,17 @@ Pierre dorée, pierres précieuses et eau vert-jade qui ruisselle de partout, de
 
 ![La cité entre le Nil et le désert](.github/screenshots/aerial.jpg)
 
-## Accueil et atelier d’ambiance — v0.3.0
+## Matières, pyramide et découvertes — v0.4.0
+
+Soleil de fin de journée à **12°** par défaut. La pyramide conserve sa silhouette à degrés, avec des corniches sculptées, de petits pilastres et des panneaux vert malachite/or à la place des larges bandes alternées bleu-rouge-vert. Le grain des pierres et les épaules des joints sont accentués de près et filtrés à distance.
+
+Dans `L`, **Pierre** et **Sous l’eau** apparaissent en premier. Le grain modéré est activé ; le **relief renforcé**, plus coûteux, reste désactivé. Le niveau sous-marin « rayons » et leur intensité maximale sont maintenant les valeurs par défaut ; la densité de l’eau reste à 0,085. Douze ensembles statiques de jarres, pierres gravées et fragments de colonne ponctuent les fonds des canaux.
+
+Quatre destinations extérieures : un sanctuaire du désert à l’ouest, un campement près de la cité, un mémorial près de l’oasis de la cascade et un abri sur la rive du Nil. L’implantation recherche un terrain sec assez plat ; les pierres et piliers ont des collisions, les voiles des abris restent décoratives.
+
+[Captures et mesures de cette version](.github/screenshots/iteration5/README.md). Sur la vue de mur proche à résolution fixe en Medium, les relevés courts passent de 12,38 ms GPU sans grain à 13,13 ms avec le grain par défaut, puis 14,12 ms avec le relief renforcé. Ces mesures ne remplacent pas un benchmark de fluidité sur chaque appareil.
+
+## Accueil et atelier d’ambiance
 
 L’accueil laisse voir l’eau et ses reflets : titre, entrée et trois qualités, sans image intégrée ni plan. **Sanctuaire voilé** est l’ambiance par défaut. Sur ordinateur, **`L`** ouvre les réglages de lumière et d’eau ; **`I`** affiche les statistiques. Aucun bouton d’outils n’encombre le téléphone. Les essais reviennent aux valeurs par défaut à chaque ouverture ; copier/importer permet de conserver volontairement des valeurs. Appliquer la position du soleil recharge la scène ; les changements de ciel et de lumière recalculent aussi l’environnement des reflets.
 
@@ -70,7 +80,7 @@ npm install
 npm run build
 ```
 
-Contrôles CPU et livrable : `cd source && npm run check:plan && npm run check:ambiance && npm run check:bundle`. Le fichier minifié autonome reste proche de **101 ko** (86 ko gzip), sans ressource externe. Pour reproduire les captures et le benchmark, lancer `python3 source/tools/qa-server.py` à la racine, puis ouvrir dans Chrome `http://localhost:8137/dev.html?auto&lv=1&w=1440&h=900&qa=release-medium&bench&nots` après `npm run build:dev`. Les captures de développement et les outils de mesure ne sont pas inclus dans `index.html`.
+Contrôles CPU et livrable : `cd source && npm run check:plan && npm run check:ambiance && npm run check:bundle`. Le fichier minifié autonome reste proche de **103 ko** (88 ko gzip), sans ressource externe. Pour reproduire les captures et le benchmark, lancer `python3 source/tools/qa-server.py` à la racine, puis ouvrir dans Chrome `http://localhost:8137/dev.html?auto&lv=1&w=1440&h=900&qa=release-medium&bench&nots` après `npm run build:dev`. Les captures de développement et les outils de mesure ne sont pas inclus dans `index.html`.
 
 ## Licence
 

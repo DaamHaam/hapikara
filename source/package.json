@@ -1,6 +1,6 @@
 {
   "name": "hapikara",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "A procedural Egyptian oasis city rendered with WebGPU, bundled into one HTML file",
   "type": "module",

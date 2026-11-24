@@ -168,6 +168,22 @@
       }
       if(QP.has('looks'))for(const [name,preset]of Object.entries(LOOK_PRESETS)){LOOK_ACTIVE.set(LOOK);for(let i=0;i<20;i++)if(preset[LOOK_FIELDS[i][0]]!==undefined)LOOK_ACTIVE[i]=preset[LOOK_FIELDS[i][0]];syncLook();F[RESET]=1;await send({name:'look-'+name+'.png',image:(await window.__shot({pose:2,time:10}))[0]});}LOOK_ACTIVE.set(LOOK);syncLook();F[RESET]=1;
       for(let level=0;level<4;level++){LOOK_ACTIVE[22]=level;syncLook();F[RESET]=1;await send({name:'underwater-'+level+'.png',image:(await window.__shot({cam:[130,4.8,180,130,4.6,155],time:10}))[0]});report.views.push({underwater:level,stats:window.__stats()});}LOOK_ACTIVE.set(LOOK);syncLook();F[RESET]=1;
+      if(QP.has('materials')){
+        report.materials=[];
+        for(const [grain,relief]of [[0,0],[1,0],[1,1]]){
+          LOOK_ACTIVE[25]=grain;LOOK_ACTIVE[26]=relief;syncLook();F[RESET]=1;
+          const cam=[342,8.2,123,343,8,118];
+          await send({name:'stone-'+grain+'-'+relief+'.png',image:(await window.__shot({cam,time:10}))[0]});
+          let sum=0,peak=0;for(let j=0;j<24;j++){draw();await Q.onSubmittedWorkDone();sum+=gpuMs[NP];peak=max(peak,gpuMs[NP]);}
+          report.materials.push({grain,relief,gpuMean:sum/24,gpuPeak:peak});
+        }
+        LOOK_ACTIVE.set(LOOK);syncLook();F[RESET]=1;
+        report.discoveries=window.__discoveries;
+        for(const d of window.__discoveries.outside){
+          await send({name:'discovery-'+d.kind+'.png',image:(await window.__shot({cam:[d.x+27,d.y+12,d.z+28,d.x,d.y+3,d.z],time:10}))[0]});
+        }
+        await send({name:'pyramid-detail.png',image:(await window.__shot({cam:[110,62,100,0,65,0],time:10}))[0]});
+      }
       if(QP.has('bench')) report.benchmark=await window.__bench();
       if(GPU_ERRORS.length)throw Error(GPU_ERRORS.join('\n'));
       await send({name:'report.json',report});

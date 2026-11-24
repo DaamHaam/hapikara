@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 const read = f => readFileSync(new URL('../src/'+f,import.meta.url),'utf8');
-const source = ['math.js'].map(read).join('\n') + '\nconst LOOK=new Float32Array(22);LOOK[20]=32.51;LOOK[21]=-44.06;\n' + ['layout.js'].map(read).join('\n') + '\n' + read('sh_scene.js').split('// per view')[0] + '\nconst LEAFK=1;\n' + ['meshes.js','egypt.js','collide.js'].map(read).join('\n');
+const source = ['math.js'].map(read).join('\n') + '\nconst LOOK=new Float32Array(27);LOOK[20]=12;LOOK[21]=-44;\n' + ['layout.js'].map(read).join('\n') + '\n' + read('sh_scene.js').split('// per view')[0] + '\nconst LEAFK=1;\n' + ['meshes.js','egypt.js','discoveries.js','collide.js'].map(read).join('\n');
 vm.runInNewContext(source + `
 const assert = (b,m) => {if(!b) throw Error(m)};
 setHard({boxes:[],bridges:[]}); landY=terrainH;
@@ -40,6 +40,12 @@ for(const b of BLOCKS) {
 const meshes=[mesh,meshPyramid(),meshAcropolis(),meshCascades(),meshSphinx(0),meshSphinx(1),meshPublic(0,0).mesh,meshPublic(1,0).mesh];
 for(let v=1;v<=20;v++)meshes.push(meshVillaE(v,0).mesh);
 for(let l=0;l<5;l++)meshes.push(meshPalm(11,l));
+meshes.push(meshCanalFinds());
+for(const [x,z,k]of DISCOVERY_SITES){
+ const p=discoveryAt(x,z,terrainH);assert(p,'missing discovery '+k);
+ assert(!inCity(p[0],p[2])&&p[1]-p[3]<2.7,'discovery site ground');
+ for(let lod=0;lod<2;lod++)meshes.push(meshDiscovery(k,lod).mesh);
+}
 for(const m of meshes){const f=new Float32Array(m.vb);for(let i=0;i<m.nv;i++)for(let j=0;j<3;j++)assert(Number.isFinite(f[i*5+j]),'non-finite vertex');for(const i of m.ib)assert(i<m.nv,'index outside mesh');}
 for(const [x,z,h]of [[-207,-191,22],[-200,36,16],[190,203,16],[345,130,FLOOR_Y]]) {
  surfaceAtPoint(x,z,1e6); assert(abs(COL[0]-(h+CLEAR))<1e-6,'landmark collision');

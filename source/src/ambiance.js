@@ -1,5 +1,5 @@
 // User-adjustable look. Loaded before layout so a new sun also rebuilds sky and baked shadows.
-// Array indices are the GPU uniform contract (five vec4s), then the two sun angles.
+// Stable indices: 0–19 appearance, 20–21 sun, 22–24 water, 25–26 stone; see syncLook.
 const LOOK_FIELDS = [
   ['sun','Soleil','Intensité',.3,1.8,.01,1],
   ['sunWarm','Soleil','Chaleur',-1,1,.01,0],
@@ -21,11 +21,13 @@ const LOOK_FIELDS = [
   ['sharpness','Finition','Netteté',0,.6,.01,.3],
   ['bloom','Finition','Halo lumineux',0,.15,.005,.04],
   ['shadowCool','Ombres','Fraîcheur des ombres',0,1,.01,0],
-  ['sunElevation','Position du soleil','Hauteur',12,70,.1,32.5],
+  ['sunElevation','Position du soleil','Hauteur',12,70,.1,12],
   ['sunAzimuth','Position du soleil','Direction',-180,180,.1,-44],
-  ['underwater','Sous l’eau','Niveau : simple · fonds · caustiques · rayons',0,3,1,0],
+  ['underwater','Sous l’eau','Niveau : simple · fonds · caustiques · rayons',0,3,1,3],
   ['waterFog','Sous l’eau','Densité de l’eau',.03,.25,.005,.085],
-  ['waterRays','Sous l’eau','Intensité des rayons',0,2,.05,1],
+  ['waterRays','Sous l’eau','Intensité des rayons',0,2,.05,2],
+  ['stoneGrain','Pierre','Grain et petites irrégularités',0,2,.05,1],
+  ['stoneRelief','Pierre','Relief renforcé · coût supplémentaire',0,1,.05,0],
 ];
 const LOOK = new Float32Array(LOOK_FIELDS.map(f=>f[6]));
 const readLook = value => { if(!value || value.version!==1 || !value.values || typeof value.values!=='object') return false;

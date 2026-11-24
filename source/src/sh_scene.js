@@ -352,7 +352,11 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
     let ridge=1.-ss(.015,.05+abs(uvx.x)+abs(uvy.x),abs(q.x-.5));
     o.alb=i.tint.rgb*i.tint.rgb*(.68+.3*q.y+.08*i.uv.z)*mix(vec3f(.9,1.,.72),vec3f(1.05,1.,.8),q.y)*(1.-.12*vein+.09*ridge);
     o.rough=.82;o.trans=.25;
-  } else if(mat==23u){let A=tri(tNoiseA,p,dx,dy,w,2.);o.alb=vec3f(.29,.32,.19)*(.75+.45*A.r);o.rough=.88;}
+  } else if(mat==23u){
+    let A=tri(tNoiseA,p,dx,dy,w,2.);let marker=i.uv.x>.002;
+    o.alb=select(vec3f(.29,.32,.19),vec3f(.08,.28,.17),marker)*(.75+.45*A.r);o.rough=.88;
+    if(marker&&N.y>.5){let q=vec2f((i.lp.x-.3)/.75,(i.lp.z-1.7)/.8);let cut=1.-ss(-fw,fw,glyphD(q,0u));o.alb*=1.-.45*cut;}
+  }
   else if (mat == 0u || mat == 4u || mat == 9u) {
     // marble: honed walls in courses, smooth trim, quay walls with a waterline
     let m = marble(p, dx, dy, w, vec3f(0.));
@@ -460,6 +464,14 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
     let wall = 1. - abs(N.y); let cy = p.y / .9; let jy = line(min(fract(cy), 1. - fract(cy)) * .9, .006, fw) * wall;
     let ax = select(p.x, p.z, w.x > w.z) / 1.6 + h11(floor(cy)) * 7.; let jx = line(min(fract(ax), 1. - fract(ax)) * 1.6, .006, fw) * wall * ss(.6, .9, max(w.x, w.z));
     o.alb *= 1. - .3 * max(jy, jx);
+    // Slight block-to-block tone and rounded joint shoulders, using the existing course coordinates.
+    let blockTone=h21(vec2f(floor(ax),floor(cy)));
+    o.alb*=1.+(blockTone-.5)*.13*(1.-ss(.25,1.,fw));
+    let vx=fract(ax);let vy=fract(cy);
+    let bx=(1.-ss(.012,.08,min(vx,1.-vx)*1.6))*sign(vx-.5);
+    let by=(1.-ss(.012,.08,min(vy,1.-vy)*.9))*sign(vy-.5);
+    let tangent=select(vec3f(1.,0.,0.),vec3f(0.,0.,1.),w.x>w.z);
+    o.nb+=(tangent*bx+vec3f(0.,by,0.))*.16*view.look6.x*wall*(1.-ss(.06,.2,fw));
     if (i.uv.y > .9 && wall > .5) {
       // pylon towers: columns of signs cut into the stone, every 3 m, shaded deeper than the joints
       let la = select(i.lp.z, i.lp.x, abs(N.z) > abs(N.x)); let cu = fract(la / 3.) * 3.; let sc = max(i.sc.x, .2);
@@ -490,6 +502,25 @@ const FLOWERS = array<vec3f, 8>(vec3f(.52, .08, .24), vec3f(.8, .36, .5), vec3f(
     if (ac + (A.r - .5) * .55 + (B.a - .5) * .3 > .84) { discard; }
     let foam = ss(.3, .62, stp * 1.2 + (A.r - .5) * .9 + (B.r - .5) * .4 + ss(.45, .9, ac) * .35);
     o.alb = mix(vec3f(.1, .2, .19), mix(vec3f(.4, .5, .53), vec3f(.88, .9, .92), ss(.3, .72, A.r * .7 + B.a * .6)), foam); o.rough = mix(.1, .6, foam);
+  }
+  // Stone detail is world anchored and filtered; fine grain disappears before it aliases.
+  let stone=mat==0u||mat==1u||mat==4u||mat==5u||mat==9u||mat==12u||mat==13u||mat==14u||mat==19u||mat==20u||mat==23u;
+  if(stone){
+    let amount=view.look6.x;let near=1.-ss(.025,.12,fw);
+    o.nb*=1.+amount*.55;
+    if(amount>0.&&near>.001){
+      let gr=tri(tNoiseA,p,dx,dy,w,7.);
+      o.alb*=1.+(gr.a-.5)*.16*amount*near;
+      o.rough=clamp(o.rough+(gr.g-.5)*.12*amount*near,.12,.96);
+      o.nb+=triN(p,dx,dy,w,7.,true)*.14*amount*near;
+    }
+    // Opt-in: two extra scales of erosion and fissures, disabled by default.
+    if(view.look6.y>.001){
+      let er=tri(tNoiseA,p,dx,dy,w,.65);
+      let crack=(1.-ss(.02,.08,abs(er.r-.5)))*(1.-ss(.06,.3,fw));
+      o.alb*=1.-crack*.2*view.look6.y;
+      o.nb+=(triN(p,dx,dy,w,.65,true)*.3+triN(p,dx,dy,w,3.,true)*.18)*view.look6.y;
+    }
   }
   N = normalize(N - o.nb);
   // specular AA: in-pixel curvature widens the highlight instead of sparkling

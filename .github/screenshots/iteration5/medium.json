@@ -1,0 +1,169 @@
+{
+  "environment": {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+    "visibility": "visible",
+    "width": 1440,
+    "height": 900,
+    "level": "Medium",
+    "timestamps": true
+  },
+  "gpu": {
+    "vendor": "apple",
+    "architecture": "metal-3",
+    "device": "",
+    "description": ""
+  },
+  "path": "path: peak speed 67.5 m/s, peak yaw rate 39.7 deg/s, lowest 1.2 m above ground or water (at 39.1 s)",
+  "planting": {
+    "trees": 5934,
+    "palms": 5492,
+    "palmsInCity": 434,
+    "esplanadeFountains": 4
+  },
+  "views": [
+    {
+      "pose": 0,
+      "stats": "waves 0.92  cull 0.26  shadow 0.39  mirror 0.39  gbuffer 7.73  ao 7.01  light 8.65  transp 10.75  taa 1.31  bloom 1.57  post 1.70  | total 14.35 ms",
+      "count": "main: 1.06 M tris \u00b7 solid 471 inst 0.74 M \u00b7 crystal 1 inst 0.00 M \u00b7 water 3 inst 0.13 M \u00b7 cascade 1 inst 0.01 M \u00b7 leaf 3219 inst 0.18 M\n   top: 1x126912(w0)  938x90(l3)  900x90(l3)  68x734(s1)  1x44216(s0)  2x10610(s2)  1x16736(s0)  1x16736(s0)  2x7934(s2)\nmirror: 0.66 M tris \u00b7 solid 260 inst 0.47 M \u00b7 crystal 1 inst 0.00 M \u00b7 water 3 inst 0.13 M \u00b7 cascade 1 inst 0.01 M \u00b7 leaf 861 inst 0.06 M\n   top: 1x126912(w0)  1x44216(s0)  2x10610(s2)  196x90(l3)  186x90(l3)  2x7934(s2)  1x15066(s0)  3x4586(s2)  17x734(s1)\nshadow: 0.00 M tris \u00b7 solid 2 inst 0.00 M \u00b7 leaf 26 inst 0.00 M\n   top: 14x90(l3)  12x90(l3)  1x480(s0)  1x10(s0)"
+    },
+    {
+      "pose": 1,
+      "stats": "waves 0.98  cull 0.52  shadow 0.46  mirror 2.29  gbuffer 4.65  ao 3.34  light 4.98  transp 6.49  taa 0.92  bloom 1.11  post 1.25  | total 11.99 ms",
+      "count": "main: 1.10 M tris \u00b7 solid 591 inst 0.71 M \u00b7 crystal 1 inst 0.00 M \u00b7 water 3 inst 0.13 M \u00b7 cascade 8 inst 0.01 M \u00b7 leaf 2608 inst 0.25 M\n   top: 1x126912(w0)  1x44216(s0)  14x2691(s0)  41x734(s1)  29x968(l1)  2x13298(s1)  26x968(l1)  268x90(l3)  250x90(l3)\nmirror: 0.69 M tris \u00b7 solid 290 inst 0.48 M \u00b7 crystal 1 inst 0.00 M \u00b7 water 3 inst 0.13 M \u00b7 cascade 1 inst 0.01 M \u00b7 leaf 973 inst 0.07 M\n   top: 1x126912(w0)  1x44216(s0)  44x734(s1)  2x10610(s2)  202x90(l3)  197x90(l3)  2x7934(s2)  1x15066(s0)  3x4586(s2)\nshadow: 0.21 M tris \u00b7 solid 126 inst 0.10 M \u00b7 leaf 308 inst 0.11 M\n   top: 14x2691(s0)  27x968(l1)  21x968(l1)  1x15066(s0)  7x1904(l0)  1x9830(s0)  24x376(l2)  19x376(l2)  3x1904(l0)"
+    },
+    {
+      "pose": 2,
+      "stats": "waves 1.05  cull 0.33  shadow 0.59  mirror 2.16  gbuffer 4.06  ao 3.28  light 4.85  transp 7.01  taa 1.38  bloom 1.64  post 1.70  | total 12.06 ms",
+      "count": "main: 0.93 M tris \u00b7 solid 510 inst 0.62 M \u00b7 crystal 1 inst 0.00 M \u00b7 water 3 inst 0.13 M \u00b7 cascade 8 inst 0.01 M \u00b7 leaf 2172 inst 0.18 M\n   top: 1x126912(w0)  1x44216(s0)  2x13298(s1)  234x90(l3)  2x9950(s1)  215x90(l3)  17x968(l1)  17x968(l1)  1x15066(s0)\nmirror: 0.66 M tris \u00b7 solid 260 inst 0.47 M \u00b7 crystal 1 inst 0.00 M \u00b7 water 3 inst 0.13 M \u00b7 cascade 1 inst 0.01 M \u00b7 leaf 861 inst 0.06 M\n   top: 1x126912(w0)  1x44216(s0)  2x10610(s2)  196x90(l3)  186x90(l3)  2x7934(s2)  1x15066(s0)  3x4586(s2)  17x734(s1)\nshadow: 0.18 M tris \u00b7 solid 138 inst 0.09 M \u00b7 leaf 295 inst 0.09 M\n   top: 17x968(l1)  8x1904(l0)  1x15066(s0)  13x968(l1)  17x734(s1)  1x9830(s0)  4x1904(l0)  6x1140(s0)  1x5706(s1)"
+    },
+    {
+      "pose": 3,
+      "stats": "waves 0.98  cull 0.33  shadow 0.33  mirror 1.44  gbuffer 3.28  ao 2.82  light 4.46  transp 6.16  taa 1.18  bloom 1.44  post 1.44  | total 10.29 ms",
+      "count": "main: 0.66 M tris \u00b7 solid 279 inst 0.45 M \u00b7 crystal 1 inst 0.00 M \u00b7 water 3 inst 0.13 M \u00b7 cascade 3 inst 0.01 M \u00b7 leaf 1237 inst 0.07 M\n   top: 1x126912(w0)  1x44216(s0)  294x90(l3)  263x90(l3)  1x15066(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nmirror: 0.50 M tris \u00b7 solid 120 inst 0.33 M \u00b7 crystal 0 inst 0.00 M \u00b7 water 3 inst 0.13 M \u00b7 cascade 1 inst 0.01 M \u00b7 leaf 399 inst 0.03 M\n   top: 1x126912(w0)  1x44216(s0)  1x15066(s0)  164x90(l3)  137x90(l3)  1x11584(s0)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.09 M tris \u00b7 solid 20 inst 0.08 M \u00b7 leaf 160 inst 0.01 M\n   top: 1x44216(s0)  1x15066(s0)  1x9830(s0)  45x90(l3)  1x3180(s0)  32x90(l3)  1x2256(s0)  3x284(s2)  2x284(s2)"
+    },
+    {
+      "pose": 4,
+      "stats": "waves 0.98  cull 0.33  shadow 0.66  mirror 2.16  gbuffer 4.72  ao 3.74  light 5.44  transp 7.34  taa 1.05  bloom 1.38  post 1.38  | total 12.52 ms",
+      "count": "main: 0.92 M tris \u00b7 solid 496 inst 0.60 M \u00b7 crystal 1 inst 0.00 M \u00b7 water 3 inst 0.13 M \u00b7 cascade 7 inst 0.01 M \u00b7 leaf 2243 inst 0.18 M\n   top: 1x126912(w0)  1x44216(s0)  258x90(l3)  228x90(l3)  2x9950(s1)  3x5124(l0)  1x15066(s0)  1x13298(s1)  13x968(l1)\nmirror: 0.62 M tris \u00b7 solid 215 inst 0.42 M \u00b7 crystal 1 inst 0.00 M \u00b7 water 3 inst 0.13 M \u00b7 cascade 2 inst 0.01 M \u00b7 leaf 810 inst 0.05 M\n   top: 1x126912(w0)  1x44216(s0)  2x7934(s2)  1x15066(s0)  156x90(l3)  153x90(l3)  1x11584(s0)  1x11584(s0)  1x11584(s0)\nshadow: 0.23 M tris \u00b7 solid 180 inst 0.13 M \u00b7 leaf 342 inst 0.11 M\n   top: 1x44216(s0)  8x1904(l0)  1x15066(s0)  1x13298(s1)  8x1542(l1)  12x968(l1)  2x5124(l0)  1x9830(s0)  6x1542(l1)"
+    },
+    {
+      "pose": 5,
+      "stats": "waves 0.92  cull 0.39  shadow 0.39  mirror 2.23  gbuffer 3.87  ao 3.21  light 5.11  transp 7.67  taa 1.57  bloom 1.84  post 1.97  | total 12.32 ms",
+      "count": "main: 1.00 M tris \u00b7 solid 433 inst 0.71 M \u00b7 crystal 1 inst 0.00 M \u00b7 water 3 inst 0.13 M \u00b7 cascade 1 inst 0.01 M \u00b7 leaf 2588 inst 0.16 M\n   top: 1x126912(w0)  822x90(l3)  753x90(l3)  68x734(s1)  1x44216(s0)  2x10610(s2)  1x16736(s0)  1x16736(s0)  1x16736(s0)\nmirror: 0.65 M tris \u00b7 solid 146 inst 0.47 M \u00b7 crystal 1 inst 0.00 M \u00b7 water 3 inst 0.13 M \u00b7 cascade 1 inst 0.01 M \u00b7 leaf 544 inst 0.04 M\n   top: 1x126912(w0)  1x44216(s0)  249x90(l3)  2x10610(s2)  221x90(l3)  1x16736(s0)  2x7934(s2)  1x15066(s0)  3x4586(s2)\nshadow: 0.06 M tris \u00b7 solid 4 inst 0.00 M \u00b7 leaf 74 inst 0.06 M\n   top: 9x1904(l0)  13x968(l1)  12x968(l1)  5x1904(l0)  1x2394(s0)  6x376(l2)  16x90(l3)  10x90(l3)  1x480(s0)"
+    },
+    {
+      "underwater": 0,
+      "stats": "waves 0.98  cull 0.39  shadow 0.66  mirror 2.36  gbuffer 4.52  ao 3.74  light 5.31  transp 7.01  taa 1.18  bloom 3.47  post 3.60  | total 14.48 ms"
+    },
+    {
+      "underwater": 1,
+      "stats": "waves 0.98  cull 0.39  shadow 0.79  mirror 2.23  gbuffer 4.46  ao 5.57  light 7.14  transp 8.91  taa 1.11  bloom 1.38  post 1.51  | total 14.02 ms"
+    },
+    {
+      "underwater": 2,
+      "stats": "waves 0.98  cull 0.33  shadow 0.72  mirror 2.29  gbuffer 4.39  ao 3.80  light 5.37  transp 7.14  taa 1.11  bloom 1.38  post 1.51  | total 12.39 ms"
+    },
+    {
+      "underwater": 3,
+      "stats": "waves 0.98  cull 0.33  shadow 0.72  mirror 2.16  gbuffer 4.26  ao 3.87  light 7.27  transp 9.04  taa 1.11  bloom 1.44  post 1.57  | total 14.16 ms"
+    }
+  ],
+  "materials": [
+    {
+      "grain": 0,
+      "relief": 0,
+      "gpuMean": 12.380842666666668,
+      "gpuPeak": 12.845056
+    },
+    {
+      "grain": 1,
+      "relief": 0,
+      "gpuMean": 13.134506666666669,
+      "gpuPeak": 18.415616
+    },
+    {
+      "grain": 1,
+      "relief": 1,
+      "gpuMean": 14.120277333333334,
+      "gpuPeak": 20.905984
+    }
+  ],
+  "discoveries": {
+    "outside": [
+      {
+        "kind": 0,
+        "x": -860,
+        "y": 21.375800082484606,
+        "z": -210
+      },
+      {
+        "kind": 1,
+        "x": -630,
+        "y": 17.72645468982123,
+        "z": 320
+      },
+      {
+        "kind": 2,
+        "x": -1715.8737462452439,
+        "y": 5.159757661553525,
+        "z": 65
+      },
+      {
+        "kind": 3,
+        "x": 531.8731139846157,
+        "y": 10.009360071615859,
+        "z": 510
+      }
+    ],
+    "underwater": [
+      [
+        130,
+        168
+      ],
+      [
+        130,
+        225
+      ],
+      [
+        266,
+        320
+      ],
+      [
+        -130,
+        210
+      ],
+      [
+        336,
+        130
+      ],
+      [
+        320,
+        196
+      ],
+      [
+        -310,
+        240
+      ],
+      [
+        345,
+        130
+      ],
+      [
+        266,
+        -220
+      ],
+      [
+        -240,
+        -130
+      ],
+      [
+        130,
+        -230
+      ],
+      [
+        310,
+        75
+      ]
+    ]
+  }
+}

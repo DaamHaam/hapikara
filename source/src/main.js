@@ -81,7 +81,7 @@ const TANH = tan(30 * DEG), NEAR = 0.3, EXPO = 0.72;
 // sun at the ground: atmospheric transmittance x 1.35 (keeps sunlit paving warm rather than grey)
 const AT = atmo(), SUNC = AT.Ts.map((t) => t * E0 * 1.35);
 if (AUTO) console.log('sun at ground ' + SUNC.map((v) => v.toFixed(2)) + ' · psi ' + AT.PSI.map((v) => v.toFixed(4)));
-const syncLook = () => { for(const U of UB){U.set(LOOK_ACTIVE.subarray(0,20),O_LOOK);U.set(LOOK_ACTIVE.subarray(22,25),204);U[207]=-1e9; for(let c=0;c<3;c++)U[O_SUNC+c]=SUNC[c]*LOOK_ACTIVE[0]*(1+LOOK_ACTIVE[1]*[.14,0,-.16][c]);U[O_SUNC+3]=LOOK_ACTIVE[4];} };
+const syncLook = () => { for(const U of UB){U.set(LOOK_ACTIVE.subarray(0,20),O_LOOK);U.set(LOOK_ACTIVE.subarray(22,25),204);U[207]=-1e9;U.set(LOOK_ACTIVE.subarray(25,27),208); for(let c=0;c<3;c++)U[O_SUNC+c]=SUNC[c]*LOOK_ACTIVE[0]*(1+LOOK_ACTIVE[1]*[.14,0,-.16][c]);U[O_SUNC+3]=LOOK_ACTIVE[4];} };
 for (const U of UB) { U.set(SUN, O_SUN); U.set(SUNC, O_SUNC); U[O_SUNC + 3] = EXPO; U[O_MISC + 2] = 1; U[O_LODC + 3] = 1; }
 syncLook();
 // camera matrices and frustum planes for a view at (cx, cy, cz), yaw / pitch

@@ -2,6 +2,7 @@
 // gH: land mesh height. hard (for collide.js): boxes [x0, z0, x1, z1, top] and bridges; wm: extra water surfaces
 function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
   const rngA = RNG(20261), rngB = RNG(90210); let rng = rngA; const rr = (a, b) => a + (b - a) * rng();
+  const outsideSites=DISCOVERY_SITES.map(([x,z,kind])=>({kind,site:discoveryAt(x,z,gH)})).filter(d=>d.site);
   // leaf tints are square roots (the shader squares them); alpha seeds the flower colour
   const TINT = { olive: [0.55, 0.59, 0.47], plane: [0.38, 0.49, 0.28], bloom: [0.4, 0.49, 0.3], shrub: [0.36, 0.47, 0.28], palm: [0.42, 0.53, 0.27], papyrus: [0.5, 0.62, 0.3], lily: [0.5, 0.66, 0.38] };
   const tintOf = (k, seed) => { const c = TINT[k], v = 0.78 + 0.34 * rng(), w = rng(); return rgb(c[0] * v * (0.92 + 0.22 * w), c[1] * v * (0.94 + 0.1 * rng()), c[2] * v * (1.12 - 0.25 * w), (seed & 255) / 255); };
@@ -22,6 +23,7 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
   // [x, z, radius] claimed by buildings
   const occ = [], free = (x, z, r) => { for (const o of occ) if ((x - o[0]) ** 2 + (z - o[1]) ** 2 < (r + o[2]) ** 2) return false; return true; };
   const tree = (k, x, y, z, s = 1, lap = 0.6, walls = true) => {
+    for(const d of outsideSites)if(hypot(x-d.site[0],z-d.site[2])<17)return false;
     const seed = (rng() * 256) | 0, ty = trees[k][seed & 1], sc = s * rr(0.85, 1.2), q = qYaw(rng() * TAU), tint = tintOf(k, seed), sy = rr(0.9, 1.15);
     if ((walls && !free(x, z, k === 'palm' ? 0.8 : crowns[ty] * sc * 0.45 - 1.2)) || !roomFor(x, z, crowns[ty] * sc * (k === 'palm' ? 0.55 : 1), lap)) return false;
     put(ty, x, y, z, sc, q, tint, sy); nTree++; if(k==='palm'){nPalm++;if(inCity(x,z))nCityPalm++;} return true;
@@ -219,11 +221,10 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
     }}
   }
   // Optional still-life on canal floors: stones and a small amphora, hidden in the simple underwater mode.
-  const finds=new MB(1024);finds.mat=M.UWSTONE;
-  for(const [x,z,r]of [[-1,.4,.55],[.7,-.8,.4],[1.1,.6,.3]])finds.lathe([[r*.7,0],[r,.12],[r*.75,r*.65],[0,r*.8]],{seg:8,cx:x,cz:z});
-  finds.lathe([[.17,0],[.24,.1],[.35,.4],[.25,.65],[.12,.78],[.14,.9]],{seg:12,cx:0,cz:0});
-  const tFinds=type([finds.build()],K.SOLID,1e9,1e9,240);
-  for(const [x,z]of [[130,168],[266,320],[-130,210],[336,130],[320,196],[-310,240]])if(canalAt(x,z))put(tFinds,x,FLOOR_Y,z,1,qYaw(rng()*TAU));
+  const tFinds=type([meshCanalFinds()],K.SOLID,1e9,1e9,180),underwaterSites=[];
+  for(const [x,z]of [[130,168],[130,225],[266,320],[-130,210],[336,130],[320,196],[-310,240],[345,130],[266,-220],[-240,-130],[130,-230],[310,75]])if(canalAt(x,z)){
+    put(tFinds,x,FLOOR_Y,z,1,qYaw(rng()*TAU));underwaterSites.push([x,z]);
+  }
   // garden planting: palms, sycamores, flowering trees, shrubs; paths
   for (const poly of garden) {
     let bx0 = 1e9, bz0 = 1e9, bx1 = -1e9, bz1 = -1e9; for (const p of poly) { bx0 = min(bx0, p[0]); bz0 = min(bz0, p[1]); bx1 = max(bx1, p[0]); bz1 = max(bz1, p[1]); }
@@ -278,6 +279,15 @@ function populate({ type, put, paint, MAP, balRun, gH, hard, wm }) {
   { const pts = []; for (let i = 0; i < 48; i++) { const a = i / 48 * TAU; pts.push([OASIS[0] + 72 * cos(a), OASIS[1] + 72 * sin(a)]); } waterPoly(wm, pts, 2.6, 0);
     for (let i = 0; i < 150; i++) { const a = rng() * TAU, r = rr(58, 125), x = OASIS[0] + r * cos(a), z = OASIS[1] + r * sin(a), y=gH(x,z); if(y>3 && y<14 && abs(gH(x+3,z)-gH(x-3,z))<3 && abs(gH(x,z+3)-gH(x,z-3))<3) tree('palm', x, y, z, rr(.8, 1.3), .55, false); }
     for (let i = 0; i < 40; i++) { const a = rng() * TAU, x = OASIS[0] + rr(56, 61) * cos(a), z = OASIS[1] + rr(56, 61) * sin(a); papyrus(x, gH(x, z) - 0.2, z); } }
+  // Four distinct, static destinations: desert shrine, camp, oasis memorial and river shelter.
+  const discoveries=[];
+  for(const {kind,site}of outsideSites){
+    const [x,y,z]=site,a=meshDiscovery(kind,0),b=meshDiscovery(kind,1);
+    const ty=type([a.mesh,b.mesh],K.SOLID,180,1e9,1000);
+    put(ty,x,y,z);for(const q of a.boxes)boxAt(q,x,y,z,0);
+    discoveries.push({kind,x,y,z});
+  }
+  if(AUTO)window.__discoveries={outside:discoveries,underwater:underwaterSites};
   // feluccas on the Nile and the ring canal
   const tBoat = type([meshFelucca()], K.SOLID, 1e9, 1e9, 4000);
   put(tBoat,EAST_QUAY[0]-75,.05,-165,1,qYaw(-PI/2));
