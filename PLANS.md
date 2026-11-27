@@ -2,10 +2,9 @@
 
 ## État
 
-- Version livrée : v0.10.0 — Plan 5 (version, plein écran, levier) codé et contrôlé, **à tester par Damien**. Plan 4 (manette) toujours à tester avec une manette physique. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
-- Manette (Plan 4 et gâchette droite) et levier validés par Damien le 2026-11-27. Plan 5 : autres essais à tester. Plan 6 en préparation : multijoueur à deux avec momies, en réflexion, **précédé d’une revue complète du code**. Plan 3 à tester. Plan 2 partiellement testé : mécanisme fonctionnel confirmé par Damien ; autres essais en attente. Tests antérieurs non confirmés conservés. VR toujours reportée, emplacement conservé.
-- La revue du code depuis `revue-ok` reste à faire avant la prochaine clôture ; la génération de cette référence ne constitue pas une revue.
-- Retours après v0.6.0 : poissons bien visibles, y compris depuis l’extérieur de l’eau ; passage intérieur approuvé en l’état, sans nouvelle refonte. Blocage sur les deux montants extérieurs de l’entrée : priorité n°1 du Plan 2. Ces retours ont été intégrés au Plan 2 lancé ensuite par Damien.
+- Version livrée : v0.10.0. **Tous les tests des Plans 1 à 5 validés par Damien le 2026-11-27** ; aucun test en attente.
+- Plan 6 en préparation : multijoueur à deux avec momies. Décisions principales prises ; reste le choix du projet Supabase (Damien regarde demain).
+- Revue complète du code faite le 2026-11-27 (tout le projet, aucune clôture auparavant) ; corrections proposées ci-dessous dans le Plan 6, **en attente d’accord**. VR reportée, solo.
 
 ## Plan 1 — Fiabiliser le passage et enrichir la découverte
 
@@ -22,22 +21,15 @@
 
 **Contrôles :** CPU plan/maillages/collisions, géométrie du conduit et enveloppe des poissons ; réglages et bundle. Le test de la paroi gauche échoue avec l’ancien code (x=70, côté gauche) et passe avec le nouveau. Tests géométriques supplémentaires à 70° et avec azimuts 90°/180°. Captures WebGPU des trois qualités ; mesures et limites dans `.github/screenshots/iteration7/README.md`. Pas de test sur iPhone physique dans cette session.
 
-### Tests utilisateur du Plan 1 — à valider
+### Tests utilisateur du Plan 1 — validés
 
-- Vérifier que les torches sont contre les murs, sans gêner le passage.
-- Depuis la chambre, repérer le conduit et la lumière ; depuis l’extérieur, juger l’ouverture discrète et vérifier qu’on ne la traverse pas.
-- Juger le sarcophage, les trésors et les hiéroglyphes par rapport à la direction artistique validée.
-- Sur iPhone, vérifier la fluidité ; sur ordinateur, tester aussi la densité des poissons dans `L`. Repérage des bancs validé par Damien, depuis l’eau et depuis l’extérieur.
+Validés par Damien le 2026-11-27 (« pour l’instant, tout marche ») ; tests retirés.
 
-## Tests utilisateur encore à valider — version v0.5.0
+## Tests utilisateur v0.5.0 — validés
 
-- Installation depuis l’écran d’accueil : icône et absence des barres du navigateur, marges sans gêne avec l’encoche.
-- Fluidité des nouveautés sur ordinateur et iPhone, en qualité choisie.
-- Réglages `L` : grain 1,25, relief renforcé absent, densité de poissons fonctionnelle sur ordinateur.
+Validés par Damien le 2026-11-27 (« pour l’instant, tout marche ») ; tests retirés.
 
-Les tests v0.5.0 ci-dessus restent en attente faute de validation explicite ; ils peuvent être réalisés avec v0.6.0. Avant le prochain plan, proposer à Damien de retirer ceux que son usage a déjà confirmés, sans les retirer d’office.
-
-## Plan 2 — Livré en v0.7.0, à tester
+## Plan 2 — Livré en v0.7.0, validé
 
 ### Retours v0.6.0 pour la prochaine session
 
@@ -57,15 +49,9 @@ Les tests v0.5.0 ci-dessus restent en attente faute de validation explicite ; il
 
 **Contrôles :** plan/maillages/collisions, automate du mécanisme, réglages et bundle ; régressions des deux montants avec porte ouverte/fermée, collisions du monde complet, captures WebGPU des trois qualités, interaction réelle du bouton et remise à zéro à la relance. Aucun test sur téléphone physique dans cette session ; l’audition et le dosage du son restent à valider par Damien. Captures et rapports : `.github/screenshots/iteration8/`.
 
-### Tests utilisateur du Plan 2 — à valider
+### Tests utilisateur du Plan 2 — validés
 
-- Toucher chacun des deux montants de l’entrée sous l’eau : pouvoir reculer/se dégager, porte fermée puis ouverte, sans relancer ; entrer et ressortir après activation.
-- Essayer Passer ; vérifier que la porte reste ouverte sans minuterie et qu’une nouvelle visite la remet fermée. Tester aussi le respect du mode muet.
-- Juger les trois tailles de poissons et leur visibilité depuis la surface et sous l’eau.
-- Repérer davantage de mosaïques et de petits décors au fond des canaux, sans gêne pour se déplacer.
-- Découvrir cabanes, tentes, marché/voiles, faïence, lotus, incrustations et barques ; juger implantation, fluidité et ambiance.
-- Vérifier que l’accueil n’annonce plus L/I, que ces raccourcis restent actifs sur ordinateur et que la musique est conservée.
-- Découvrir la petite gravure DAM ; vérifier que sa discrétion convient.
+Validés par Damien le 2026-11-27 (« pour l’instant, tout marche ») ; tests retirés.
 
 Retour de Damien après livraison : mécanisme fonctionnel et claquement du loquet confirmés ; petite barque appréciée. Test général du mécanisme retiré ; les cas particuliers (Passer, relance, muet) restent à vérifier. Demandes d’amélioration consignées dans le Plan 3. VR exclue de cette livraison.
 
@@ -133,14 +119,9 @@ Repère de la signature actuelle (information à Damien, pas de déplacement dem
 
 **Contrôles :** check:plan, check:mechanism, check:ambiance, build, check:bundle ; captures WebGPU Équilibrée du levier depuis la traversée et de près, du scarabée de porte et des cinq plaques. Espace testé en interaction réelle, puis retour devant le levier basculé ; aucune erreur navigateur. Relecture du diff du Plan 3 effectuée ; elle ne remplace pas la revue globale depuis `revue-ok`, toujours en attente avant clôture. Rapport et captures : `.github/screenshots/iteration9/`.
 
-### Tests utilisateur du Plan 3 — à valider
+### Tests utilisateur du Plan 3 — validés
 
-- Depuis la traversée du Nil, repérer spontanément le levier sur l’esplanade et reconnaître le scarabée commun avec la porte ; circuler librement autour du socle et des colonnes déplacées.
-- Actionner avec Espace sur ordinateur et avec le bouton sur téléphone ; retrouver sa position après la séquence. Maintenir Espace ne doit pas relancer ni écourter celle-ci.
-- Entendre un grondement distinct pendant l’ouverture de la porte, avec un volume agréable sur ordinateur et téléphone ; vérifier le mode muet.
-- Découvrir quelques plaques DAM au fil de la promenade ; juger leur répartition et leur discrétion.
-
-Les anciens essais non confirmés restent en attente ; ils pourront être retirés sur confirmation de Damien.
+Validés par Damien le 2026-11-27 (« pour l’instant, tout marche ») ; tests retirés.
 
 ## Plan 4 — Livré v0.9.0 : support d’une manette
 
@@ -176,27 +157,42 @@ Retours de Damien après la v0.9.0. Exécution commencée par Codex, terminée p
 
 **Contrôles :** check:plan, check:mechanism (dont portée 18/23 m et caméra au-dessus de l’eau), check:ambiance, check:gamepad, check:fullscreen, build et check:bundle. Captures WebGPU du levier à 18 m et de l’ouverture vue de la surface, séquence au clic sans erreur, version en largeur mobile. Plein écran réel non vérifiable dans le navigateur intégré. Rapport : `.github/screenshots/iteration11/`. Revue globale depuis `revue-ok` toujours à faire avant clôture.
 
-### Tests utilisateur du Plan 5 — à valider
+### Tests utilisateur du Plan 5 — validés
 
-- Lire la version en bas à gauche, à l’accueil et pendant la visite, sur ordinateur et téléphone ; elle ne doit gêner aucun bouton.
-- Dans Chrome/Safari sur ordinateur : entrer et sortir du plein écran par le bouton, puis sortir avec Échap ; l’icône suit l’état et l’image se redimensionne.
-- Juger le nouveau bouton « Actionner »/« Passer » sur sable, eau et téléphone.
-- Pendant la séquence, voir le scarabée et la porte s’ouvrir à travers la surface ; retour au bon endroit.
+Validés par Damien le 2026-11-27 (« pour l’instant, tout marche ») ; tests retirés.
 
 ## Plan 6 — En préparation : jouer à deux, en momies
 
-**Préalable décidé :** revue de code complète avant toute modification (aucune clôture ni `revue-ok` jusqu’ici : 35 commits, tout le projet).
+**Idée de Damien (2026-11-27) :** deux joueurs, chacun sur son ordinateur, dans le même monde en temps réel. Chacun incarne une momie et voit celle de l’autre. Deux joueurs seulement pour commencer. Le jeu solo actuel reste intact, sans connexion.
 
-**Idée de Damien (2026-11-27) :** deux joueurs, chacun sur son ordinateur avec sa propre page, dans le même monde en temps réel. Chacun incarne une momie, voit celle de l’autre et peut peut-être l’attaquer. Deux joueurs seulement pour commencer. Le jeu solo actuel doit rester intact, sans connexion.
+**Décisions de Damien (2026-11-27) :**
+- Les momies **marchent** (gravité, au sol), **ne volent pas**, et **marchent aussi sur l’eau**.
+- **Course** : accélération limitée à quelques secondes, puis temps de récupération sans pouvoir accélérer.
+- **Sort à distance**, matérialisé : on le voit partir et voyager.
+- **Points de vie et score.**
+- **Monde partagé** : le levier ouvre la porte pour les deux.
+- **Vue à la première personne** conservée.
+- **Bouton « Jouer à deux »** dans l’accueil : crée le salon et donne le lien à envoyer à l’autre.
+- **Relais : Supabase Realtime** (compte gratuit accepté). Damien a déjà deux projets Supabase ; l’offre gratuite limite à deux projets actifs : soit réutiliser un projet existant (le temps réel ne crée aucune table), soit en mettre un en pause. À voir demain.
 
-**Pistes techniques (à trancher) :**
-- Site statique sur GitHub Pages : il faut un petit relais extérieur, la page seule ne suffit pas.
-- Option A (recommandée) — relais en temps réel hébergé gratuit (Supabase Realtime ou équivalent) : canal de diffusion et présence, fonctionne sur tous les réseaux, client WebSocket écrit à la main, sans bibliothèque externe.
-- Option B — pair-à-pair WebRTC : latence minimale, mais signalisation et relais TURN nécessaires sur certains réseaux.
-- Identité : pas de compte. Un joueur crée un salon (code court ou lien), l’autre le rejoint ; pseudonyme et couleur de bandelettes choisis localement ; troisième joueur refusé.
-- Échanges : position, orientation et état ~15 fois/s, interpolés chez l’autre ; événements ponctuels (attaque, levier, porte). Tampons préalloués : aucune allocation par image.
-- Momie : maillage procédural de bandelettes, animée au vertex shader, avec ombre et reflet ; vue à la première personne conservée.
+**Principe technique retenu (proposition) :**
+- Client WebSocket écrit à la main (protocole Realtime), sans bibliothèque externe ; clé publique uniquement, notée dans `ACCOUNTS.md`.
+- Identité sans compte : salon par lien (`#salon=XXXX`), pseudonyme et couleur choisis localement ; troisième joueur refusé.
+- Position, orientation et état ~15 fois/s, interpolés chez l’autre ; événements ponctuels (sort, impact, levier, porte, score). Tampons préalloués : aucune allocation par image.
+- Momie : maillage procédural de bandelettes, animée au vertex shader, ombre et reflet.
 
-**À décider :** voir les questions posées à Damien le 2026-11-27 (forme de l’attaque, déplacement de la momie, porte partagée, vue, connexion).
+**Encore à préciser :**
+- En solo, garde-t-on le vol actuel et la momie seulement à deux, ou la marche partout ?
+- Sous l’eau : la momie ne peut plus plonger (elle marche dessus). Comment atteindre la crypte immergée et ses fonds : plongée volontaire, escalier, ou porte depuis le quai ?
+- Sort : dégâts, cadence, portée, visée (au centre de l’écran), bouton (clic, gâchette gauche ?). Points de vie, mort, réapparition, fin de partie ou score cumulé.
+- Escaliers, terrasses et pyramide : la marche demande des pentes et marches franchissables (le contrat de collisions actuel est pensé pour le vol).
+- Commandes manette de la course et du sort.
 
-**Corrections immédiates :** accélération à la manette sur la gâchette droite au lieu de B (v0.10.0, poussé), validée par Damien le 2026-11-27.
+**Corrections de revue (2026-11-27), en attente d’accord :**
+1. Recalcul du soleil (`L`) pendant la séquence du levier : la caméra de la séquence et une porte entrouverte sont enregistrées ; après rechargement, le visiteur se retrouve au-dessus de l’eau, porte fermée. Terminer la séquence avant l’enregistrement (`interface.js:34`).
+2. Pause pendant la séquence (Start, Échap, `L`) : l’animation s’arrête, le son du mécanisme continue. Suspendre puis reprendre son contexte audio avec le menu (`mechanism.js:71`, `main.js:638`).
+3. Clés `localStorage` nommées `atlantis*`, partagées par tous les sites de `daamhaam.github.io` : risque de collision avec un autre projet du même compte. Les préfixer `hapikara*` avec reprise des anciennes valeurs, avant d’ajouter pseudonyme et couleur (`quality.js:7`, `music.js:48`).
+4. Boucle `for…of` dans le calcul de collision, appelé plusieurs fois par image : passer en boucle indexée pour respecter « aucune allocation par image » (`collide.js:49`).
+5. `index.html` non reproductible entre Mac et Linux (compression zlib différente, code identique) : chaque reconstruction ailleurs produit un gros diff sans changement réel. Faire vérifier par `check:bundle` le code décompressé, et ne recommiter `index.html` qu’après un changement de source.
+
+**Corrections immédiates :** accélération à la manette sur la gâchette droite au lieu de B (v0.10.0), validée par Damien le 2026-11-27.
