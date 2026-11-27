@@ -3,7 +3,7 @@
 ## État
 
 - Version livrée : v0.10.0 — Plan 5 (version, plein écran, levier) codé et contrôlé, **à tester par Damien**. Plan 4 (manette) toujours à tester avec une manette physique. La validation utilisateur reste distincte des contrôles CPU/WebGPU.
-- Plans 5 et 4 à tester ; Plan 6 en préparation (vide pour l’instant). Plan 3 à tester. Plan 2 partiellement testé : mécanisme fonctionnel confirmé par Damien ; autres essais en attente. Tests antérieurs non confirmés conservés. VR toujours reportée, emplacement conservé.
+- Manette (Plan 4 et gâchette droite) et levier validés par Damien le 2026-11-27. Plan 5 : autres essais à tester. Plan 6 en préparation : multijoueur à deux avec momies, en réflexion, **précédé d’une revue complète du code**. Plan 3 à tester. Plan 2 partiellement testé : mécanisme fonctionnel confirmé par Damien ; autres essais en attente. Tests antérieurs non confirmés conservés. VR toujours reportée, emplacement conservé.
 - La revue du code depuis `revue-ok` reste à faire avant la prochaine clôture ; la génération de cette référence ne constitue pas une revue.
 - Retours après v0.6.0 : poissons bien visibles, y compris depuis l’extérieur de l’eau ; passage intérieur approuvé en l’état, sans nouvelle refonte. Blocage sur les deux montants extérieurs de l’entrée : priorité n°1 du Plan 2. Ces retours ont été intégrés au Plan 2 lancé ensuite par Damien.
 
@@ -113,7 +113,7 @@ Sélection retenue : E1, E3, E4, E6, E8. Les barques sont précisées au point 7
 
 ### Réalité virtuelle — toujours pour plus tard, emplacement conservé
 
-WebXR / HTC Vive : déplacement selon casque ou manette, montée/descente, niveaux de qualité et essais matériels. Projet Sous-Marin à tester séparément. Non lancé ; les tests casque devront être identifiés comme bloquants avant de construire sur leur résultat.
+WebXR / HTC Vive, version **solo, pas forcément multijoueur** (précision de Damien, 2026-11-27) : déplacement selon casque ou manette, montée/descente, niveaux de qualité et essais matériels. Projet Sous-Marin à tester séparément. Non lancé ; les tests casque devront être identifiés comme bloquants avant de construire sur leur résultat.
 
 ## Plan 3 — Livré v0.8.0 : levier plus visible et signatures réparties
 
@@ -156,13 +156,9 @@ Les anciens essais non confirmés restent en attente ; ils pourront être retir�
 
 **Contrôles :** check:gamepad (état et vrai frame), check:plan, check:mechanism, check:ambiance, build et check:bundle. Parcours de menus avec manette simulée dans le navigateur, puis chargement du livrable sans manette. Relecture du diff du Plan 4 faite ; revue globale depuis `revue-ok` toujours à faire avant clôture. Capture et rapport dans `.github/screenshots/iteration10/`. Aucun essai de manette physique dans cette session.
 
-### Tests utilisateur du Plan 4 — à valider
+### Tests utilisateur du Plan 4 — validés
 
-- Brancher/appairer la manette, appuyer sur un bouton puis relâcher : aide affichée et visite lançable avec A/Croix. Choisir une qualité depuis la manette et retrouver les menus après le rechargement.
-- Vérifier déplacement, regard, absence de dérive, montée/descente aux gâchettes et accélération avec B/Rond ; juger le confort sur la télévision.
-- Actionner le levier avec A/Croix, puis tester le saut de séquence ; retour au bon endroit. Start/Options doit permettre l’accueil et la reprise sans mouvement de caméra dans le menu.
-- Débrancher/rebrancher et changer de fenêtre : aucun mouvement bloqué ni activation involontaire au retour. Clavier, souris et tactile restent fonctionnels.
-- Vérifier musique et sons avec la manette ; si le navigateur bloque le son au premier lancement, vérifier qu’un clic ou une touche le déverrouille.
+Damien confirme le 2026-11-27 que la manette fonctionne ; tests retirés.
 
 ## Plan 5 — Livré v0.10.0 : repères de version et confort du mécanisme
 
@@ -184,15 +180,23 @@ Retours de Damien après la v0.9.0. Exécution commencée par Codex, terminée p
 
 - Lire la version en bas à gauche, à l’accueil et pendant la visite, sur ordinateur et téléphone ; elle ne doit gêner aucun bouton.
 - Dans Chrome/Safari sur ordinateur : entrer et sortir du plein écran par le bouton, puis sortir avec Échap ; l’icône suit l’état et l’image se redimensionne.
-- Faire apparaître « Actionner » de plus loin, levier entier dans le cadre ; vérifier aussi au téléphone, avec Espace et A/Croix.
 - Juger le nouveau bouton « Actionner »/« Passer » sur sable, eau et téléphone.
 - Pendant la séquence, voir le scarabée et la porte s’ouvrir à travers la surface ; retour au bon endroit.
 
-## Plan 6 — En préparation
+## Plan 6 — En préparation : jouer à deux, en momies
 
-Rien de noté pour l’instant.
+**Préalable décidé :** revue de code complète avant toute modification (aucune clôture ni `revue-ok` jusqu’ici : 35 commits, tout le projet).
 
-**Correctif immédiat demandé par Damien (v0.10.0, poussé) :** accélération à la manette sur la gâchette droite au lieu de B, pour accélérer tout en maniant les deux sticks. Les gâchettes ne font plus monter ni descendre ; B n’a plus de rôle en visite.
+**Idée de Damien (2026-11-27) :** deux joueurs, chacun sur son ordinateur avec sa propre page, dans le même monde en temps réel. Chacun incarne une momie, voit celle de l’autre et peut peut-être l’attaquer. Deux joueurs seulement pour commencer. Le jeu solo actuel doit rester intact, sans connexion.
 
-- Test : accélérer avec la gâchette droite en manœuvrant les deux sticks ; vérifier que B et la gâchette gauche n’ont plus d’effet en visite.
+**Pistes techniques (à trancher) :**
+- Site statique sur GitHub Pages : il faut un petit relais extérieur, la page seule ne suffit pas.
+- Option A (recommandée) — relais en temps réel hébergé gratuit (Supabase Realtime ou équivalent) : canal de diffusion et présence, fonctionne sur tous les réseaux, client WebSocket écrit à la main, sans bibliothèque externe.
+- Option B — pair-à-pair WebRTC : latence minimale, mais signalisation et relais TURN nécessaires sur certains réseaux.
+- Identité : pas de compte. Un joueur crée un salon (code court ou lien), l’autre le rejoint ; pseudonyme et couleur de bandelettes choisis localement ; troisième joueur refusé.
+- Échanges : position, orientation et état ~15 fois/s, interpolés chez l’autre ; événements ponctuels (attaque, levier, porte). Tampons préalloués : aucune allocation par image.
+- Momie : maillage procédural de bandelettes, animée au vertex shader, avec ombre et reflet ; vue à la première personne conservée.
 
+**À décider :** voir les questions posées à Damien le 2026-11-27 (forme de l’attaque, déplacement de la momie, porte partagée, vue, connexion).
+
+**Corrections immédiates :** accélération à la manette sur la gâchette droite au lieu de B (v0.10.0, poussé), validée par Damien le 2026-11-27.
